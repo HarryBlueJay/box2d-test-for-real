@@ -5,8 +5,8 @@
 using namespace sf;
 const int WINDOWWIDTH = 800;
 const int WINDOWHEIGHT = 600;
-float scaleFactor = 16; // multiple of 2 to avoid precision issues
-//also anything below 2 pixels causes trouble, don't expect to reach that
+float scaleFactor = 1.0f/32.0f; // multiple of 2 to avoid precision issues
+//also anything below 4 pixels causes trouble, don't expect to reach that
 
 b2WorldDef worldDef;
 b2WorldId worldId;
@@ -24,20 +24,14 @@ void move(sf::RectangleShape& rectangle, b2BodyId& id) {
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
     //std::cout << b2Rot_GetAngle(b2Body_GetRotation(id)) * 180/B2_PI << std::endl;
     rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180/B2_PI);
-
 }
-/*
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position = b2Vec2{ 45, 4.0f };
-    b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-
-    b2Polygon dynamicBox = b2MakeBox(2.5f, 2.5f);
-    b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.density = 1.0f;
-    shapeDef.material.friction = 1.f;*/
+float pixelsToMeters(float input) {
+    return input * scaleFactor;
+}
 // maybe make a version that takes in a body def
 void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyType bodyType) {
+    position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
+    size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = bodyType;
     bodyDef.position = sfVector2f_to_b2Vec2(position);
@@ -76,6 +70,7 @@ int main()
     b2Body_SetAngularVelocity(bodyId, 100);
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
+    sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
@@ -91,8 +86,9 @@ int main()
         int subStepCount = 4;
         b2World_Step(worldId, 1./165, subStepCount);
         move(testShape, bodyId);
-        
         move(movingBox, movingBoxId);
+
+        window.setView(view);
         window.clear();
         window.draw(testShape);
         window.draw(floor);
