@@ -44,11 +44,28 @@ void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vec
     box.setOrigin(size.x / 2, size.y / 2);
     move(box, id);  
 }
+void movePlayer(b2BodyId id) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+        b2Body_ApplyForceToCenter(id, { -20,0 }, true);
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+        b2Body_ApplyForceToCenter(id, { 20,0 }, true);
+    }
+}
+void onGround(b2BodyId id) {
+    b2ShapeCastInput input;
+    b2CastOutput result = b2ShapeCastPolygon(input, b2Shape_GetPolygon(id));
+}
+void movePlayerEvents(b2BodyId id, sf::Event event) {
+    if (event.key.code == sf::Keyboard::Key::Space) {
+        b2Body_ApplyLinearImpulseToCenter(id, { 0,-10 }, true);
+    }
+}
 
 int main()
 {
     worldDef = b2DefaultWorldDef();
-    worldDef.gravity = b2Vec2{ 0.0f, 10.0f };
+    worldDef.gravity = b2Vec2{ 0.0f, 8.25f };
     worldId = b2CreateWorld(&worldDef);
     // Making moving box
     sf::RectangleShape testShape{};
@@ -56,18 +73,18 @@ int main()
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     shapeDef.density = 1.0f;
     shapeDef.material.friction = 1.f;
-    makeBox(testShape, bodyId, shapeDef, sf::Vector2f(50, 4.0f), sf::Vector2f(2.5f, 2.5f), b2_dynamicBody);
+    makeBox(testShape, bodyId, shapeDef, sf::Vector2f(50, 4.0f), sf::Vector2f(4.0f, 4.0f), b2_dynamicBody);
 
     sf::RectangleShape movingBox{};
     b2BodyId movingBoxId{};
-    makeBox(movingBox, movingBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(50, 50), b2_dynamicBody);
+    makeBox(movingBox, movingBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(32, 32), b2_dynamicBody);
 
     // Making floor
     sf::RectangleShape floor{};
     b2BodyId groundId{};
     makeBox(floor, groundId, b2DefaultShapeDef(), sf::Vector2f(50, 500), sf::Vector2f(50, 10), b2_staticBody);
 
-    b2Body_SetAngularVelocity(bodyId, 100);
+    //b2Body_SetAngularVelocity(movingBoxId, 100000);
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
@@ -80,9 +97,14 @@ int main()
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+            if (event.type == sf::Event::KeyPressed)
+            {
+                movePlayerEvents(movingBoxId, event);
+            }
         }
         Time currentTime = clock.getElapsedTime();
 
+        movePlayer(movingBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, 1./165, subStepCount);
         move(testShape, bodyId);
