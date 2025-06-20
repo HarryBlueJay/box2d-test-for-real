@@ -8,6 +8,9 @@ const int WINDOWHEIGHT = 600;
 float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 //also anything below 4 pixels causes trouble, don't expect to reach that
 
+//temporary variables (no i will not make a namespace)
+bool playerCanJump = false;
+
 b2WorldDef worldDef;
 b2WorldId worldId;
 
@@ -65,7 +68,7 @@ static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float 
 {
     CastResult* result = (CastResult*)context;
     result->point = point;
-    std::cout << normal.y << std::endl;
+    std::cout << shapeId.index1 << std::endl;
     result->bodyId = b2Shape_GetBody(shapeId);
     result->fraction = fraction;
     result->hit = true;
@@ -79,11 +82,15 @@ void onGroundBroken(b2BodyId id, RenderWindow& window) {
     b2ShapeId shapearray[1];
     b2Body_GetShapes(id, shapearray, 1);
     b2Polygon polygon = b2Shape_GetPolygon(shapearray[0]);
+    //b2World_CastRayClosest()
+
     //b2Polygon polygon = b2MakeOffsetBox(100,100);
     //input.proxy = b2MakeProxy(polygon.vertices, polygon.count, 0);
     //input.translation = { 0,1000 };
     //input.translation = b2Body_GetPosition(id);
-    b2ShapeProxy p = b2MakeOffsetProxy(polygon.vertices, polygon.count, 0,b2Body_GetPosition(id)+b2Vec2{1,1}, b2Body_GetRotation(id));
+    polygon.vertices[0] = polygon.vertices[2];
+    polygon.vertices[1] = polygon.vertices[3];
+    b2ShapeProxy p = b2MakeOffsetProxy(polygon.vertices, 2, 0,b2Body_GetPosition(id)+b2Vec2{1,1}, b2Body_GetRotation(id));
     b2World_CastShape(worldId, &p, {0,1000}, b2DefaultQueryFilter(), CastCallback, &context);
 
     sf::Vertex line2[]
@@ -96,7 +103,7 @@ void onGroundBroken(b2BodyId id, RenderWindow& window) {
     sf::Vertex line1[]
     {
 
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetWorldPoint(id, b2Vec2{0,0})),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)),sf::Color::Red),
         sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id) + b2Vec2{0, 300}),sf::Color::Red),
     };
 
@@ -104,9 +111,32 @@ void onGroundBroken(b2BodyId id, RenderWindow& window) {
     window.draw(line1, 2, sf::Lines);
     window.draw(line2, 2, sf::Lines);
 }
+void onGroundHopefullyWillWork(b2BodyId id, RenderWindow& window){
+    b2RayResult result = b2World_CastRayClosest(worldId, b2Body_GetPosition(id), {0,1},b2DefaultQueryFilter());
+
+    sf::Vertex line2[]
+    {
+
+        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)), sf::Color::Green),
+        sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
+    };
+
+    sf::Vertex line1[]
+    {
+
+        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id) + b2Vec2{0, 1}),sf::Color::Red),
+    };
+    window.draw(line1, 2, sf::Lines);
+    window.draw(line2, 2, sf::Lines);
+    if (result.hit) {
+        playerCanJump = true;
+    }
+}
 void movePlayerEvents(b2BodyId id, sf::Event event) {
-    if (event.key.code == sf::Keyboard::Key::Space) {
+    if (event.key.code == sf::Keyboard::Key::Space && playerCanJump) {
         b2Body_ApplyLinearImpulseToCenter(id, { 0,-10 }, true);
+        playerCanJump = false;
     }
 }
 
@@ -164,7 +194,9 @@ int main()
         window.draw(floor);
         window.draw(movingBox);
         //onGround(movingBoxId, window);
-        onGroundBroken(movingBoxId,window);
+        //onGroundBroken(movingBoxId,window);
+        playerCanJump = false;
+        onGroundHopefullyWillWork(movingBoxId, window);
         window.display();
     }
     return 0;
