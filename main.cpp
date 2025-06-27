@@ -10,6 +10,7 @@ float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 
 //temporary variables (no i will not make a namespace)
 bool playerCanJump = false;
+bool showRaycasts = true;
 
 b2WorldDef worldDef;
 b2WorldId worldId;
@@ -31,12 +32,9 @@ void move(sf::RectangleShape& rectangle, b2BodyId& id) {
 float pixelsToMeters(float input) {
     return input * scaleFactor;
 }
-// maybe make a version that takes in a body def
-void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyType bodyType) {
+void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyDef bodyDef) {
     position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
     size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = bodyType;
     bodyDef.position = sfVector2f_to_b2Vec2(position);
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
     b2Polygon dynamicBox = b2MakeBox(size.x / 2, size.y / 2); // eventually do stuff with the scale factor
@@ -47,6 +45,13 @@ void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vec
     box.setOrigin(size.x / 2, size.y / 2);
     move(box, id);
 }
+// maybe make a version that takes in a body def
+void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyType bodyType) {
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = bodyType;
+    bodyDef.position = sfVector2f_to_b2Vec2(position);
+    makeBoxWithBodyDef(box, id, shapeDef,position,size,bodyDef);
+} 
 void movePlayer(b2BodyId id) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
         b2Body_ApplyForceToCenter(id, { -20,0 }, true);
@@ -111,25 +116,63 @@ void onGroundBroken(b2BodyId id, RenderWindow& window) {
     window.draw(line1, 2, sf::Lines);
     window.draw(line2, 2, sf::Lines);
 }
-void onGroundHopefullyWillWork(b2BodyId id, RenderWindow& window){
-    b2RayResult result = b2World_CastRayClosest(worldId, b2Body_GetPosition(id), {0,1},b2DefaultQueryFilter());
 
-    sf::Vertex line2[]
-    {
-
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)), sf::Color::Green),
-        sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
+void simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, RenderWindow& window) {
+    CastResult context = {};
+    b2Vec2 points[2] = { point1, point2 };
+    b2ShapeProxy p = b2MakeProxy(points, 2, 0.5);
+    b2World_CastShape(worldId, &p, offset*0.5, b2DefaultQueryFilter(), CastCallback, &context);
+    sf::Vertex line1[] {
+        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point2),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red)
     };
 
-    sf::Vertex line1[]
-    {
+    if (showRaycasts) {
+        window.draw(line1, 5, sf::LineStrip);
+    }
+    if (context.hit) {
+        sf::Vertex line2[]{
+            sf::Vertex(b2Vec2_to_sfVector2f(point1), sf::Color::Green),
+            sf::Vertex(b2Vec2_to_sfVector2f(context.point),sf::Color::Green),
+        };
+        if (showRaycasts) {
+            window.draw(line2, 2, sf::Lines);
+        }
+    }
+}
 
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id) + b2Vec2{0, 1}),sf::Color::Red),
+b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset, RenderWindow& window)
+{
+    b2RayResult result = b2World_CastRayClosest(worldId, start, offset, b2DefaultQueryFilter());
+    sf::Vertex line1[] {
+        sf::Vertex(b2Vec2_to_sfVector2f(start),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(start + offset),sf::Color::Red),
     };
-    window.draw(line1, 2, sf::Lines);
-    window.draw(line2, 2, sf::Lines);
+
+    if (showRaycasts) {
+        window.draw(line1, 2, sf::Lines);
+    }
     if (result.hit) {
+        sf::Vertex line2[] {
+            sf::Vertex(b2Vec2_to_sfVector2f(start), sf::Color::Green),
+            sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
+        };
+        if (showRaycasts) {
+            window.draw(line2, 2, sf::Lines);
+        }
+    }
+    return result;
+}
+
+void onGroundHopefullyWillWork(b2BodyId id, RenderWindow& window){
+    b2RayResult result = simpleRaycast(b2Body_GetWorldPoint(id, { 0,0 }), {0,0.6}, window);
+    b2RayResult result2 = simpleRaycast(b2Body_GetWorldPoint(id, { -0.5,0 }), {0,0.6}, window);
+    b2RayResult result3 = simpleRaycast(b2Body_GetWorldPoint(id, { 0.5,0 }), {0,0.6}, window);
+
+    if (result.hit || result2.hit || result3.hit) {
         playerCanJump = true;
     }
 }
@@ -153,16 +196,19 @@ int main()
     shapeDef.material.friction = 1.f;
     makeBox(testShape, bodyId, shapeDef, sf::Vector2f(50, 4.0f), sf::Vector2f(4.0f, 4.0f), b2_dynamicBody);
 
-    sf::RectangleShape movingBox{};
-    b2BodyId movingBoxId{};
-    makeBox(movingBox, movingBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(32, 32), b2_dynamicBody);
+    sf::RectangleShape playerBox{};
+    b2BodyId playerBoxId{};
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.fixedRotation = true;
+    makeBoxWithBodyDef(playerBox, playerBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(32, 32), bodyDef);
 
     // Making floor
     sf::RectangleShape floor{};
     b2BodyId groundId{};
     makeBox(floor, groundId, b2DefaultShapeDef(), sf::Vector2f(50, 500), sf::Vector2f(50, 10), b2_staticBody);
 
-    //b2Body_SetAngularVelocity(movingBoxId, 100000);
+    //b2Body_SetAngularVelocity(playerBoxId, 100000);
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
@@ -177,26 +223,27 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyPressed)
             {
-                movePlayerEvents(movingBoxId, event);
+                movePlayerEvents(playerBoxId, event);
             }
         }
         Time currentTime = clock.getElapsedTime();
 
-        movePlayer(movingBoxId);
+        movePlayer(playerBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, 1. / 165, subStepCount);
         move(testShape, bodyId);
-        move(movingBox, movingBoxId);
+        move(playerBox, playerBoxId);
 
         window.setView(view);
         window.clear();
         window.draw(testShape);
         window.draw(floor);
-        window.draw(movingBox);
-        //onGround(movingBoxId, window);
-        //onGroundBroken(movingBoxId,window);
+        window.draw(playerBox);
+        //onGround(playerBoxId, window);
+        //onGroundBroken(playerBoxId,window);
         playerCanJump = false;
-        onGroundHopefullyWillWork(movingBoxId, window);
+        onGroundHopefullyWillWork(playerBoxId, window);
+        simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
         window.display();
     }
     return 0;
