@@ -1,0 +1,118 @@
+#pragma once
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
+using namespace sf;
+bool showCasts = true;
+b2WorldId castWorldId;
+
+//vec2forSFML
+sf::Vector2f b2Vec2_to_sfVector2f(b2Vec2 input) {
+    return sf::Vector2f(input.x, input.y);
+}
+b2Vec2 sfVector2f_to_b2Vec2(sf::Vector2f input) {
+    return b2Vec2{ input.x, input.y };
+}
+
+//callbacks go here
+struct CastResult
+{
+    b2Vec2 point;
+    b2BodyId bodyId;
+    float fraction;
+    bool hit;
+};
+static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
+{
+    CastResult* result = (CastResult*)context;
+    result->point = point;
+    std::cout << shapeId.index1 << std::endl;
+    result->bodyId = b2Shape_GetBody(shapeId);
+    result->fraction = fraction;
+    result->hit = true;
+    return fraction;
+}
+struct OverlapResult
+{
+    int hits;
+    int maxHits;
+    b2ShapeId hitIds[10];
+};
+bool OverlapCallback(b2ShapeId id, void* context) {
+    OverlapResult* result = (OverlapResult*)context;
+    result->hits += 1;
+    result->maxHits += 1;
+    result->hitIds[result->hits] = id;
+    return true;
+}
+
+void simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, RenderWindow& window) {
+    CastResult context = {};
+    b2Vec2 points[2] = { point1, point2 };
+    b2ShapeProxy p = b2MakeProxy(points, 2, 0.5);
+    b2World_CastShape(castWorldId, &p, offset * 0.5, b2DefaultQueryFilter(), CastCallback, &context);
+    sf::Vertex line1[]{
+        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point2),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red)
+    };
+
+    if (showCasts) {
+        window.draw(line1, 5, sf::LineStrip);
+    }
+    if (context.hit) {
+        sf::Vertex line2[]{
+            sf::Vertex(b2Vec2_to_sfVector2f(point1), sf::Color::Green),
+            sf::Vertex(b2Vec2_to_sfVector2f(context.point),sf::Color::Green),
+        };
+        if (showCasts) {
+            window.draw(line2, 2, sf::Lines);
+        }
+    }
+}
+
+b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset, RenderWindow& window)
+{
+    b2RayResult result = b2World_CastRayClosest(castWorldId, start, offset, b2DefaultQueryFilter());
+    sf::Vertex line1[]{
+        sf::Vertex(b2Vec2_to_sfVector2f(start),sf::Color::Red),
+        sf::Vertex(b2Vec2_to_sfVector2f(start + offset),sf::Color::Red),
+    };
+
+    if (showCasts) {
+        window.draw(line1, 2, sf::Lines);
+    }
+    if (result.hit) {
+        sf::Vertex line2[]{
+            sf::Vertex(b2Vec2_to_sfVector2f(start), sf::Color::Green),
+            sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
+        };
+        if (showCasts) {
+            window.draw(line2, 2, sf::Lines);
+        }
+    }
+    return result;
+}
+
+OverlapResult lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter, RenderWindow& window) {
+    OverlapResult result = {};
+    b2Vec2 points[2] = { start, end };
+    b2ShapeProxy p = b2MakeProxy(points, 2, 0);
+    b2World_OverlapShape(castWorldId, &p, filter, OverlapCallback, &result);
+    sf::Color color = sf::Color::Red;
+    std::cout << result.hits << std::endl;
+    if (result.hits > 0) {
+        color = sf::Color::Green;
+    }
+    if (showCasts) {
+        sf::Vertex line1[]{
+            sf::Vertex(b2Vec2_to_sfVector2f(start),color),
+            sf::Vertex(b2Vec2_to_sfVector2f(end),color),
+        };
+        window.draw(line1, 2, sf::Lines);
+    }
+
+    return result;
+}

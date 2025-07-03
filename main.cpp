@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
+#include "Casts.h"
 
 using namespace sf;
 const int WINDOWWIDTH = 800;
@@ -10,17 +11,13 @@ float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 
 //temporary variables (no i will not make a namespace)
 bool playerCanJump = false;
-bool showRaycasts = true;
 
 b2WorldDef worldDef;
 b2WorldId worldId;
 
-//vec2forSFML
-sf::Vector2f b2Vec2_to_sfVector2f(b2Vec2 input) {
-    return sf::Vector2f(input.x, input.y);
-}
-b2Vec2 sfVector2f_to_b2Vec2(sf::Vector2f input) {
-    return b2Vec2{ input.x, input.y };
+
+float pixelsToMeters(float input) {
+    return input * scaleFactor;
 }
 void move(sf::RectangleShape& rectangle, b2BodyId& id) {
     //b2Body_GetPosition()
@@ -28,9 +25,6 @@ void move(sf::RectangleShape& rectangle, b2BodyId& id) {
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
     //std::cout << b2Rot_GetAngle(b2Body_GetRotation(id)) * 180/B2_PI << std::endl;
     rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180 / B2_PI);
-}
-float pixelsToMeters(float input) {
-    return input * scaleFactor;
 }
 void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyDef bodyDef) {
     position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
@@ -61,112 +55,6 @@ void movePlayer(b2BodyId id) {
     }
 }
 
-
-struct CastResult
-{
-    b2Vec2 point;
-    b2BodyId bodyId;
-    float fraction;
-    bool hit;
-};
-static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
-{
-    CastResult* result = (CastResult*)context;
-    result->point = point;
-    std::cout << shapeId.index1 << std::endl;
-    result->bodyId = b2Shape_GetBody(shapeId);
-    result->fraction = fraction;
-    result->hit = true;
-    return fraction;
-}
-
-
-void onGroundBroken(b2BodyId id, RenderWindow& window) {
-    b2ShapeCastInput input{};
-    CastResult context = {};
-    b2ShapeId shapearray[1];
-    b2Body_GetShapes(id, shapearray, 1);
-    b2Polygon polygon = b2Shape_GetPolygon(shapearray[0]);
-    //b2World_CastRayClosest()
-
-    //b2Polygon polygon = b2MakeOffsetBox(100,100);
-    //input.proxy = b2MakeProxy(polygon.vertices, polygon.count, 0);
-    //input.translation = { 0,1000 };
-    //input.translation = b2Body_GetPosition(id);
-    polygon.vertices[0] = polygon.vertices[2];
-    polygon.vertices[1] = polygon.vertices[3];
-    b2ShapeProxy p = b2MakeOffsetProxy(polygon.vertices, 2, 0,b2Body_GetPosition(id)+b2Vec2{1,1}, b2Body_GetRotation(id));
-    b2World_CastShape(worldId, &p, {0,1000}, b2DefaultQueryFilter(), CastCallback, &context);
-
-    sf::Vertex line2[]
-    {
-
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)), sf::Color::Green),
-        sf::Vertex(b2Vec2_to_sfVector2f(context.point),sf::Color::Green),
-    };
-
-    sf::Vertex line1[]
-    {
-
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(b2Body_GetPosition(id) + b2Vec2{0, 300}),sf::Color::Red),
-    };
-
-
-    window.draw(line1, 2, sf::Lines);
-    window.draw(line2, 2, sf::Lines);
-}
-
-void simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, RenderWindow& window) {
-    CastResult context = {};
-    b2Vec2 points[2] = { point1, point2 };
-    b2ShapeProxy p = b2MakeProxy(points, 2, 0.5);
-    b2World_CastShape(worldId, &p, offset*0.5, b2DefaultQueryFilter(), CastCallback, &context);
-    sf::Vertex line1[] {
-        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point2),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red)
-    };
-
-    if (showRaycasts) {
-        window.draw(line1, 5, sf::LineStrip);
-    }
-    if (context.hit) {
-        sf::Vertex line2[]{
-            sf::Vertex(b2Vec2_to_sfVector2f(point1), sf::Color::Green),
-            sf::Vertex(b2Vec2_to_sfVector2f(context.point),sf::Color::Green),
-        };
-        if (showRaycasts) {
-            window.draw(line2, 2, sf::Lines);
-        }
-    }
-}
-
-b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset, RenderWindow& window)
-{
-    b2RayResult result = b2World_CastRayClosest(worldId, start, offset, b2DefaultQueryFilter());
-    sf::Vertex line1[] {
-        sf::Vertex(b2Vec2_to_sfVector2f(start),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(start + offset),sf::Color::Red),
-    };
-
-    if (showRaycasts) {
-        window.draw(line1, 2, sf::Lines);
-    }
-    if (result.hit) {
-        sf::Vertex line2[] {
-            sf::Vertex(b2Vec2_to_sfVector2f(start), sf::Color::Green),
-            sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
-        };
-        if (showRaycasts) {
-            window.draw(line2, 2, sf::Lines);
-        }
-    }
-    return result;
-}
-
 void onGroundHopefullyWillWork(b2BodyId id, RenderWindow& window){
     b2RayResult result = simpleRaycast(b2Body_GetWorldPoint(id, { 0,0 }), {0,0.6}, window);
     b2RayResult result2 = simpleRaycast(b2Body_GetWorldPoint(id, { -0.5,0 }), {0,0.6}, window);
@@ -188,6 +76,7 @@ int main()
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 8.25f };
     worldId = b2CreateWorld(&worldDef);
+    castWorldId = worldId;
     // Making moving box
     sf::RectangleShape testShape{};
     b2BodyId bodyId{};
@@ -243,7 +132,8 @@ int main()
         //onGroundBroken(playerBoxId,window);
         playerCanJump = false;
         onGroundHopefullyWillWork(playerBoxId, window);
-        simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
+        //simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
+        OverlapResult result = lineOverlap(b2Body_GetWorldPoint(playerBoxId, { -0.6,-0.4 }), b2Body_GetWorldPoint(playerBoxId, { -0.6,0.4 }), b2DefaultQueryFilter(), window);
         window.display();
     }
     return 0;
