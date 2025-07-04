@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 #include "Casts.h"
+#include "Player.h"
 
 using namespace sf;
 const int WINDOWWIDTH = 800;
@@ -9,12 +10,8 @@ const int WINDOWHEIGHT = 600;
 float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 //also anything below 4 pixels causes trouble, don't expect to reach that
 
-//temporary variables (no i will not make a namespace)
-bool playerCanJump = false;
-
 b2WorldDef worldDef;
 b2WorldId worldId;
-
 
 float pixelsToMeters(float input) {
     return input * scaleFactor;
@@ -46,30 +43,6 @@ void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vec
     bodyDef.position = sfVector2f_to_b2Vec2(position);
     makeBoxWithBodyDef(box, id, shapeDef,position,size,bodyDef);
 } 
-void movePlayer(b2BodyId id) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-        b2Body_ApplyForceToCenter(id, { -20,0 }, true);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-        b2Body_ApplyForceToCenter(id, { 20,0 }, true);
-    }
-}
-
-void onGroundHopefullyWillWork(b2BodyId id, RenderWindow& window){
-    b2RayResult result = simpleRaycast(b2Body_GetWorldPoint(id, { 0,0 }), {0,0.6}, window);
-    b2RayResult result2 = simpleRaycast(b2Body_GetWorldPoint(id, { -0.5,0 }), {0,0.6}, window);
-    b2RayResult result3 = simpleRaycast(b2Body_GetWorldPoint(id, { 0.5,0 }), {0,0.6}, window);
-
-    if (result.hit || result2.hit || result3.hit) {
-        playerCanJump = true;
-    }
-}
-void movePlayerEvents(b2BodyId id, sf::Event event) {
-    if (event.key.code == sf::Keyboard::Key::Space && playerCanJump) {
-        b2Body_ApplyLinearImpulseToCenter(id, { 0,-10 }, true);
-        playerCanJump = false;
-    }
-}
 
 int main()
 {
@@ -131,7 +104,7 @@ int main()
         //onGround(playerBoxId, window);
         //onGroundBroken(playerBoxId,window);
         playerCanJump = false;
-        onGroundHopefullyWillWork(playerBoxId, window);
+        onGround(playerBoxId, window);
         //simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
         OverlapResult result = lineOverlap(b2Body_GetWorldPoint(playerBoxId, { -0.6,-0.4 }), b2Body_GetWorldPoint(playerBoxId, { -0.6,0.4 }), b2DefaultQueryFilter(), window);
         window.display();
