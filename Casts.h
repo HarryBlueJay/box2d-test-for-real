@@ -26,7 +26,6 @@ static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float 
 {
     CastResult* result = (CastResult*)context;
     result->point = point;
-    std::cout << shapeId.index1 << std::endl;
     result->bodyId = b2Shape_GetBody(shapeId);
     result->fraction = fraction;
     result->hit = true;
@@ -34,14 +33,15 @@ static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float 
 }
 struct OverlapResult
 {
+    bool hit;
     int hits;
-    int maxHits;
+    int maxHits = 10;
     b2ShapeId hitIds[10];
 };
 bool OverlapCallback(b2ShapeId id, void* context) {
     OverlapResult* result = (OverlapResult*)context;
     result->hits += 1;
-    result->maxHits += 1;
+    result->hit = true;
     result->hitIds[result->hits] = id;
     return true;
 }
@@ -102,7 +102,6 @@ OverlapResult lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter, Render
     b2ShapeProxy p = b2MakeProxy(points, 2, 0);
     b2World_OverlapShape(castWorldId, &p, filter, OverlapCallback, &result);
     sf::Color color = sf::Color::Red;
-    std::cout << result.hits << std::endl;
     if (result.hits > 0) {
         color = sf::Color::Green;
     }

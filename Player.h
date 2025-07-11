@@ -28,28 +28,44 @@ public:
 		player = playerId;
 	}
 
-	void movePlayer() {
+	void movePlayer(RenderWindow& window) {
+
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 			b2Body_ApplyForceToCenter(player, { -20,0 }, true);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 			b2Body_ApplyForceToCenter(player, { 20,0 }, true);
 		}
-	}
-
-	void onGround(RenderWindow& window) {
-		b2RayResult result = simpleRaycast(b2Body_GetWorldPoint(player, { 0,0 }), { 0,0.6 }, window);
-		b2RayResult result2 = simpleRaycast(b2Body_GetWorldPoint(player, { -0.5,0 }), { 0,0.6 }, window);
-		b2RayResult result3 = simpleRaycast(b2Body_GetWorldPoint(player, { 0.5,0 }), { 0,0.6 }, window);
-
-		if (result.hit || result2.hit || result3.hit) {
-			canJump = true;
-		}
-	}
-	void movePlayerEvents(sf::Event event) {
-		if (event.key.code == sf::Keyboard::Key::Space && canJump) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
 			b2Body_ApplyLinearImpulseToCenter(player, { 0,-10 }, true);
 			canJump = false;
 		}
+		onGround(window);
+	}
+
+	void onGround(RenderWindow& window) {
+		b2Vec2 topLeft = b2Body_GetWorldPoint(player, { -0.5,-0.5 });
+		b2Vec2 topRight = b2Body_GetWorldPoint(player, { 0.5,-0.5 });
+		b2Vec2 bottomLeft = b2Body_GetWorldPoint(player, { -0.5,0.5 });
+		b2Vec2 bottomRight = b2Body_GetWorldPoint(player, { 0.5,0.5 });
+
+		OverlapResult bottomResult = lineOverlap(bottomLeft + b2Vec2{ 0,0.1 }, bottomRight + b2Vec2{0,0.1 }, b2DefaultQueryFilter(), window);
+		OverlapResult topResult = lineOverlap(topLeft + b2Vec2{ 0,-0.1 }, topRight + b2Vec2{ 0,-0.1 }, b2DefaultQueryFilter(), window);
+		OverlapResult leftResult = lineOverlap(topLeft+b2Vec2{-0.1,0.1}, bottomLeft+b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
+		OverlapResult rightResult = lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
+		bottomLine = bottomResult.hit;
+		topLine = topResult.hit;
+		leftLine = leftResult.hit;
+		rightLine = rightResult.hit;
+
+		if (bottomLine && !canJump) {
+			canJump = true;
+		}
+		else if (!bottomLine && canJump) {
+			canJump = false;
+		}
+	}
+	void movePlayerEvents(sf::Event event) {
+		
 	}
 };

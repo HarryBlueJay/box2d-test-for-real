@@ -74,6 +74,7 @@ int main()
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
+    Player player(playerBoxId);
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
@@ -85,28 +86,26 @@ int main()
                 window.close();
             if (event.type == sf::Event::KeyPressed)
             {
-                movePlayerEvents(playerBoxId, event);
+                player.movePlayerEvents(event);
             }
         }
         Time currentTime = clock.getElapsedTime();
 
-        movePlayer(playerBoxId);
+        window.setView(view);
+        window.clear();
+
+        player.movePlayer(window);
         int subStepCount = 4;
         b2World_Step(worldId, 1. / 165, subStepCount);
         move(testShape, bodyId);
         move(playerBox, playerBoxId);
 
-        window.setView(view);
-        window.clear();
         window.draw(testShape);
         window.draw(floor);
         window.draw(playerBox);
         //onGround(playerBoxId, window);
         //onGroundBroken(playerBoxId,window);
-        playerCanJump = false;
-        onGround(playerBoxId, window);
         //simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
-        OverlapResult result = lineOverlap(b2Body_GetWorldPoint(playerBoxId, { -0.6,-0.4 }), b2Body_GetWorldPoint(playerBoxId, { -0.6,0.4 }), b2DefaultQueryFilter(), window);
         window.display();
     }
     return 0;
