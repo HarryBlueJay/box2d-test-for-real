@@ -137,10 +137,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="levels\level1.json" />
+    <None Include="levels\level1old.json" />
+    <None Include="levels\levels.json" />
+    <None Include="levels\testlevel.json" />
+    <None Include="levels\tutorial.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Casts.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,53 +3,20 @@
 #include <box2d/box2d.h>
 #include "Casts.h"
 #include "Player.h"
+#include "Level.h"
+#include <cmath>
+#include <math.h>
 
 using namespace sf;
 const int WINDOWWIDTH = 800;
 const int WINDOWHEIGHT = 600;
-float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
-//also anything below 4 pixels causes trouble, don't expect to reach that
-
 b2WorldDef worldDef;
-b2WorldId worldId;
-
-float pixelsToMeters(float input) {
-    return input * scaleFactor;
-}
-void move(sf::RectangleShape& rectangle, b2BodyId& id) {
-    //b2Body_GetPosition()
-    //b2Body_GetRotation()
-    rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
-    //std::cout << b2Rot_GetAngle(b2Body_GetRotation(id)) * 180/B2_PI << std::endl;
-    rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180 / B2_PI);
-}
-void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyDef bodyDef) {
-    position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
-    size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
-    bodyDef.position = sfVector2f_to_b2Vec2(position);
-    b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-    b2Polygon dynamicBox = b2MakeBox(size.x / 2, size.y / 2); // eventually do stuff with the scale factor
-    id = b2CreateBody(worldId, &bodyDef);
-    b2CreatePolygonShape(id, &shapeDef, &dynamicBox);
-
-    box.setSize(size);
-    box.setOrigin(size.x / 2, size.y / 2);
-    move(box, id);
-}
-// maybe make a version that takes in a body def
-void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyType bodyType) {
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = bodyType;
-    bodyDef.position = sfVector2f_to_b2Vec2(position);
-    makeBoxWithBodyDef(box, id, shapeDef,position,size,bodyDef);
-} 
 
 int main()
 {
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 8.25f };
     worldId = b2CreateWorld(&worldDef);
-    castWorldId = worldId;
     // Making moving box
     sf::RectangleShape testShape{};
     b2BodyId bodyId{};
@@ -75,6 +42,7 @@ int main()
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
     Player player(playerBoxId);
+    Level::loadLevel("level1.json");
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
@@ -94,18 +62,23 @@ int main()
         window.setView(view);
         window.clear();
 
-        player.movePlayer(window);
-        int subStepCount = 4;
-        b2World_Step(worldId, 1. / 165, subStepCount);
+        float deltaTime = clock.restart().asSeconds();
+        player.update(window, deltaTime);
+        // view stuff
+        sf::Vector2f viewPosition = view.getCenter();
+        b2Vec2 result = b2Lerp({ viewPosition.x, viewPosition.y }, { playerBox.getPosition().x, playerBox.getPosition().y }, 0.1f);
+        viewPosition.x = result.x;
+        viewPosition.y = std::min(result.y, 0 - view.getSize().y + 33.75f + view.getSize().y / 2);
+        view.setCenter(viewPosition);
+        //
         move(testShape, bodyId);
         move(playerBox, playerBoxId);
+        int subStepCount = 4;
+        b2World_Step(worldId, deltaTime, subStepCount);
 
         window.draw(testShape);
         window.draw(floor);
         window.draw(playerBox);
-        //onGround(playerBoxId, window);
-        //onGroundBroken(playerBoxId,window);
-        //simpleLinecast(b2Body_GetWorldPoint(playerBoxId, { -0.5,-0.5 }), b2Body_GetWorldPoint(playerBoxId, { -0.5,0.5 }), { -0.25,0 }, window);
         window.display();
     }
     return 0;

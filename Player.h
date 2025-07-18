@@ -16,6 +16,7 @@ public:
 	//state//
 	//Game::PlayerState state;
 	bool canJump;
+	float jumpCooldown;
 
 	//movement//
 	int leftWallJumps = 0;
@@ -28,19 +29,20 @@ public:
 		player = playerId;
 	}
 
-	void movePlayer(RenderWindow& window) {
-
+	void update(RenderWindow& window, float deltaTime) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 			b2Body_ApplyForceToCenter(player, { -20,0 }, true);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 			b2Body_ApplyForceToCenter(player, { 20,0 }, true);
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump && jumpCooldown <= 0) {
 			b2Body_ApplyLinearImpulseToCenter(player, { 0,-10 }, true);
 			canJump = false;
+			jumpCooldown = 0.1;
 		}
 		onGround(window);
+		jumpCooldown -= deltaTime;
 	}
 
 	void onGround(RenderWindow& window) {
