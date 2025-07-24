@@ -30,7 +30,7 @@ int main()
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     bodyDef.fixedRotation = true;
-    makeBoxWithBodyDef(playerBox, playerBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(32, 32), bodyDef);
+    makeBoxWithBodyDef(playerBox, playerBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(64, 64), bodyDef);
 
     // Making floor
     sf::RectangleShape floor{};
@@ -52,10 +52,16 @@ int main()
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (event.type == sf::Event::KeyPressed)
-            {
+            else if (event.type == sf::Event::KeyPressed)
                 player.movePlayerEvents(event);
+            else if (event.type == sf::Event::Resized) {
+                view.setSize({
+                        static_cast<float>(pixelsToMeters(event.size.width)),
+                        static_cast<float>(pixelsToMeters(event.size.height))
+                    });
+                // source: https://stackoverflow.com/questions/61447069/sfml-window-resizing-is-very-ugly
             }
+            
         }
         Time currentTime = clock.getElapsedTime();
 
@@ -76,6 +82,10 @@ int main()
         int subStepCount = 4;
         b2World_Step(worldId, deltaTime, subStepCount);
 
+        for (LevelRectangle rectangle : Level::currentLevel) {
+            std::cout << rectangle.rectangle.getPosition().x << " " << rectangle.rectangle.getPosition().x << std::endl;
+            window.draw(rectangle.rectangle);
+        }
         window.draw(testShape);
         window.draw(floor);
         window.draw(playerBox);

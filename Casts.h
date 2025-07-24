@@ -123,10 +123,7 @@ float pixelsToMeters(float input) {
     return input * scaleFactor;
 }
 void move(sf::RectangleShape& rectangle, b2BodyId& id) {
-    //b2Body_GetPosition()
-    //b2Body_GetRotation()
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
-    //std::cout << b2Rot_GetAngle(b2Body_GetRotation(id)) * 180/B2_PI << std::endl;
     rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180 / B2_PI);
 }
 

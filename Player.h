@@ -1,4 +1,5 @@
 #pragma once
+#include "Level.h"
 
 class Player
 {
@@ -27,6 +28,9 @@ public:
 
 	Player(b2BodyId playerId) {
 		player = playerId;
+	}
+	void die() {
+		b2Body_SetTransform(player,Level::spawnLocation,b2Body_GetRotation(player));
 	}
 
 	void update(RenderWindow& window, float deltaTime) {
@@ -68,6 +72,8 @@ public:
 		}
 	}
 	void movePlayerEvents(sf::Event event) {
-		
+		if (event.key.code == sf::Keyboard::Key::Delete) {
+			die();
+		}
 	}
 };
