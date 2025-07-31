@@ -17,20 +17,18 @@ int main()
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 8.25f };
     worldId = b2CreateWorld(&worldDef);
-    // Making moving box
-    sf::RectangleShape testShape{};
-    b2BodyId bodyId{};
-    b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.density = 1.0f;
-    shapeDef.material.friction = 1.f;
-    makeBox(testShape, bodyId, shapeDef, sf::Vector2f(50, 4.0f), sf::Vector2f(4.0f, 4.0f), b2_dynamicBody);
 
     sf::RectangleShape playerBox{};
     b2BodyId playerBoxId{};
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     bodyDef.fixedRotation = true;
-    makeBoxWithBodyDef(playerBox, playerBoxId, b2DefaultShapeDef(), sf::Vector2f(50, 100), sf::Vector2f(64, 64), bodyDef);
+    b2ShapeDef playerShapeDef = b2DefaultShapeDef();
+    b2SurfaceMaterial playerMaterial = b2DefaultSurfaceMaterial();
+    playerShapeDef.density /= 4;
+    playerMaterial.friction = 0;
+    playerShapeDef.material = playerMaterial;
+    makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), bodyDef);
 
     // Making floor
     sf::RectangleShape floor{};
@@ -41,8 +39,10 @@ int main()
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
-    Player player(playerBoxId);
+    Player player(playerBoxId,playerBox);
+    Level::tiledHexToSfColor("#ff000000");
     Level::loadLevel("level1.json");
+    player.die();
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
@@ -61,12 +61,11 @@ int main()
                     });
                 // source: https://stackoverflow.com/questions/61447069/sfml-window-resizing-is-very-ugly
             }
-            
         }
         Time currentTime = clock.getElapsedTime();
 
         window.setView(view);
-        window.clear();
+        window.clear(sf::Color::White);
 
         float deltaTime = clock.restart().asSeconds();
         player.update(window, deltaTime);
@@ -76,19 +75,15 @@ int main()
         viewPosition.x = result.x;
         viewPosition.y = std::min(result.y, 0 - view.getSize().y + 33.75f + view.getSize().y / 2);
         view.setCenter(viewPosition);
-        //
-        move(testShape, bodyId);
         move(playerBox, playerBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, deltaTime, subStepCount);
 
         for (LevelRectangle rectangle : Level::currentLevel) {
-            std::cout << rectangle.rectangle.getPosition().x << " " << rectangle.rectangle.getPosition().x << std::endl;
             window.draw(rectangle.rectangle);
         }
-        window.draw(testShape);
         window.draw(floor);
-        window.draw(playerBox);
+        player.draw(window);
         window.display();
     }
     return 0;

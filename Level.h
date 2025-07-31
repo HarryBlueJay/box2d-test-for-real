@@ -18,6 +18,21 @@ struct LevelRectangle {
 namespace Level {
 	b2Vec2 spawnLocation;
 	std::vector<LevelRectangle> currentLevel;
+	sf::Color tiledHexToSfColor(std::string color) {
+		std::string alpha = color.substr(1, 2);
+		std::string red = color.substr(3, 2);
+		std::string green = color.substr(5, 2);
+		std::string blue = color.substr(7, 2);
+
+		// std::strtoul(alpha.c_str(), nullptr, 16)
+
+		return sf::Color(
+			std::strtoul(red.c_str(), nullptr, 16),
+			std::strtoul(green.c_str(), nullptr, 16), 
+			std::strtoul(blue.c_str(), nullptr, 16),
+			std::strtoul(alpha.c_str(), nullptr, 16)
+		);
+	}
 	void loadLevel(std::string level) {
 		std::ifstream f("levels\\" + level);
 		json data = json::parse(f);
@@ -28,12 +43,12 @@ namespace Level {
 				json spawnLocationJSON = (*layer)["objects"][0];
 				spawnLocation.x = pixelsToMeters(spawnLocationJSON["x"]);
 				spawnLocation.y = pixelsToMeters(spawnLocationJSON["y"]);
-				std::cout << spawnLocation.x << " " << spawnLocation.y << std::endl;
 			}
 			if (layerName == "Collision") {
 				json objects = (*layer)["objects"];
 				for (json::iterator object = objects.begin(); object != objects.end(); ++object) {
 					sf::RectangleShape rectangle;
+					sf::Color rectangleColor = sf::Color::Black;
 					sf::Vector2f size = sf::Vector2f(
 						(*object)["width"],
 						(*object)["height"]
@@ -60,8 +75,12 @@ namespace Level {
 						if (name == "type") {
 							type = (*property)["value"];
 						}
+						else if (name == "color") {
+							rectangleColor = tiledHexToSfColor((*property)["value"]);
+						}
 					}
 					//rectangle.setFillColor(sf::Color(r, g, b, a));
+					rectangle.setFillColor(rectangleColor);
 					LevelRectangle actualRectangle;
 					actualRectangle.rectangle = rectangle;
 					actualRectangle.bodyId = bodyId;
