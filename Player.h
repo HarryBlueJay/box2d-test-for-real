@@ -65,8 +65,8 @@ public:
 		b2Vec2 bottomLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,0.5 * 2 });
 		b2Vec2 bottomRight = b2Body_GetWorldPoint(player, { 0.5 * 2,0.5 * 2 });
 
-		OverlapResult bottomResult = lineOverlap(bottomLeft + b2Vec2{ 0,0.1 }, bottomRight + b2Vec2{0,0.1 }, b2DefaultQueryFilter(), window);
-		OverlapResult topResult = lineOverlap(topLeft + b2Vec2{ 0,-0.1 }, topRight + b2Vec2{ 0,-0.1 }, b2DefaultQueryFilter(), window);
+		OverlapResult bottomResult = lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{-0.1,0.1 }, b2DefaultQueryFilter(), window);
+		OverlapResult topResult = lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
 		OverlapResult leftResult = lineOverlap(topLeft+b2Vec2{-0.1,0.1 }, bottomLeft+b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
 		OverlapResult rightResult = lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
 		bottomLine = bottomResult.hit;

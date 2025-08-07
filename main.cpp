@@ -36,11 +36,15 @@ int main()
     makeBox(floor, groundId, b2DefaultShapeDef(), sf::Vector2f(50, 500), sf::Vector2f(50, 10), b2_staticBody);
 
     //b2Body_SetAngularVelocity(playerBoxId, 100000);
+    sf::ConvexShape test(3);
+    test.setPoint(0,sf::Vector2f(-13, -39));
+    test.setPoint(1, sf::Vector2f(-10, -40));
+    test.setPoint(2, sf::Vector2f(-5, -41));
+    test.setFillColor(sf::Color::Black);
 
     RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
     Player player(playerBoxId,playerBox);
-    Level::tiledHexToSfColor("#ff000000");
     Level::loadLevel("level1.json");
     player.die();
 
@@ -82,6 +86,7 @@ int main()
         for (LevelRectangle rectangle : Level::currentLevel) {
             window.draw(rectangle.rectangle);
         }
+        window.draw(test);
         window.draw(floor);
         player.draw(window);
         window.display();

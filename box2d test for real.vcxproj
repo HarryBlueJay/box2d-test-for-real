@@ -106,6 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>extlibs\include;C:\Users\harry\source\repos\box2d-3.1.0\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +141,7 @@
     <None Include="levels\level1.json" />
     <None Include="levels\level1old.json" />
     <None Include="levels\levels.json" />
+    <None Include="levels\levels.tiled-project" />
     <None Include="levels\testlevel.json" />
     <None Include="levels\tutorial.json" />
     <None Include="packages.config" />
@@ -149,6 +151,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="tileson.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

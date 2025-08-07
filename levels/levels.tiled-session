@@ -1,13 +1,24 @@
 {
-    "activeFile": "",
+    "activeFile": "level1.json",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "level1.json": {
+            "scale": 0.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": -1258,
+                "y": -1410
+            }
+        }
     },
     "openFiles": [
+        "level1.json"
     ],
     "project": "levels.tiled-project",
     "property.type": "RectangleType",
     "recentFiles": [
+        "level1.json"
     ]
 }

@@ -26,6 +26,7 @@
     <None Include="levels\levels.json" />
     <None Include="levels\level1old.json" />
     <None Include="levels\level1.json" />
+    <None Include="levels\levels.tiled-project" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -39,6 +40,9 @@
     </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tileson.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

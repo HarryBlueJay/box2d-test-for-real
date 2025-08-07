@@ -1,5 +1,7 @@
 #pragma once
 #include "json.hpp"
+#include <filesystem>
+#include "tileson.hpp"
 #include <iostream>
 #include <fstream>
 #include <box2d/box2d.h>
@@ -34,16 +36,59 @@ namespace Level {
 		);
 	}
 	void loadLevel(std::string level) {
-		std::ifstream f("levels\\" + level);
-		json data = json::parse(f);
+		tson::Tileson t;
+		std::unique_ptr<tson::Map> map = t.parse("levels\\" + level);
+		if (map->getStatus() != tson::ParseStatus::OK) {
+			std::cout << "Failed to parse" << std::endl;
+			return;
+		}
+		//SpawnLocation
+		tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
+		tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
+		tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
+		spawnLocation.x = pixelsToMeters(spawnLocationPosition.x);
+		spawnLocation.y = pixelsToMeters(spawnLocationPosition.y);
+
+		//Collision
+		tson::Layer* collisionLayer = map->getLayer("Collision");
+		for (auto& object : collisionLayer->getObjects()) {
+
+			tson::Vector2i objectPosition = object.getPosition();
+			tson::Vector2i objectSize = object.getSize();
+			tson::Colori objectColor = object.get<tson::Colori>("color");
+
+			RectangleType type = NORMAL;
+			type = object.get<RectangleType>("type");
+
+			//object.getObjectType();
+			//tson::ObjectType::
+			sf::RectangleShape rectangle;
+			sf::Color rectangleColor = sf::Color::Black;
+			rectangleColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+			sf::Vector2f size = sf::Vector2f(
+				objectSize.x,
+				objectSize.y
+			);
+			sf::Vector2f position = sf::Vector2f(
+				objectPosition.x + (size.x / 2),
+				objectPosition.y + (size.y / 2)
+			);
+
+			rectangle.setFillColor(rectangleColor);
+			b2BodyId bodyId{};
+			makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
+
+			LevelRectangle actualRectangle;
+			actualRectangle.rectangle = rectangle;
+			actualRectangle.bodyId = bodyId;
+			actualRectangle.type = type;
+			currentLevel.push_back(actualRectangle);
+		}
+		std::cout << currentLevel.size() << std::endl;
+		/*json data = json::parse(f);
 		json layers = data["layers"];
 		for (json::iterator layer = layers.begin(); layer != layers.end(); ++layer) {
 			std::string layerName = (*layer)["name"];
-			if (layerName == "SpawnLocation") {
-				json spawnLocationJSON = (*layer)["objects"][0];
-				spawnLocation.x = pixelsToMeters(spawnLocationJSON["x"]);
-				spawnLocation.y = pixelsToMeters(spawnLocationJSON["y"]);
-			}
 			if (layerName == "Collision") {
 				json objects = (*layer)["objects"];
 				for (json::iterator object = objects.begin(); object != objects.end(); ++object) {
@@ -60,26 +105,6 @@ namespace Level {
 					b2BodyId bodyId{};
 					makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
 					RectangleType type = NORMAL;
-					json properties = (*object)["properties"];
-					for (json::iterator property = properties.begin(); property != properties.end(); ++property) {
-						std::string name = (*property)["name"];
-						//if (name == "r") {
-						//	r = (*it2)["value"];
-						//}
-						//else if (name == "g") {
-						//	g = (*it2)["value"];
-						//}
-						//else if (name == "b") {
-						//	b = (*it2)["value"];
-						//}
-						if (name == "type") {
-							type = (*property)["value"];
-						}
-						else if (name == "color") {
-							rectangleColor = tiledHexToSfColor((*property)["value"]);
-						}
-					}
-					//rectangle.setFillColor(sf::Color(r, g, b, a));
 					rectangle.setFillColor(rectangleColor);
 					LevelRectangle actualRectangle;
 					actualRectangle.rectangle = rectangle;
@@ -89,6 +114,6 @@ namespace Level {
 				}
 			}
 			std::cout << layerName << std::endl;
-		}
+		}*/
 	}
 }
