@@ -30,11 +30,6 @@ int main()
     playerShapeDef.material = playerMaterial;
     makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), bodyDef);
 
-    // Making floor
-    sf::RectangleShape floor{};
-    b2BodyId groundId{};
-    makeBox(floor, groundId, b2DefaultShapeDef(), sf::Vector2f(50, 500), sf::Vector2f(50, 10), b2_staticBody);
-
     //b2Body_SetAngularVelocity(playerBoxId, 100000);
     sf::ConvexShape test(3);
     test.setPoint(0,sf::Vector2f(-13, -39));
@@ -84,10 +79,10 @@ int main()
         b2World_Step(worldId, deltaTime, subStepCount);
 
         for (LevelRectangle rectangle : Level::currentLevel) {
+            // sfml rectangles rotate around center and not the top left, like tiled
             window.draw(rectangle.rectangle);
         }
         window.draw(test);
-        window.draw(floor);
         player.draw(window);
         window.display();
     }

@@ -12,10 +12,15 @@ enum RectangleType {
 	DOOR
 };
 struct LevelRectangle {
+	tson::ObjectType objectType;
 	sf::RectangleShape rectangle;
+	sf::CircleShape circle;
+	sf::ConvexShape polygon;
+	sf::Text text;
 	b2BodyId bodyId;
 	RectangleType type;
 };
+
 
 namespace Level {
 	b2Vec2 spawnLocation;
@@ -59,61 +64,37 @@ namespace Level {
 
 			RectangleType type = NORMAL;
 			type = object.get<RectangleType>("type");
+			tson::ObjectType objectType = object.getObjectType();
+			if (objectType == tson::ObjectType::Rectangle) {
+				sf::RectangleShape rectangle;
+				sf::Color rectangleColor = sf::Color::Black;
+				rectangleColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+				sf::Vector2f size = sf::Vector2f(
+					objectSize.x,
+					objectSize.y
+				);
+				sf::Vector2f position = sf::Vector2f(
+					objectPosition.x + (size.x / 2),
+					objectPosition.y + (size.y / 2)
+				);
+
+				rectangle.setFillColor(rectangleColor);
+				b2BodyId bodyId{};
+				makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
+
+				LevelRectangle actualRectangle;
+				actualRectangle.rectangle = rectangle;
+				actualRectangle.bodyId = bodyId;
+				actualRectangle.type = type;
+				currentLevel.push_back(actualRectangle);
+			}
 
 			//object.getObjectType();
 			//tson::ObjectType::
-			sf::RectangleShape rectangle;
-			sf::Color rectangleColor = sf::Color::Black;
-			rectangleColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
-			sf::Vector2f size = sf::Vector2f(
-				objectSize.x,
-				objectSize.y
-			);
-			sf::Vector2f position = sf::Vector2f(
-				objectPosition.x + (size.x / 2),
-				objectPosition.y + (size.y / 2)
-			);
+			
 
-			rectangle.setFillColor(rectangleColor);
-			b2BodyId bodyId{};
-			makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
-
-			LevelRectangle actualRectangle;
-			actualRectangle.rectangle = rectangle;
-			actualRectangle.bodyId = bodyId;
-			actualRectangle.type = type;
-			currentLevel.push_back(actualRectangle);
+			
 		}
 		std::cout << currentLevel.size() << std::endl;
-		/*json data = json::parse(f);
-		json layers = data["layers"];
-		for (json::iterator layer = layers.begin(); layer != layers.end(); ++layer) {
-			std::string layerName = (*layer)["name"];
-			if (layerName == "Collision") {
-				json objects = (*layer)["objects"];
-				for (json::iterator object = objects.begin(); object != objects.end(); ++object) {
-					sf::RectangleShape rectangle;
-					sf::Color rectangleColor = sf::Color::Black;
-					sf::Vector2f size = sf::Vector2f(
-						(*object)["width"],
-						(*object)["height"]
-					);
-					sf::Vector2f position = sf::Vector2f(
-						(*object)["x"] + (size.x / 2),
-						(*object)["y"] + (size.y / 2)
-					);
-					b2BodyId bodyId{};
-					makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
-					RectangleType type = NORMAL;
-					rectangle.setFillColor(rectangleColor);
-					LevelRectangle actualRectangle;
-					actualRectangle.rectangle = rectangle;
-					actualRectangle.bodyId = bodyId;
-					actualRectangle.type = type;
-					currentLevel.push_back(actualRectangle);
-				}
-			}
-			std::cout << layerName << std::endl;
-		}*/
 	}
 }

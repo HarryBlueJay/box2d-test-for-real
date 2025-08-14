@@ -5,11 +5,11 @@
     ],
     "fileStates": {
         "level1.json": {
-            "scale": 0.5,
-            "selectedLayer": 3,
+            "scale": 0.33,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": -1258,
-                "y": -1410
+                "x": -809.090909090909,
+                "y": -1075.7575757575758
             }
         }
     },
