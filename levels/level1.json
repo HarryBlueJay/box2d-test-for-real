@@ -48,7 +48,7 @@
                          "type":"color",
                          "value":"#ff000000"
                         }],
-                 "rotation":0,
+                 "rotation":45,
                  "type":"",
                  "visible":true,
                  "width":1920,
@@ -198,7 +198,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":139,
+ "nextobjectid":143,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

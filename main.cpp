@@ -4,7 +4,6 @@
 #include "Casts.h"
 #include "Player.h"
 #include "Level.h"
-#include <cmath>
 #include <math.h>
 
 using namespace sf;
@@ -28,7 +27,7 @@ int main()
     playerShapeDef.density /= 4;
     playerMaterial.friction = 0;
     playerShapeDef.material = playerMaterial;
-    makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), bodyDef);
+    makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
 
     //b2Body_SetAngularVelocity(playerBoxId, 100000);
     sf::ConvexShape test(3);
@@ -45,7 +44,7 @@ int main()
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
-    window.setFramerateLimit(165);
+    window.setFramerateLimit(10);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -68,12 +67,18 @@ int main()
 
         float deltaTime = clock.restart().asSeconds();
         player.update(window, deltaTime);
+
         // view stuff
         sf::Vector2f viewPosition = view.getCenter();
-        b2Vec2 result = b2Lerp({ viewPosition.x, viewPosition.y }, { playerBox.getPosition().x, playerBox.getPosition().y }, 0.1f);
+        b2Vec2 start = { viewPosition.x, viewPosition.y };
+        b2Vec2 end = { playerBox.getPosition().x, playerBox.getPosition().y };
+        b2Vec2 result = start + (end - start) * std::exp(-deltaTime*25);
+        std::cout << result.x << " " << result.y << std::endl;
+        
         viewPosition.x = result.x;
-        viewPosition.y = std::min(result.y, 0 - view.getSize().y + 33.75f + view.getSize().y / 2);
+        viewPosition.y = result.y;
         view.setCenter(viewPosition);
+
         move(playerBox, playerBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, deltaTime, subStepCount);

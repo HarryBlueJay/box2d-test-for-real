@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <box2d/box2d.h>
+#include <cmath>
 using json = nlohmann::json;
 enum RectangleType {
 	NORMAL,
@@ -60,10 +61,29 @@ namespace Level {
 
 			tson::Vector2i objectPosition = object.getPosition();
 			tson::Vector2i objectSize = object.getSize();
+			float objectRotation = object.getRotation();
+			if (objectRotation > 0.0f) {
+				float angleBetweenMidpoints = objectRotation * B2_PI / 180;
+				sf::Vector2i offset(objectSize.x/2.0f, objectSize.y / 2.0f);
+				sf::Vector2i rotatedOffset(
+					offset.x * std::cos(angleBetweenMidpoints) - offset.y * std::sin(angleBetweenMidpoints),
+					offset.x * std::sin(angleBetweenMidpoints) + offset.y * std::cos(angleBetweenMidpoints)
+				);
+				objectPosition.x -= offset.x;
+				objectPosition.y -= offset.y;
+				objectPosition.x += rotatedOffset.x;
+				objectPosition.y += rotatedOffset.y;
+			}
+			
+			
+			
 			tson::Colori objectColor = object.get<tson::Colori>("color");
 
 			RectangleType type = NORMAL;
 			type = object.get<RectangleType>("type");
+			LevelRectangle actualRectangle;
+			actualRectangle.type = type;
+
 			tson::ObjectType objectType = object.getObjectType();
 			if (objectType == tson::ObjectType::Rectangle) {
 				sf::RectangleShape rectangle;
@@ -80,21 +100,13 @@ namespace Level {
 
 				rectangle.setFillColor(rectangleColor);
 				b2BodyId bodyId{};
-				makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, b2_staticBody);
+				makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
 
-				LevelRectangle actualRectangle;
 				actualRectangle.rectangle = rectangle;
 				actualRectangle.bodyId = bodyId;
-				actualRectangle.type = type;
-				currentLevel.push_back(actualRectangle);
 			}
 
-			//object.getObjectType();
-			//tson::ObjectType::
-			
-
-			
+			currentLevel.push_back(actualRectangle);
 		}
-		std::cout << currentLevel.size() << std::endl;
 	}
 }

@@ -127,10 +127,11 @@ void move(sf::RectangleShape& rectangle, b2BodyId& id) {
     rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180 / B2_PI);
 }
 
-void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyDef bodyDef) {
+void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef) {
     position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
     size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
     bodyDef.position = sfVector2f_to_b2Vec2(position);
+    bodyDef.rotation = b2MakeRot(rotation * B2_PI / 180);
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
     b2Polygon dynamicBox = b2MakeBox(size.x / 2, size.y / 2); // eventually do stuff with the scale factor
     id = b2CreateBody(worldId, &bodyDef);
@@ -141,9 +142,8 @@ void makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeD
     move(box, id);
 }
 // maybe make a version that takes in a body def
-void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, b2BodyType bodyType) {
+void makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = bodyType;
-    bodyDef.position = sfVector2f_to_b2Vec2(position);
-    makeBoxWithBodyDef(box, id, shapeDef, position, size, bodyDef);
+    makeBoxWithBodyDef(box, id, shapeDef, position, size, rotation, bodyDef);
 }

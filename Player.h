@@ -44,16 +44,24 @@ public:
 	}
 
 	void update(RenderWindow& window, float deltaTime) {
+		float xForce = 0;
+		b2Vec2 linearVelocity = b2Body_GetLinearVelocity(player);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-			b2Body_ApplyForceToCenter(player, { -20,0 }, true);
+			xForce = -40;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-			b2Body_ApplyForceToCenter(player, { 20,0 }, true);
+			xForce = 40;
 		}
+		xForce -= linearVelocity.x*2;
+
+		b2Body_ApplyForceToCenter(player, { xForce,0 }, true);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump && jumpCooldown <= 0) {
 			b2Body_ApplyLinearImpulseToCenter(player, { 0,-10 }, true);
 			canJump = false;
 			jumpCooldown = 0.1;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
+			b2Body_ApplyForceToCenter(player, { 0,-100 }, true);
 		}
 		onGround(window);
 		jumpCooldown -= deltaTime;

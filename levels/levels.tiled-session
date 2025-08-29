@@ -5,11 +5,11 @@
     ],
     "fileStates": {
         "level1.json": {
-            "scale": 0.33,
+            "scale": 0.125,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": -809.090909090909,
-                "y": -1075.7575757575758
+                "x": 448,
+                "y": 4080
             }
         }
     },
@@ -17,7 +17,7 @@
         "level1.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "RectangleType",
+    "property.type": "color",
     "recentFiles": [
         "level1.json"
     ]
