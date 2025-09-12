@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <box2d/box2d.h>
+#include "BasicIncludes.h"
 
 using namespace sf;
 bool showCasts = true;

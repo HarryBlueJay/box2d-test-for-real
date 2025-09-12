@@ -1,10 +1,10 @@
 #pragma once
+#include "BasicIncludes.h"
+#include "Casts.h"
 #include "json.hpp"
 #include <filesystem>
 #include "tileson.hpp"
-#include <iostream>
 #include <fstream>
-#include <box2d/box2d.h>
 #include <cmath>
 using json = nlohmann::json;
 enum RectangleType {

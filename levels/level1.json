@@ -48,7 +48,7 @@
                          "type":"color",
                          "value":"#ff000000"
                         }],
-                 "rotation":45,
+                 "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":1920,
@@ -109,7 +109,7 @@
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-2240,
+                 "x":-768,
                  "y":-2304
                 }, 
                 {

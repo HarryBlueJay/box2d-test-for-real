@@ -1,6 +1,4 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <box2d/box2d.h>
+#include "BasicIncludes.h"
 #include "Casts.h"
 #include "Player.h"
 #include "Level.h"
@@ -14,7 +12,7 @@ b2WorldDef worldDef;
 int main()
 {
     worldDef = b2DefaultWorldDef();
-    worldDef.gravity = b2Vec2{ 0.0f, 8.25f };
+    worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
     worldId = b2CreateWorld(&worldDef);
 
     sf::RectangleShape playerBox{};
@@ -22,6 +20,7 @@ int main()
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     bodyDef.fixedRotation = true;
+
     b2ShapeDef playerShapeDef = b2DefaultShapeDef();
     b2SurfaceMaterial playerMaterial = b2DefaultSurfaceMaterial();
     playerShapeDef.density /= 4;
@@ -44,7 +43,7 @@ int main()
 
     Clock clock;
     Time lastTime = clock.getElapsedTime();
-    window.setFramerateLimit(10);
+    window.setFramerateLimit(240);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -72,8 +71,7 @@ int main()
         sf::Vector2f viewPosition = view.getCenter();
         b2Vec2 start = { viewPosition.x, viewPosition.y };
         b2Vec2 end = { playerBox.getPosition().x, playerBox.getPosition().y };
-        b2Vec2 result = start + (end - start) * std::exp(-deltaTime*25);
-        std::cout << result.x << " " << result.y << std::endl;
+        b2Vec2 result = end + (start - end) * std::exp(-deltaTime*15);
         
         viewPosition.x = result.x;
         viewPosition.y = result.y;

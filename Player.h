@@ -1,9 +1,9 @@
 #pragma once
-#include "Level.h"
+#include "BasicIncludes.h"
 
 class Player
 {
-public:
+private:
 	//hitboxes//
 	// left hitbox
 	// right hitbox
@@ -17,11 +17,16 @@ public:
 	//state//
 	//Game::PlayerState state;
 	bool canJump;
-	float jumpCooldown;
+	int touchingWall = 0;
 
 	//movement//
-	int leftWallJumps = 0;
-	int rightWallJumps = 0;
+	int wallJumps = 0;
+	float walkForce = 40;
+	float maxWalkingSpeed = 15;
+	float airFriction = 2;
+	float groundFriction = 4;
+	float jumpSpeed = 25;
+
 
 	//textures//
 	sf::Texture textureNotMoving;
@@ -32,72 +37,16 @@ public:
 	sf::RectangleShape playerRectangle;
 	b2BodyId player;
 
-	Player(b2BodyId playerId, sf::RectangleShape& rectangle) {
-		player = playerId;
-		playerRectangle = rectangle;
-		textureNotMoving.loadFromFile("resources/eyestatic.png");
-		textureRight.loadFromFile("resources/eyeright.png");
-		textureLeft.loadFromFile("resources/eyeleft.png");
-	}
-	void die() {
-		b2Body_SetTransform(player,Level::spawnLocation,b2Body_GetRotation(player));
-	}
+	//debug//
+	std::vector<sf::Vertex> path;
+public:
+	Player(b2BodyId playerId, sf::RectangleShape& rectangle);
+	void die();
 
-	void update(RenderWindow& window, float deltaTime) {
-		float xForce = 0;
-		b2Vec2 linearVelocity = b2Body_GetLinearVelocity(player);
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-			xForce = -40;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-			xForce = 40;
-		}
-		xForce -= linearVelocity.x*2;
+	void update(sf::RenderWindow& window, float deltaTime);
 
-		b2Body_ApplyForceToCenter(player, { xForce,0 }, true);
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump && jumpCooldown <= 0) {
-			b2Body_ApplyLinearImpulseToCenter(player, { 0,-10 }, true);
-			canJump = false;
-			jumpCooldown = 0.1;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
-			b2Body_ApplyForceToCenter(player, { 0,-100 }, true);
-		}
-		onGround(window);
-		jumpCooldown -= deltaTime;
-	}
+	void onGround(sf::RenderWindow& window);
+	void movePlayerEvents(sf::Event event);
 
-	void onGround(RenderWindow& window) {
-		b2Vec2 topLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,-0.5 * 2 });
-		b2Vec2 topRight = b2Body_GetWorldPoint(player, { 0.5 * 2,-0.5 * 2 });
-		b2Vec2 bottomLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,0.5 * 2 });
-		b2Vec2 bottomRight = b2Body_GetWorldPoint(player, { 0.5 * 2,0.5 * 2 });
-
-		OverlapResult bottomResult = lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{-0.1,0.1 }, b2DefaultQueryFilter(), window);
-		OverlapResult topResult = lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-		OverlapResult leftResult = lineOverlap(topLeft+b2Vec2{-0.1,0.1 }, bottomLeft+b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-		OverlapResult rightResult = lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
-		bottomLine = bottomResult.hit;
-		topLine = topResult.hit;
-		leftLine = leftResult.hit;
-		rightLine = rightResult.hit;
-
-		if (bottomLine && !canJump) {
-			canJump = true;
-		}
-		else if (!bottomLine && canJump) {
-			canJump = false;
-		}
-	}
-	void movePlayerEvents(sf::Event event) {
-		if (event.key.code == sf::Keyboard::Key::Delete) {
-			die();
-		}
-	}
-
-	void draw(sf::RenderWindow& window) {
-		playerRectangle.setTexture(&textureNotMoving);
-		move(playerRectangle, player);
-		window.draw(playerRectangle);
-	}
+	void draw(sf::RenderWindow& window);
 };
