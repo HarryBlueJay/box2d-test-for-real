@@ -1,6 +1,8 @@
 #include "Player.h"
 #include "Level.h"
 #include "Casts.h"
+extern b2Vec2 spawnLocation;
+extern std::vector<LevelRectangle> currentLevel;
 
 Player::Player(b2BodyId playerId, sf::RectangleShape& rectangle) {
 	player = playerId;
@@ -10,7 +12,7 @@ Player::Player(b2BodyId playerId, sf::RectangleShape& rectangle) {
 	textureLeft.loadFromFile("resources/eyeleft.png");
 }
 void Player::die() {
-	b2Body_SetTransform(player, Level::spawnLocation, b2Body_GetRotation(player));
+	b2Body_SetTransform(player, spawnLocation, b2Body_GetRotation(player));
 }
 
 void Player::update(sf::RenderWindow& window, float deltaTime) {
@@ -60,16 +62,16 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	onGround(window);
 }
 
-void Player::onGround(RenderWindow& window) {
+void Player::onGround(sf::RenderWindow& window) {
 	b2Vec2 topLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,-0.5 * 2 });
 	b2Vec2 topRight = b2Body_GetWorldPoint(player, { 0.5 * 2,-0.5 * 2 });
 	b2Vec2 bottomLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,0.5 * 2 });
 	b2Vec2 bottomRight = b2Body_GetWorldPoint(player, { 0.5 * 2,0.5 * 2 });
 
-	OverlapResult bottomResult = lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ -0.1,0.1 }, b2DefaultQueryFilter(), window);
-	OverlapResult topResult = lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-	OverlapResult leftResult = lineOverlap(topLeft + b2Vec2{ -0.1,0.1 }, bottomLeft + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-	OverlapResult rightResult = lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
+	Casts::OverlapResult bottomResult = Casts::lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ -0.1,0.1 }, b2DefaultQueryFilter(), window);
+	Casts::OverlapResult topResult = Casts::lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
+	Casts::OverlapResult leftResult = Casts::lineOverlap(topLeft + b2Vec2{ -0.1,0.1 }, bottomLeft + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
+	Casts::OverlapResult rightResult = Casts::lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
 	bottomLine = bottomResult.hit;
 	topLine = topResult.hit;
 	leftLine = leftResult.hit;
@@ -78,7 +80,7 @@ void Player::onGround(RenderWindow& window) {
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(player);
 	canJump = bottomLine;// || leftLine || rightLine;
 	touchingWall = 0;
-	if (linearVelocity.y > 0) {
+	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
 		canJump = bottomLine || leftLine || rightLine;
 		if (leftLine) {
 			touchingWall -= 1;
@@ -99,7 +101,7 @@ void Player::movePlayerEvents(sf::Event event) {
 
 void Player::draw(sf::RenderWindow& window) {
 	playerRectangle.setTexture(&textureNotMoving);
-	move(playerRectangle, player);
+	Casts::move(playerRectangle, player);
 	window.draw(playerRectangle);
 	path.push_back(sf::Vertex(playerRectangle.getPosition(), sf::Color::Green));
 	if (path.size() > 14400) {

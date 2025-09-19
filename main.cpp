@@ -4,16 +4,18 @@
 #include "Level.h"
 #include <math.h>
 
-using namespace sf;
 const int WINDOWWIDTH = 800;
 const int WINDOWHEIGHT = 600;
 b2WorldDef worldDef;
+b2WorldId worldId;
+
+extern std::vector<LevelRectangle> currentLevel;
 
 int main()
 {
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
-    worldId = b2CreateWorld(&worldDef);
+    Level::loadLevel("level1.json");
 
     sf::RectangleShape playerBox{};
     b2BodyId playerBoxId{};
@@ -26,7 +28,7 @@ int main()
     playerShapeDef.density /= 4;
     playerMaterial.friction = 0;
     playerShapeDef.material = playerMaterial;
-    makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
+    Casts::makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
 
     //b2Body_SetAngularVelocity(playerBoxId, 100000);
     sf::ConvexShape test(3);
@@ -35,14 +37,13 @@ int main()
     test.setPoint(2, sf::Vector2f(-5, -41));
     test.setFillColor(sf::Color::Black);
 
-    RenderWindow window(VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
-    sf::View view(sf::FloatRect({ 0,0 }, { pixelsToMeters(WINDOWWIDTH) , pixelsToMeters(WINDOWHEIGHT) }));
+    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
+    sf::View view(sf::FloatRect({ 0,0 }, { Casts::pixelsToMeters(WINDOWWIDTH) , Casts::pixelsToMeters(WINDOWHEIGHT) }));
     Player player(playerBoxId,playerBox);
-    Level::loadLevel("level1.json");
     player.die();
 
-    Clock clock;
-    Time lastTime = clock.getElapsedTime();
+    sf::Clock clock;
+    sf::Time lastTime = clock.getElapsedTime();
     window.setFramerateLimit(240);
     while (window.isOpen()) {
         sf::Event event;
@@ -53,13 +54,13 @@ int main()
                 player.movePlayerEvents(event);
             else if (event.type == sf::Event::Resized) {
                 view.setSize({
-                        static_cast<float>(pixelsToMeters(event.size.width)),
-                        static_cast<float>(pixelsToMeters(event.size.height))
+                        static_cast<float>(Casts::pixelsToMeters(event.size.width)),
+                        static_cast<float>(Casts::pixelsToMeters(event.size.height))
                     });
                 // source: https://stackoverflow.com/questions/61447069/sfml-window-resizing-is-very-ugly
             }
         }
-        Time currentTime = clock.getElapsedTime();
+        sf::Time currentTime = clock.getElapsedTime();
 
         window.setView(view);
         window.clear(sf::Color::White);
@@ -77,11 +78,11 @@ int main()
         viewPosition.y = result.y;
         view.setCenter(viewPosition);
 
-        move(playerBox, playerBoxId);
+        Casts::move(playerBox, playerBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, deltaTime, subStepCount);
 
-        for (LevelRectangle rectangle : Level::currentLevel) {
+        for (LevelRectangle rectangle : currentLevel) {
             // sfml rectangles rotate around center and not the top left, like tiled
             window.draw(rectangle.rectangle);
         }

@@ -16,7 +16,7 @@ private:
 
 	//state//
 	//Game::PlayerState state;
-	bool canJump;
+	bool canJump = false;
 	int touchingWall = 0;
 
 	//movement//
