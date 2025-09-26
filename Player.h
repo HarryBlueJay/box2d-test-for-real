@@ -1,7 +1,7 @@
 #pragma once
-#include "BasicIncludes.h"
+#include "Object.h"
 
-class Player
+class Player : public Object
 {
 private:
 	//hitboxes//
@@ -33,20 +33,17 @@ private:
 	sf::Texture textureRight;
 	sf::Texture textureLeft;
 
-	//shapes//
-	sf::RectangleShape playerRectangle;
-	b2BodyId player;
-
 	//debug//
 	std::vector<sf::Vertex> path;
 public:
-	Player(b2BodyId playerId, sf::RectangleShape& rectangle);
+
+	Player();
 	void die();
 
-	void update(sf::RenderWindow& window, float deltaTime);
+	void update(sf::RenderWindow& window, float deltaTime) override;
 
-	void onGround(sf::RenderWindow& window);
+	void collide(b2BodyId otherObject, b2Manifold manifold) override;
 	void movePlayerEvents(sf::Event event);
 
-	void draw(sf::RenderWindow& window);
+	void draw(sf::RenderWindow& window) override;
 };

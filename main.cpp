@@ -16,31 +16,12 @@ int main()
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
     Level::loadLevel("level1.json");
-
-    sf::RectangleShape playerBox{};
-    b2BodyId playerBoxId{};
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.fixedRotation = true;
-
-    b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-    b2SurfaceMaterial playerMaterial = b2DefaultSurfaceMaterial();
-    playerShapeDef.density /= 4;
-    playerMaterial.friction = 0;
-    playerShapeDef.material = playerMaterial;
-    Casts::makeBoxWithBodyDef(playerBox, playerBoxId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
-
-    //b2Body_SetAngularVelocity(playerBoxId, 100000);
-    sf::ConvexShape test(3);
-    test.setPoint(0,sf::Vector2f(-13, -39));
-    test.setPoint(1, sf::Vector2f(-10, -40));
-    test.setPoint(2, sf::Vector2f(-5, -41));
-    test.setFillColor(sf::Color::Black);
+    std::vector<Object*> objectList;
 
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
     sf::View view(sf::FloatRect({ 0,0 }, { Casts::pixelsToMeters(WINDOWWIDTH) , Casts::pixelsToMeters(WINDOWHEIGHT) }));
-    Player player(playerBoxId,playerBox);
-    player.die();
+    Player player;
+    objectList.push_back(&player);
 
     sf::Clock clock;
     sf::Time lastTime = clock.getElapsedTime();
@@ -64,30 +45,42 @@ int main()
 
         window.setView(view);
         window.clear(sf::Color::White);
+        for (int i = 0; i < objectList.size(); i++) {
+            b2ContactData data[10];
+            int elements = b2Body_GetContactData(objectList[i]->bodyId, data, 10);
+            for (int j = 0; j < elements; j++) {
+                b2ContactData contactData = data[j];
+                b2BodyId bodyA = b2Shape_GetBody(contactData.shapeIdA);
+                b2BodyId bodyB = b2Shape_GetBody(contactData.shapeIdB);
+                objectList[i]->collide(bodyA.index1 == objectList[i]->bodyId.index1 ? bodyB : bodyA, contactData.manifold);
+            }
+        }
 
         float deltaTime = clock.restart().asSeconds();
-        player.update(window, deltaTime);
+        for (int i = 0; i < objectList.size(); i++) {
+            objectList[i]->update(window, deltaTime);
+        }
 
         // view stuff
         sf::Vector2f viewPosition = view.getCenter();
         b2Vec2 start = { viewPosition.x, viewPosition.y };
-        b2Vec2 end = { playerBox.getPosition().x, playerBox.getPosition().y };
+        sf::Vector2f playerPosition = player.rectangle.getPosition();
+        b2Vec2 end = { playerPosition.x, playerPosition.y };
         b2Vec2 result = end + (start - end) * std::exp(-deltaTime*15);
         
         viewPosition.x = result.x;
         viewPosition.y = result.y;
         view.setCenter(viewPosition);
 
-        Casts::move(playerBox, playerBoxId);
         int subStepCount = 4;
         b2World_Step(worldId, deltaTime, subStepCount);
 
         for (LevelRectangle rectangle : currentLevel) {
-            // sfml rectangles rotate around center and not the top left, like tiled
             window.draw(rectangle.rectangle);
         }
-        window.draw(test);
-        player.draw(window);
+        for (int i = 0; i < objectList.size(); i++) {
+            objectList[i]->draw(window);
+        }
         window.display();
     }
     return 0;

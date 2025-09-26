@@ -4,21 +4,32 @@
 extern b2Vec2 spawnLocation;
 extern std::vector<LevelRectangle> currentLevel;
 
-Player::Player(b2BodyId playerId, sf::RectangleShape& rectangle) {
-	player = playerId;
-	playerRectangle = rectangle;
+Player::Player() {
+	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.fixedRotation = true;
+
+	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
+	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
+	playerShapeDef.density /= 4;
+	bodyIdMaterial.friction = 0;
+	playerShapeDef.material = bodyIdMaterial;
+	Casts::makeBoxWithBodyDef(rectangle, bodyId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
+
 	textureNotMoving.loadFromFile("resources/eyestatic.png");
 	textureRight.loadFromFile("resources/eyeright.png");
 	textureLeft.loadFromFile("resources/eyeleft.png");
+
+	die();
 }
 void Player::die() {
-	b2Body_SetTransform(player, spawnLocation, b2Body_GetRotation(player));
+	b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
 }
 
 void Player::update(sf::RenderWindow& window, float deltaTime) {
 	float xForce = 0;
-	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(player);
-	b2Body_SetLinearVelocity(player, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
+	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+	b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 		xForce -= walkForce;
 	}
@@ -36,11 +47,11 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 		}
 	}
 
-	b2Body_ApplyForceToCenter(player, { xForce,0 }, true);
+	b2Body_ApplyForceToCenter(bodyId, { xForce,0 }, true);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
-		//b2Body_SetLinearVelocity(player, { linearVelocity.x - touchingWall*jumpSpeed, -jumpSpeed});
+		//b2Body_SetLinearVelocity(bodyId, { linearVelocity.x - touchingWall*jumpSpeed, -jumpSpeed});
 		if (touchingWall == 0) {
-			b2Body_SetLinearVelocity(player, b2Vec2{ linearVelocity.x, -jumpSpeed });
+			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
 		}
 		else {
 			if (std::signbit(wallJumps) == std::signbit(touchingWall)) {
@@ -49,50 +60,53 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 			else {
 				wallJumps = touchingWall;
 			}
-			b2Body_SetLinearVelocity(player, b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed);
+			b2Body_SetLinearVelocity(bodyId, b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed);
 		}
 
 
-		//b2Body_ApplyLinearImpulseToCenter(player, { 0,-10 }, true);
+		//b2Body_ApplyLinearImpulseToCenter(bodyId, { 0,-10 }, true);
 		canJump = false;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
-		b2Body_ApplyForceToCenter(player, { 0,-100 }, true);
+		b2Body_ApplyForceToCenter(bodyId, { 0,-100 }, true);
 	}
-	onGround(window);
+	//onGround(window);
+}
+void Player::collide(b2BodyId otherObject, b2Manifold manifold) {
+	std::cout << manifold.normal.x << " " << manifold.normal.y << std::endl;
 }
 
-void Player::onGround(sf::RenderWindow& window) {
-	b2Vec2 topLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,-0.5 * 2 });
-	b2Vec2 topRight = b2Body_GetWorldPoint(player, { 0.5 * 2,-0.5 * 2 });
-	b2Vec2 bottomLeft = b2Body_GetWorldPoint(player, { -0.5 * 2,0.5 * 2 });
-	b2Vec2 bottomRight = b2Body_GetWorldPoint(player, { 0.5 * 2,0.5 * 2 });
-
-	Casts::OverlapResult bottomResult = Casts::lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ -0.1,0.1 }, b2DefaultQueryFilter(), window);
-	Casts::OverlapResult topResult = Casts::lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-	Casts::OverlapResult leftResult = Casts::lineOverlap(topLeft + b2Vec2{ -0.1,0.1 }, bottomLeft + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-	Casts::OverlapResult rightResult = Casts::lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
-	bottomLine = bottomResult.hit;
-	topLine = topResult.hit;
-	leftLine = leftResult.hit;
-	rightLine = rightResult.hit;
-
-	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(player);
-	canJump = bottomLine;// || leftLine || rightLine;
-	touchingWall = 0;
-	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
-		canJump = bottomLine || leftLine || rightLine;
-		if (leftLine) {
-			touchingWall -= 1;
-		}
-		if (rightLine) {
-			touchingWall += 1;
-		}
-	}
-	if (bottomLine) {
-		wallJumps = 0;
-	}
-}
+//void Player::onGround(sf::RenderWindow& window) {
+//	b2Vec2 topLeft = b2Body_GetWorldPoint(bodyId, { -0.5 * 2,-0.5 * 2 });
+//	b2Vec2 topRight = b2Body_GetWorldPoint(bodyId, { 0.5 * 2,-0.5 * 2 });
+//	b2Vec2 bottomLeft = b2Body_GetWorldPoint(bodyId, { -0.5 * 2,0.5 * 2 });
+//	b2Vec2 bottomRight = b2Body_GetWorldPoint(bodyId, { 0.5 * 2,0.5 * 2 });
+//
+//	Casts::OverlapResult bottomResult = Casts::lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ -0.1,0.1 }, b2DefaultQueryFilter(), window);
+//	Casts::OverlapResult topResult = Casts::lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
+//	Casts::OverlapResult leftResult = Casts::lineOverlap(topLeft + b2Vec2{ -0.1,0.1 }, bottomLeft + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
+//	Casts::OverlapResult rightResult = Casts::lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
+//	bottomLine = bottomResult.hit;
+//	topLine = topResult.hit;
+//	leftLine = leftResult.hit;
+//	rightLine = rightResult.hit;
+//
+//	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+//	canJump = bottomLine;// || leftLine || rightLine;
+//	touchingWall = 0;
+//	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
+//		canJump = bottomLine || leftLine || rightLine;
+//		if (leftLine) {
+//			touchingWall -= 1;
+//		}
+//		if (rightLine) {
+//			touchingWall += 1;
+//		}
+//	}
+//	if (bottomLine) {
+//		wallJumps = 0;
+//	}
+//}
 void Player::movePlayerEvents(sf::Event event) {
 	if (event.key.code == sf::Keyboard::Key::Delete) {
 		die();
@@ -100,10 +114,10 @@ void Player::movePlayerEvents(sf::Event event) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-	playerRectangle.setTexture(&textureNotMoving);
-	Casts::move(playerRectangle, player);
-	window.draw(playerRectangle);
-	path.push_back(sf::Vertex(playerRectangle.getPosition(), sf::Color::Green));
+	rectangle.setTexture(&textureNotMoving);
+	Casts::move(rectangle, bodyId);
+	window.draw(rectangle);
+	path.push_back(sf::Vertex(rectangle.getPosition(), sf::Color::Green));
 	if (path.size() > 14400) {
 		path.erase(path.begin());
 	}
