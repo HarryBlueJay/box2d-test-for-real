@@ -5,10 +5,13 @@
 #include <fstream>
 #include <cmath>
 #include "Casts.h"
+#include "json.hpp"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 b2Vec2 spawnLocation;
 std::vector<LevelRectangle> currentLevel;
+int currentLevelNumber = 0;
+std::vector<std::string> levelList;
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
 	std::string red = color.substr(3, 2);
@@ -24,9 +27,21 @@ sf::Color Level::tiledHexToSfColor(std::string color) {
 		std::strtoul(alpha.c_str(), nullptr, 16)
 	);
 }
-void Level::loadLevel(std::string level) {
+int Level::getCurrentLevel() {
+	return currentLevelNumber;
+}
+void Level::loadLevelList() {
+	std::ifstream f("levels\\levels.json");
+	nlohmann::json data = nlohmann::json::parse(f);
+	nlohmann::json object = data["levels"];
+	for (nlohmann::json::iterator it = object.begin(); it != object.end(); ++it) {
+		levelList.push_back(*it);
+	}
+}
+void Level::loadLevel(int levelNumber) {
+	currentLevelNumber = levelNumber;
 	tson::Tileson t;
-	std::unique_ptr<tson::Map> map = t.parse("levels\\" + level);
+	std::unique_ptr<tson::Map> map = t.parse("levels\\" + levelList[levelNumber]);
 	if (map->getStatus() != tson::ParseStatus::OK) {
 		std::cout << "Failed to parse" << std::endl;
 		return;
@@ -45,11 +60,10 @@ void Level::loadLevel(std::string level) {
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
 	for (auto& object : collisionLayer->getObjects()) {
-
 		tson::Vector2i objectPosition = object.getPosition();
 		tson::Vector2i objectSize = object.getSize();
 		float objectRotation = object.getRotation();
-		if (objectRotation > 0.0f) {
+		if (objectRotation != 0.0f) {
 			float angleBetweenMidpoints = objectRotation * B2_PI / 180;
 			sf::Vector2i offset(objectSize.x / 2.0f, objectSize.y / 2.0f);
 			sf::Vector2i rotatedOffset(
@@ -68,8 +82,9 @@ void Level::loadLevel(std::string level) {
 
 		RectangleType type = NORMAL;
 		type = object.get<RectangleType>("type");
-		LevelRectangle actualRectangle;
-		actualRectangle.type = type;
+		std::cout << type << std::endl;
+		currentLevel.emplace_back();
+		currentLevel[currentLevel.size() - 1].type = type;
 
 		tson::ObjectType objectType = object.getObjectType();
 		if (objectType == tson::ObjectType::Rectangle) {
@@ -88,11 +103,10 @@ void Level::loadLevel(std::string level) {
 			rectangle.setFillColor(rectangleColor);
 			b2BodyId bodyId{};
 			Casts::makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
+			b2Body_SetUserData(bodyId, &currentLevel[currentLevel.size() - 1]);
 
-			actualRectangle.rectangle = rectangle;
-			actualRectangle.bodyId = bodyId;
+			currentLevel[currentLevel.size() - 1].rectangle = rectangle;
+			currentLevel[currentLevel.size() - 1].bodyId = bodyId;
 		}
-
-		currentLevel.push_back(actualRectangle);
 	}
 }

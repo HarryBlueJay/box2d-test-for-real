@@ -70,10 +70,36 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
 		b2Body_ApplyForceToCenter(bodyId, { 0,-100 }, true);
 	}
+	canJump = false;
+	touchingWall = 0;
 	//onGround(window);
 }
-void Player::collide(b2BodyId otherObject, b2Manifold manifold) {
-	std::cout << manifold.normal.x << " " << manifold.normal.y << std::endl;
+void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
+	LevelRectangle* rectangle = static_cast<LevelRectangle*>(b2Body_GetUserData(otherObject));
+	
+	if (rectangle) {
+		// might not be a levelrectangle, but it does exist
+		if (rectangle->type == DOOR) {
+			
+			Level::loadLevel(Level::getCurrentLevel() + 1);
+		}
+	}
+
+	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+	if (normal.y < -0.5f) {
+		canJump = true;
+		wallJumps = 0;
+	}
+	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
+		if (normal.x > 0.9 && touchingWall >= 0) {
+			canJump = true;
+			touchingWall -= 1;
+		}
+		else if (normal.x < -0.9 && touchingWall <= 0) {
+			canJump = true;
+			touchingWall += 1;
+		}
+	}
 }
 
 //void Player::onGround(sf::RenderWindow& window) {

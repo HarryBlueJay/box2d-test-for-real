@@ -15,7 +15,8 @@ int main()
 {
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
-    Level::loadLevel("level1.json");
+    Level::loadLevelList();
+    Level::loadLevel(0);
     std::vector<Object*> objectList;
 
     sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
@@ -52,7 +53,12 @@ int main()
                 b2ContactData contactData = data[j];
                 b2BodyId bodyA = b2Shape_GetBody(contactData.shapeIdA);
                 b2BodyId bodyB = b2Shape_GetBody(contactData.shapeIdB);
-                objectList[i]->collide(bodyA.index1 == objectList[i]->bodyId.index1 ? bodyB : bodyA, contactData.manifold);
+                if (bodyA.index1 == objectList[i]->bodyId.index1) {
+                    objectList[i]->collide(bodyB, -contactData.manifold.normal);
+                }
+                else {
+                    objectList[i]->collide(bodyA, contactData.manifold.normal);
+                }
             }
         }
 

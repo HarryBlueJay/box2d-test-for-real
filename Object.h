@@ -12,5 +12,5 @@ public:
 
 	virtual void draw(sf::RenderWindow& window) = 0;
 
-	virtual void collide(b2BodyId otherObject, b2Manifold manifold) = 0;
+	virtual void collide(b2BodyId otherObject, b2Vec2 normal) = 0;
 };

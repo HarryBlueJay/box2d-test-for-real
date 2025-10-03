@@ -105,12 +105,12 @@
                          "type":"color",
                          "value":"#ff000000"
                         }],
-                 "rotation":0,
+                 "rotation":-60,
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-768,
-                 "y":-2304
+                 "x":-2080,
+                 "y":-2004
                 }, 
                 {
                  "height":960,

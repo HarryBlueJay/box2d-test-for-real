@@ -20,5 +20,7 @@ struct LevelRectangle {
 
 namespace Level {
 	sf::Color tiledHexToSfColor(std::string color);
-	void loadLevel(std::string level);
+	void loadLevel(int levelNumber);
+	void loadLevelList();
+	int getCurrentLevel();
 }

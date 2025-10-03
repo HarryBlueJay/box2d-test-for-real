@@ -42,7 +42,7 @@ public:
 
 	void update(sf::RenderWindow& window, float deltaTime) override;
 
-	void collide(b2BodyId otherObject, b2Manifold manifold) override;
+	void collide(b2BodyId otherObject, b2Vec2 normal) override;
 	void movePlayerEvents(sf::Event event);
 
 	void draw(sf::RenderWindow& window) override;
