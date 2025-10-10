@@ -1,9 +1,16 @@
 #include "BasicIncludes.h"
 #include "Casts.h"
+#include "BaseCollider.h"
 extern b2WorldId worldId;
 bool showCasts = true;
 float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 //also anything below 4 pixels causes trouble, don't expect to reach that
+
+
+class EmptyData : public BaseCollider {
+    void draw(sf::RenderWindow& window) override {};
+};
+std::unique_ptr<EmptyData> nothing;
 
 //vec2forSFML
 sf::Vector2f Casts::b2Vec2_to_sfVector2f(b2Vec2 input) {
@@ -122,6 +129,8 @@ void Casts::makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef
     box.setSize(size);
     box.setOrigin(size.x / 2, size.y / 2);
     move(box, id);
+
+    b2Body_SetUserData(id, nothing.get());
 }
 // maybe make a version that takes in a body def
 void Casts::makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {

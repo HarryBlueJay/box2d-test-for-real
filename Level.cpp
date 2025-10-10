@@ -27,6 +27,9 @@ sf::Color Level::tiledHexToSfColor(std::string color) {
 		std::strtoul(alpha.c_str(), nullptr, 16)
 	);
 }
+void LevelRectangle::draw(sf::RenderWindow& window) {
+	window.draw(rectangle);
+}
 int Level::getCurrentLevel() {
 	return currentLevelNumber;
 }

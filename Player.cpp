@@ -75,13 +75,15 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	//onGround(window);
 }
 void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
-	LevelRectangle* rectangle = static_cast<LevelRectangle*>(b2Body_GetUserData(otherObject));
-	
-	if (rectangle) {
-		// might not be a levelrectangle, but it does exist
-		if (rectangle->type == DOOR) {
-			
-			Level::loadLevel(Level::getCurrentLevel() + 1);
+	BaseCollider* base = static_cast<BaseCollider*>(b2Body_GetUserData(otherObject));
+	if (base) {
+		LevelRectangle* rectangle = static_cast<LevelRectangle*>(base);
+		if (rectangle) {
+			// might not be a levelrectangle, but it does exist
+			if (rectangle->type == DOOR) {
+
+				Level::loadLevel(Level::getCurrentLevel() + 1);
+			}
 		}
 	}
 

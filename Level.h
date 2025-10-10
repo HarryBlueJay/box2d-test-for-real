@@ -1,4 +1,6 @@
 #pragma once
+#include "BaseCollider.h"
+
 namespace tson {
 	enum class ObjectType : unsigned char;
 };
@@ -7,14 +9,15 @@ enum RectangleType {
 	KILLBRICK,
 	DOOR
 };
-struct LevelRectangle {
+class LevelRectangle : public BaseCollider {
+public:
 	tson::ObjectType objectType;
-	sf::RectangleShape rectangle;
 	sf::CircleShape circle;
 	sf::ConvexShape polygon;
 	sf::Text text;
-	b2BodyId bodyId;
 	RectangleType type;
+
+	void draw(sf::RenderWindow& window) override;
 };
 
 
