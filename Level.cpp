@@ -62,7 +62,9 @@ void Level::loadLevel(int levelNumber) {
 
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
-	for (auto& object : collisionLayer->getObjects()) {
+	currentLevel.resize(collisionLayer->getObjects().size());
+	for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
+		auto& object = collisionLayer->getObjects()[i];
 		tson::Vector2i objectPosition = object.getPosition();
 		tson::Vector2i objectSize = object.getSize();
 		float objectRotation = object.getRotation();
@@ -85,9 +87,12 @@ void Level::loadLevel(int levelNumber) {
 
 		RectangleType type = NORMAL;
 		type = object.get<RectangleType>("type");
-		std::cout << type << std::endl;
-		currentLevel.emplace_back();
-		currentLevel[currentLevel.size() - 1].type = type;
+		tson::Property* typeProperty = object.getProp("type");
+		if (typeProperty) {
+		//	uint32_t typeEnum = std::any_cast<uint32_t>(typeProperty->getValue());
+		//	std::cout << typeEnum << std::endl;
+		}
+		currentLevel[i].type = type;
 
 		tson::ObjectType objectType = object.getObjectType();
 		if (objectType == tson::ObjectType::Rectangle) {
@@ -106,10 +111,10 @@ void Level::loadLevel(int levelNumber) {
 			rectangle.setFillColor(rectangleColor);
 			b2BodyId bodyId{};
 			Casts::makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
-			b2Body_SetUserData(bodyId, &currentLevel[currentLevel.size() - 1]);
+			b2Body_SetUserData(bodyId, &currentLevel[i]);
 
-			currentLevel[currentLevel.size() - 1].rectangle = rectangle;
-			currentLevel[currentLevel.size() - 1].bodyId = bodyId;
+			currentLevel[i].rectangle = rectangle;
+			currentLevel[i].bodyId = bodyId;
 		}
 	}
 }

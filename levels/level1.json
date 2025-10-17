@@ -83,7 +83,7 @@
                          "value":"#ff00ff00"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typed",
                          "propertytype":"RectangleType",
                          "type":"int",
                          "value":2

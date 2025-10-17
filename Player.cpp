@@ -2,7 +2,6 @@
 #include "Level.h"
 #include "Casts.h"
 extern b2Vec2 spawnLocation;
-extern std::vector<LevelRectangle> currentLevel;
 
 Player::Player() {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
@@ -76,14 +75,11 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 }
 void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
 	BaseCollider* base = static_cast<BaseCollider*>(b2Body_GetUserData(otherObject));
-	if (base) {
-		LevelRectangle* rectangle = static_cast<LevelRectangle*>(base);
-		if (rectangle) {
-			// might not be a levelrectangle, but it does exist
-			if (rectangle->type == DOOR) {
-
-				Level::loadLevel(Level::getCurrentLevel() + 1);
-			}
+	LevelRectangle* rectangle = dynamic_cast<LevelRectangle*>(base);
+	if (rectangle) {
+		// might not be a levelrectangle, but it does exist
+		if (rectangle->type == DOOR) {
+			Level::loadLevel(Level::getCurrentLevel() + 1);
 		}
 	}
 

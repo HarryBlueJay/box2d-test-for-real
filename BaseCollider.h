@@ -7,5 +7,5 @@ public:
 	sf::RectangleShape rectangle;
 	b2BodyId bodyId;
 
-	virtual void draw(sf::RenderWindow& window) = 0;
+	virtual void draw(sf::RenderWindow& window) {};
 };

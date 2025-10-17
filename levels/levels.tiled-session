@@ -17,7 +17,7 @@
         "level1.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "color",
+    "property.type": "RectangleType",
     "recentFiles": [
         "level1.json"
     ]
