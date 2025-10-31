@@ -1,7 +1,7 @@
 #pragma once
-#include "Object.h"
+#include "BaseCollider.h"
 
-class Player : public Object
+class Player : public BaseCollider
 {
 private:
 	//hitboxes//
@@ -17,7 +17,9 @@ private:
 	//state//
 	//Game::PlayerState state;
 	bool canJump = false;
-	int touchingWall = 0;
+	bool touchingLeft = false;
+	bool touchingRight = false;
+	bool touchingFloor = false;
 
 	//movement//
 	int wallJumps = 0;
@@ -27,23 +29,25 @@ private:
 	float groundFriction = 4;
 	float jumpSpeed = 25;
 
-
-	//textures//
-	sf::Texture textureNotMoving;
-	sf::Texture textureRight;
-	sf::Texture textureLeft;
+	//body//
+	sf::RectangleShape eye;
+	sf::Vector2f eyeOffset;
+	sf::Vector2f playerSize;
 
 	//debug//
 	std::vector<sf::Vertex> path;
+	bool finishedLevel = false;
+	bool dying = false;
 public:
 
 	Player();
 	void die();
+	void respawn();
 
 	void update(sf::RenderWindow& window, float deltaTime) override;
 
 	void collide(b2BodyId otherObject, b2Vec2 normal) override;
-	void movePlayerEvents(sf::Event event);
+	void inputCallback(sf::Event event) override;
 
 	void draw(sf::RenderWindow& window) override;
 };

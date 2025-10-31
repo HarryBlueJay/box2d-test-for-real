@@ -6,12 +6,14 @@
 #include <cmath>
 #include "Casts.h"
 #include "json.hpp"
+#include "Player.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 b2Vec2 spawnLocation;
 std::vector<LevelRectangle> currentLevel;
 int currentLevelNumber = 0;
 std::vector<std::string> levelList;
+extern std::vector<Object*> objectList;
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
 	std::string red = color.substr(3, 2);
@@ -50,7 +52,11 @@ void Level::loadLevel(int levelNumber) {
 		return;
 	}
 	if (worldId.index1 > 0) {
+		for (int i = 0; i < objectList.size(); i++) {
+			delete objectList[i];
+		}
 		b2DestroyWorld(worldId);
+		objectList.clear();
 	}
 	worldId = b2CreateWorld(&worldDef);
 	//SpawnLocation
@@ -59,6 +65,8 @@ void Level::loadLevel(int levelNumber) {
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
 	spawnLocation.x = Casts::pixelsToMeters(spawnLocationPosition.x);
 	spawnLocation.y = Casts::pixelsToMeters(spawnLocationPosition.y);
+	Player* player = new Player;
+	objectList.push_back(player);
 
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
@@ -80,20 +88,9 @@ void Level::loadLevel(int levelNumber) {
 			objectPosition.x += rotatedOffset.x;
 			objectPosition.y += rotatedOffset.y;
 		}
-
-
-
 		tson::Colori objectColor = object.get<tson::Colori>("color");
-
-		RectangleType type = NORMAL;
-		type = object.get<RectangleType>("type");
-		tson::Property* typeProperty = object.getProp("type");
-		if (typeProperty) {
-		//	uint32_t typeEnum = std::any_cast<uint32_t>(typeProperty->getValue());
-		//	std::cout << typeEnum << std::endl;
-		}
-		currentLevel[i].type = type;
-
+		currentLevel[i].isDoor = object.get<bool>("isDoor");
+		currentLevel[i].isKillbrick = object.get<bool>("isKillbrick");
 		tson::ObjectType objectType = object.getObjectType();
 		if (objectType == tson::ObjectType::Rectangle) {
 			sf::RectangleShape rectangle;

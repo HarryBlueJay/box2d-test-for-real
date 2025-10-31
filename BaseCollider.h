@@ -1,11 +1,12 @@
 #pragma once
 #include "BasicIncludes.h"
+#include "Object.h"
 
-class BaseCollider {
+class BaseCollider : public Object {
 public:
 	//shapes//
 	sf::RectangleShape rectangle;
 	b2BodyId bodyId;
 
-	virtual void draw(sf::RenderWindow& window) {};
+	virtual void collide(b2BodyId otherObject, b2Vec2 normal) {};
 };

@@ -8,8 +8,8 @@
             "scale": 0.25,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 276,
-                "y": -944
+                "x": 500,
+                "y": -1208
             }
         }
     },
@@ -17,7 +17,7 @@
         "level1.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "RectangleType",
+    "property.type": "bool",
     "recentFiles": [
         "level1.json"
     ]

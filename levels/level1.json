@@ -83,10 +83,9 @@
                          "value":"#ff00ff00"
                         }, 
                         {
-                         "name":"typed",
-                         "propertytype":"RectangleType",
-                         "type":"int",
-                         "value":2
+                         "name":"isDoor",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",
@@ -120,7 +119,12 @@
                         {
                          "name":"color",
                          "type":"color",
-                         "value":"#ff000000"
+                         "value":"#ffff0000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":0,
                  "type":"",

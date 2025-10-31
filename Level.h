@@ -4,19 +4,14 @@
 namespace tson {
 	enum class ObjectType : unsigned char;
 };
-enum RectangleType {
-	NORMAL,
-	KILLBRICK,
-	DOOR
-};
+
 class LevelRectangle : public BaseCollider {
 public:
 	tson::ObjectType objectType;
-	sf::CircleShape circle;
 	sf::ConvexShape polygon;
 	sf::Text text;
-	RectangleType type;
-
+	bool isDoor;
+	bool isKillbrick;
 	void draw(sf::RenderWindow& window) override;
 };
 

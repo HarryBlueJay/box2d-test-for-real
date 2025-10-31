@@ -1,10 +1,11 @@
 #pragma once
-#include "BaseCollider.h"
 
-class Object : public BaseCollider
+class Object
 {
 public:
-	virtual void update(sf::RenderWindow& window, float deltaTime) = 0;
+	virtual void update(sf::RenderWindow& window, float deltaTime) {}
 
-	virtual void collide(b2BodyId otherObject, b2Vec2 normal) = 0;
+	virtual void inputCallback(sf::Event event) {}
+
+	virtual void draw(sf::RenderWindow& window) {}
 };

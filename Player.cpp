@@ -2,6 +2,9 @@
 #include "Level.h"
 #include "Casts.h"
 extern b2Vec2 spawnLocation;
+sf::Texture bodyTexture;
+sf::Texture eyeTexture;
+
 
 Player::Player() {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
@@ -15,19 +18,48 @@ Player::Player() {
 	playerShapeDef.material = bodyIdMaterial;
 	Casts::makeBoxWithBodyDef(rectangle, bodyId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
 
-	textureNotMoving.loadFromFile("resources/eyestatic.png");
-	textureRight.loadFromFile("resources/eyeright.png");
-	textureLeft.loadFromFile("resources/eyeleft.png");
-
-	die();
+	bodyTexture.loadFromFile("resources/body.png");
+	rectangle.setTexture(&bodyTexture);
+	eyeTexture.loadFromFile("resources/eye.png");
+	eye.setTexture(&eyeTexture);
+	eye.setSize(rectangle.getSize());
+	eye.setOrigin(rectangle.getOrigin());
+	playerSize = rectangle.getSize();
+	respawn();
 }
 void Player::die() {
+	b2Body_SetLinearVelocity(bodyId, { 0,0 });
+	b2Body_SetType(bodyId, b2_kinematicBody);
+	dying = true;
+}
+void Player::respawn() {
+	b2Body_SetLinearVelocity(bodyId, { 0,0 });
+	b2Body_SetType(bodyId, b2_dynamicBody);
 	b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
+	dying = false;
 }
 
 void Player::update(sf::RenderWindow& window, float deltaTime) {
+	const float delta = 0.05f;
+	if (dying) {
+		rectangle.setScale(rectangle.getScale() - sf::Vector2f(deltaTime, deltaTime));
+		if (rectangle.getScale().x < delta) {
+			rectangle.setScale(sf::Vector2f(1, 1));
+			respawn();
+		}
+		eye.setScale(rectangle.getScale());
+		return;
+	}
+	if (finishedLevel) {
+		Level::loadLevel(Level::getCurrentLevel() + 1);
+		return;
+	}
 	float xForce = 0;
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+	
+	sf::Vector2f end = Casts::b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
+	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
+	
 	b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 		xForce -= walkForce;
@@ -35,24 +67,41 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 		xForce += walkForce;
 	}
-	if (xForce == 0 && linearVelocity.x != 0.0f) {
-		float friction = canJump ? groundFriction : airFriction;
-		friction *= maxWalkingSpeed;
-		if (std::signbit(linearVelocity.x)) {
-			xForce = friction;
+	if (xForce == 0) {
+		if (abs(linearVelocity.x) >= delta) {
+			float friction = canJump ? groundFriction : airFriction;
+			friction *= maxWalkingSpeed;
+			if (std::signbit(linearVelocity.x)) {
+				xForce = friction;
+			}
+			else {
+				xForce = -friction;
+			}
 		}
 		else {
-			xForce = -friction;
+			b2Body_SetLinearVelocity(bodyId, { 0, linearVelocity.y });
 		}
+		
 	}
 
 	b2Body_ApplyForceToCenter(bodyId, { xForce,0 }, true);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
 		//b2Body_SetLinearVelocity(bodyId, { linearVelocity.x - touchingWall*jumpSpeed, -jumpSpeed});
-		if (touchingWall == 0) {
+		if (!touchingLeft && !touchingRight) {
 			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
 		}
 		else {
+			float touchingWall = 0;
+			if (touchingLeft) {
+				touchingWall += 1;
+			}
+			if (touchingRight) {
+				touchingWall -= 1;
+			}
+			if (touchingFloor) {
+				touchingWall /= 10;
+			}
+			std::cout << touchingWall << std::endl;
 			if (std::signbit(wallJumps) == std::signbit(touchingWall)) {
 				wallJumps += touchingWall;
 			}
@@ -70,7 +119,9 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 		b2Body_ApplyForceToCenter(bodyId, { 0,-100 }, true);
 	}
 	canJump = false;
-	touchingWall = 0;
+	touchingLeft = false;
+	touchingRight = false;
+	touchingFloor = false;
 	//onGround(window);
 }
 void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
@@ -78,24 +129,28 @@ void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
 	LevelRectangle* rectangle = dynamic_cast<LevelRectangle*>(base);
 	if (rectangle) {
 		// might not be a levelrectangle, but it does exist
-		if (rectangle->type == DOOR) {
-			Level::loadLevel(Level::getCurrentLevel() + 1);
+		if (rectangle->isDoor) {
+			finishedLevel = true;
+		}
+		if (rectangle->isKillbrick) {
+			die();
 		}
 	}
 
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
 	if (normal.y < -0.5f) {
 		canJump = true;
+		touchingFloor = true;
 		wallJumps = 0;
 	}
-	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
-		if (normal.x > 0.9 && touchingWall >= 0) {
+	if (linearVelocity.y + abs(linearVelocity.x) >= 0) {
+		if (normal.x > 0.9) {
 			canJump = true;
-			touchingWall -= 1;
+			touchingRight = true;
 		}
-		else if (normal.x < -0.9 && touchingWall <= 0) {
+		else if (normal.x < -0.9) {
 			canJump = true;
-			touchingWall += 1;
+			touchingLeft = true;
 		}
 	}
 }
@@ -131,16 +186,19 @@ void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
 //		wallJumps = 0;
 //	}
 //}
-void Player::movePlayerEvents(sf::Event event) {
+void Player::inputCallback(sf::Event event) {
 	if (event.key.code == sf::Keyboard::Key::Delete) {
 		die();
 	}
 }
 
 void Player::draw(sf::RenderWindow& window) {
-	rectangle.setTexture(&textureNotMoving);
-	Casts::move(rectangle, bodyId);
+	if (!dying) {
+		Casts::move(rectangle, bodyId);
+	}
+	eye.setPosition(rectangle.getPosition() + (eyeOffset * eye.getScale().x));
 	window.draw(rectangle);
+	window.draw(eye);
 	path.push_back(sf::Vertex(rectangle.getPosition(), sf::Color::Green));
 	if (path.size() > 14400) {
 		path.erase(path.begin());
