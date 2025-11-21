@@ -46,7 +46,7 @@ public:
 
 	void update(sf::RenderWindow& window, float deltaTime) override;
 
-	void collide(b2BodyId otherObject, b2Vec2 normal) override;
+	void collide(Object* otherObject, b2Vec2 normal) override;
 	void inputCallback(sf::Event event) override;
 
 	void draw(sf::RenderWindow& window) override;

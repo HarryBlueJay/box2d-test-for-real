@@ -5,6 +5,7 @@ namespace Casts {
     //vec2forSFML
     sf::Vector2f b2Vec2_to_sfVector2f(b2Vec2 input);
     b2Vec2 sfVector2f_to_b2Vec2(sf::Vector2f input);
+    sf::Vector2f rotate(sf::Vector2f input, float radians);
 
     //callbacks go here
     struct CastResult

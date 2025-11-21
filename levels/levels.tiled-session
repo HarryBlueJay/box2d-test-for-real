@@ -6,10 +6,10 @@
     "fileStates": {
         "level1.json": {
             "scale": 0.25,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 500,
-                "y": -1208
+                "x": -416,
+                "y": -1248
             }
         }
     },

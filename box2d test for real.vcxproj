@@ -131,10 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Casts.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="TransitionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\box2d-3.1.0\build\src\box2d.vcxproj">
@@ -153,12 +155,14 @@
   <ItemGroup>
     <ClInclude Include="BaseCollider.h" />
     <ClInclude Include="BasicIncludes.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Casts.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="tileson.hpp" />
+    <ClInclude Include="TransitionManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

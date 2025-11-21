@@ -7,10 +7,10 @@
 #include "Casts.h"
 #include "json.hpp"
 #include "Player.h"
+#include "Camera.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 b2Vec2 spawnLocation;
-std::vector<LevelRectangle> currentLevel;
 int currentLevelNumber = 0;
 std::vector<std::string> levelList;
 extern std::vector<Object*> objectList;
@@ -65,12 +65,9 @@ void Level::loadLevel(int levelNumber) {
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
 	spawnLocation.x = Casts::pixelsToMeters(spawnLocationPosition.x);
 	spawnLocation.y = Casts::pixelsToMeters(spawnLocationPosition.y);
-	Player* player = new Player;
-	objectList.push_back(player);
 
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
-	currentLevel.resize(collisionLayer->getObjects().size());
 	for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
 		auto& object = collisionLayer->getObjects()[i];
 		tson::Vector2i objectPosition = object.getPosition();
@@ -89,8 +86,9 @@ void Level::loadLevel(int levelNumber) {
 			objectPosition.y += rotatedOffset.y;
 		}
 		tson::Colori objectColor = object.get<tson::Colori>("color");
-		currentLevel[i].isDoor = object.get<bool>("isDoor");
-		currentLevel[i].isKillbrick = object.get<bool>("isKillbrick");
+		LevelRectangle* levelRectangle = new LevelRectangle;
+		levelRectangle->isDoor = object.get<bool>("isDoor");
+		levelRectangle->isKillbrick = object.get<bool>("isKillbrick");
 		tson::ObjectType objectType = object.getObjectType();
 		if (objectType == tson::ObjectType::Rectangle) {
 			sf::RectangleShape rectangle;
@@ -108,10 +106,17 @@ void Level::loadLevel(int levelNumber) {
 			rectangle.setFillColor(rectangleColor);
 			b2BodyId bodyId{};
 			Casts::makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
-			b2Body_SetUserData(bodyId, &currentLevel[i]);
+			b2Body_SetUserData(bodyId, reinterpret_cast<void*>(i));
 
-			currentLevel[i].rectangle = rectangle;
-			currentLevel[i].bodyId = bodyId;
+			levelRectangle->rectangle = rectangle;
+			levelRectangle->bodyId = bodyId;
 		}
+		objectList.push_back(levelRectangle);
 	}
+
+	Player* player = new Player;
+	objectList.push_back(player);
+	Camera* camera = new Camera;
+	objectList.push_back(camera);
+	camera->setTarget(&player->rectangle);
 }

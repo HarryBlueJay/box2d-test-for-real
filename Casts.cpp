@@ -19,6 +19,14 @@ sf::Vector2f Casts::b2Vec2_to_sfVector2f(b2Vec2 input) {
 b2Vec2 Casts::sfVector2f_to_b2Vec2(sf::Vector2f input) {
     return b2Vec2{ input.x, input.y };
 }
+sf::Vector2f Casts::rotate(sf::Vector2f input, float radians) {
+    float sin = std::sin(radians);
+    float cos = std::cos(radians);
+    return sf::Vector2f(
+        input.x * cos - input.y * sin,
+        input.x * sin + input.y * cos
+    );
+}
 
 //callbacks go here
 static float Casts::CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)

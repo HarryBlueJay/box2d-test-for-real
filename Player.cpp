@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Level.h"
 #include "Casts.h"
+#include "TransitionManager.h"
 extern b2Vec2 spawnLocation;
 sf::Texture bodyTexture;
 sf::Texture eyeTexture;
@@ -29,29 +30,27 @@ Player::Player() {
 }
 void Player::die() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
-	b2Body_SetType(bodyId, b2_kinematicBody);
 	dying = true;
 }
 void Player::respawn() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
-	b2Body_SetType(bodyId, b2_dynamicBody);
 	b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
+	Casts::move(rectangle, bodyId);
 	dying = false;
 }
 
 void Player::update(sf::RenderWindow& window, float deltaTime) {
 	const float delta = 0.05f;
+	const float deathRotationSpeed = 360;
 	if (dying) {
 		rectangle.setScale(rectangle.getScale() - sf::Vector2f(deltaTime, deltaTime));
+		rectangle.rotate(deltaTime * deathRotationSpeed);
+		eyeOffset = Casts::rotate(eyeOffset, -deathRotationSpeed * deltaTime * B2_PI/ 180.0f);
 		if (rectangle.getScale().x < delta) {
 			rectangle.setScale(sf::Vector2f(1, 1));
 			respawn();
 		}
 		eye.setScale(rectangle.getScale());
-		return;
-	}
-	if (finishedLevel) {
-		Level::loadLevel(Level::getCurrentLevel() + 1);
 		return;
 	}
 	float xForce = 0;
@@ -123,14 +122,14 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	touchingRight = false;
 	touchingFloor = false;
 	//onGround(window);
+	Casts::move(rectangle, bodyId);
 }
-void Player::collide(b2BodyId otherObject, b2Vec2 normal) {
-	BaseCollider* base = static_cast<BaseCollider*>(b2Body_GetUserData(otherObject));
-	LevelRectangle* rectangle = dynamic_cast<LevelRectangle*>(base);
+void Player::collide(Object* otherObject, b2Vec2 normal) {
+	LevelRectangle* rectangle = dynamic_cast<LevelRectangle*>(otherObject);
 	if (rectangle) {
 		// might not be a levelrectangle, but it does exist
 		if (rectangle->isDoor) {
-			finishedLevel = true;
+			TransitionManager::get().finishLevel();
 		}
 		if (rectangle->isKillbrick) {
 			die();
@@ -193,9 +192,6 @@ void Player::inputCallback(sf::Event event) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-	if (!dying) {
-		Casts::move(rectangle, bodyId);
-	}
 	eye.setPosition(rectangle.getPosition() + (eyeOffset * eye.getScale().x));
 	window.draw(rectangle);
 	window.draw(eye);

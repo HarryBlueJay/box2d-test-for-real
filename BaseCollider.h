@@ -8,5 +8,5 @@ public:
 	sf::RectangleShape rectangle;
 	b2BodyId bodyId;
 
-	virtual void collide(b2BodyId otherObject, b2Vec2 normal) {};
+	virtual void collide(Object* otherObject, b2Vec2 normal) {};
 };
