@@ -4,9 +4,8 @@
 #include "Level.h"
 #include "TransitionManager.h"
 #include <math.h>
+#include <Windows.h>
 
-const int WINDOWWIDTH = 800;
-const int WINDOWHEIGHT = 600;
 b2WorldDef worldDef;
 b2WorldId worldId;
 
@@ -19,8 +18,9 @@ int main()
     Level::loadLevelList();
     Level::loadLevel(0);
     
-    sf::RenderWindow window(sf::VideoMode(WINDOWWIDTH, WINDOWHEIGHT), "Hello Physics");
+    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Black World");
 
+    ShowWindow(window.getSystemHandle(),SW_MAXIMIZE);
     sf::Clock clock;
     sf::Time lastTime = clock.getElapsedTime();
     window.setFramerateLimit(240);
@@ -65,14 +65,14 @@ int main()
                     collider->collide(objectList[k], normal);
                 }
             }
-            //Update
+            // Update objects
             for (int i = 0; i < objectList.size(); i++) {
                 objectList[i]->update(window, deltaTime);
             }
-        }
 
-        int subStepCount = 4;
-        b2World_Step(worldId, deltaTime, subStepCount);
+            int subStepCount = 4;
+            b2World_Step(worldId, deltaTime, subStepCount);
+        }
 
         for (int i = 0; i < objectList.size(); i++) {
             objectList[i]->draw(window);

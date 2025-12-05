@@ -6,10 +6,26 @@
     "fileStates": {
         "level1.json": {
             "scale": 0.25,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": -416,
-                "y": -1248
+                "x": 908,
+                "y": -1304
+            }
+        },
+        "level1old.json": {
+            "scale": 0.33,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 687.878787878788,
+                "y": 927.2727272727271
+            }
+        },
+        "tutorial.json": {
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1866,
+                "y": 380
             }
         }
     },
@@ -19,6 +35,7 @@
     "project": "levels.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "level1old.json",
         "level1.json"
     ]
 }

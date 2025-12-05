@@ -43,6 +43,7 @@ public:
 	Player();
 	void die();
 	void respawn();
+	bool getCanJump() { return canJump; };
 
 	void update(sf::RenderWindow& window, float deltaTime) override;
 

@@ -42,7 +42,9 @@ void Player::respawn() {
 void Player::update(sf::RenderWindow& window, float deltaTime) {
 	const float delta = 0.05f;
 	const float deathRotationSpeed = 360;
+	const float deathAnimationTime = 0.75f;
 	if (dying) {
+		deltaTime /= deathAnimationTime;
 		rectangle.setScale(rectangle.getScale() - sf::Vector2f(deltaTime, deltaTime));
 		rectangle.rotate(deltaTime * deathRotationSpeed);
 		eyeOffset = Casts::rotate(eyeOffset, -deathRotationSpeed * deltaTime * B2_PI/ 180.0f);
@@ -142,7 +144,7 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		touchingFloor = true;
 		wallJumps = 0;
 	}
-	if (linearVelocity.y + abs(linearVelocity.x) >= 0) {
+	if (linearVelocity.y >= -20.0f) {
 		if (normal.x > 0.9) {
 			canJump = true;
 			touchingRight = true;

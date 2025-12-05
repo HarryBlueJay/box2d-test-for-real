@@ -113,10 +113,9 @@ void Level::loadLevel(int levelNumber) {
 		}
 		objectList.push_back(levelRectangle);
 	}
-
 	Player* player = new Player;
-	objectList.push_back(player);
 	Camera* camera = new Camera;
 	objectList.push_back(camera);
-	camera->setTarget(&player->rectangle);
+	camera->setTarget(player);
+	objectList.push_back(player);
 }
