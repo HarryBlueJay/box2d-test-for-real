@@ -3,7 +3,7 @@
 class Object
 {
 public:
-	virtual void update(sf::RenderWindow& window, float deltaTime) {}
+	virtual void update(float deltaTime) {}
 
 	virtual void inputCallback(sf::Event event) {}
 

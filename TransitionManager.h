@@ -7,6 +7,7 @@ private:
 	const float fadeBoxSize = 100000;
 	const float fadeTime = 1;
 	float fadeTimeCounter = 0;
+	int transitionLevel = 0;
 	sf::RectangleShape fadeBox;
 	TransitionManager();
 public:
@@ -15,7 +16,8 @@ public:
 		return singleton;
 	};
 	void finishLevel();
+	void restartLevel();
 	void draw(sf::RenderWindow& window) override;
-	void update(sf::RenderWindow& window, float deltaTime) override;
+	void update(float deltaTime) override;
 	bool isTransitioning();
 };

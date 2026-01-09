@@ -12,16 +12,22 @@ bool TransitionManager::isTransitioning() {
 void TransitionManager::finishLevel() {
 	transitionState = 1;
 	fadeTimeCounter = 0;
+	transitionLevel = Level::getCurrentLevel() + 1;
+}
+void TransitionManager::restartLevel() {
+	transitionState = 1;
+	fadeTimeCounter = 0;
+	transitionLevel = Level::getCurrentLevel();
 }
 
 void TransitionManager::draw(sf::RenderWindow& window) {
 	window.draw(fadeBox);
 }
 
-void TransitionManager::update(sf::RenderWindow& window, float deltaTime) {
+void TransitionManager::update(float deltaTime) {
 	fadeTimeCounter = std::clamp(fadeTimeCounter + (deltaTime * transitionState), 0.0f, fadeTime);
 	if (fadeTimeCounter == fadeTime) {
-		Level::loadLevel(Level::getCurrentLevel() + 1);
+		Level::loadLevel(transitionLevel);
 		transitionState = -1;
 	}
 	if (fadeTimeCounter == 0) {

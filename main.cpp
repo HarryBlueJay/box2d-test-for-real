@@ -8,6 +8,7 @@
 
 b2WorldDef worldDef;
 b2WorldId worldId;
+sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Black World");
 
 std::vector<Object*> objectList;
 
@@ -17,8 +18,6 @@ int main()
     worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
     Level::loadLevelList();
     Level::loadLevel(0);
-    
-    sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Black World");
 
     ShowWindow(window.getSystemHandle(),SW_MAXIMIZE);
     sf::Clock clock;
@@ -40,7 +39,7 @@ int main()
 
         window.clear(sf::Color::White);
         if (TransitionManager::get().isTransitioning()) {
-            TransitionManager::get().update(window, deltaTime);
+            TransitionManager::get().update(deltaTime);
         }
         else {
             //Collision
@@ -67,7 +66,7 @@ int main()
             }
             // Update objects
             for (int i = 0; i < objectList.size(); i++) {
-                objectList[i]->update(window, deltaTime);
+                objectList[i]->update(deltaTime);
             }
 
             int subStepCount = 4;

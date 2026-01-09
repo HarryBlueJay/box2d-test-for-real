@@ -28,11 +28,16 @@ private:
 	float airFriction = 2;
 	float groundFriction = 4;
 	float jumpSpeed = 25;
+	sf::Vector2f lastGroundedPosition;
 
 	//body//
 	sf::RectangleShape eye;
 	sf::Vector2f eyeOffset;
 	sf::Vector2f playerSize;
+
+	//camera//
+	sf::Vector2f oldCameraPosition;
+	
 
 	//debug//
 	std::vector<sf::Vertex> path;
@@ -40,12 +45,11 @@ private:
 	bool dying = false;
 public:
 
-	Player();
+	Player(b2Vec2 spawnLocation);
 	void die();
-	void respawn();
-	bool getCanJump() { return canJump; };
+	sf::Vector2f getCameraPosition(sf::View& view);
 
-	void update(sf::RenderWindow& window, float deltaTime) override;
+	void update(float deltaTime) override;
 
 	void collide(Object* otherObject, b2Vec2 normal) override;
 	void inputCallback(sf::Event event) override;

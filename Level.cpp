@@ -10,7 +10,7 @@
 #include "Camera.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
-b2Vec2 spawnLocation;
+extern sf::RenderWindow window;
 int currentLevelNumber = 0;
 std::vector<std::string> levelList;
 extern std::vector<Object*> objectList;
@@ -43,6 +43,22 @@ void Level::loadLevelList() {
 		levelList.push_back(*it);
 	}
 }
+void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, tson::Vector2i coordinate, sf::Vector2i rotatedOffset) {
+	coordinate.x += rotatedOffset.x;
+	coordinate.y += rotatedOffset.y;
+	if (topLeft.x > coordinate.x) {
+		topLeft.x = coordinate.x;
+	}
+	if (topLeft.y > coordinate.y) {
+		topLeft.y = coordinate.y;
+	}
+	if (bottomRight.x < coordinate.x) {
+		bottomRight.x = coordinate.x;
+	}
+	if (bottomRight.y < coordinate.y) {
+		bottomRight.y = coordinate.y;
+	}
+}
 void Level::loadLevel(int levelNumber) {
 	currentLevelNumber = levelNumber;
 	tson::Tileson t;
@@ -59,7 +75,13 @@ void Level::loadLevel(int levelNumber) {
 		objectList.clear();
 	}
 	worldId = b2CreateWorld(&worldDef);
+
+	//Level bounds
+	sf::Vector2f topLeft = sf::Vector2f(FLT_MAX, FLT_MAX);
+	sf::Vector2f bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
+
 	//SpawnLocation
+	b2Vec2 spawnLocation;
 	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
 	tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
@@ -73,18 +95,20 @@ void Level::loadLevel(int levelNumber) {
 		tson::Vector2i objectPosition = object.getPosition();
 		tson::Vector2i objectSize = object.getSize();
 		float objectRotation = object.getRotation();
-		if (objectRotation != 0.0f) {
-			float angleBetweenMidpoints = objectRotation * B2_PI / 180;
-			sf::Vector2i offset(objectSize.x / 2.0f, objectSize.y / 2.0f);
-			sf::Vector2i rotatedOffset(
-				offset.x * std::cos(angleBetweenMidpoints) - offset.y * std::sin(angleBetweenMidpoints),
-				offset.x * std::sin(angleBetweenMidpoints) + offset.y * std::cos(angleBetweenMidpoints)
-			);
-			objectPosition.x -= offset.x;
-			objectPosition.y -= offset.y;
-			objectPosition.x += rotatedOffset.x;
-			objectPosition.y += rotatedOffset.y;
-		}
+		//Rotate (differences in the anchor point between tiled and box2d)
+		float angleBetweenMidpoints = objectRotation * B2_PI / 180;
+		sf::Vector2i offset(objectSize.x / 2.0f, objectSize.y / 2.0f);
+		sf::Vector2i rotatedOffset(
+			offset.x * std::cos(angleBetweenMidpoints) - offset.y * std::sin(angleBetweenMidpoints),
+			offset.x * std::sin(angleBetweenMidpoints) + offset.y * std::cos(angleBetweenMidpoints)
+		);
+		objectPosition.x += rotatedOffset.x;
+		objectPosition.y += rotatedOffset.y;
+		updateBounds(topLeft, bottomRight, objectPosition, rotatedOffset);
+		updateBounds(topLeft, bottomRight, objectPosition, -rotatedOffset);
+		updateBounds(topLeft, bottomRight, objectPosition, sf::Vector2i(-rotatedOffset.x, rotatedOffset.y));
+		updateBounds(topLeft, bottomRight, objectPosition, sf::Vector2i(rotatedOffset.x, -rotatedOffset.y));
+
 		tson::Colori objectColor = object.get<tson::Colori>("color");
 		LevelRectangle* levelRectangle = new LevelRectangle;
 		levelRectangle->isDoor = object.get<bool>("isDoor");
@@ -99,8 +123,8 @@ void Level::loadLevel(int levelNumber) {
 				objectSize.y
 			);
 			sf::Vector2f position = sf::Vector2f(
-				objectPosition.x + (size.x / 2),
-				objectPosition.y + (size.y / 2)
+				objectPosition.x,
+				objectPosition.y
 			);
 
 			rectangle.setFillColor(rectangleColor);
@@ -113,9 +137,18 @@ void Level::loadLevel(int levelNumber) {
 		}
 		objectList.push_back(levelRectangle);
 	}
-	Player* player = new Player;
-	Camera* camera = new Camera;
+	topLeft = sf::Vector2f(
+		Casts::pixelsToMeters(topLeft.x),
+		Casts::pixelsToMeters(topLeft.y)
+	);
+	bottomRight = sf::Vector2f(
+		Casts::pixelsToMeters(bottomRight.x),
+		Casts::pixelsToMeters(bottomRight.y)
+	);
+	Player* player = new Player(spawnLocation);
+	Camera* camera = new Camera(window);
 	objectList.push_back(camera);
+	camera->setBounds(topLeft, bottomRight);
 	camera->setTarget(player);
 	objectList.push_back(player);
 }

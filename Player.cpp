@@ -2,12 +2,11 @@
 #include "Level.h"
 #include "Casts.h"
 #include "TransitionManager.h"
-extern b2Vec2 spawnLocation;
 sf::Texture bodyTexture;
 sf::Texture eyeTexture;
 
 
-Player::Player() {
+Player::Player(b2Vec2 spawnLocation) {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.fixedRotation = true;
@@ -26,20 +25,35 @@ Player::Player() {
 	eye.setSize(rectangle.getSize());
 	eye.setOrigin(rectangle.getOrigin());
 	playerSize = rectangle.getSize();
-	respawn();
-}
-void Player::die() {
-	b2Body_SetLinearVelocity(bodyId, { 0,0 });
-	dying = true;
-}
-void Player::respawn() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
 	Casts::move(rectangle, bodyId);
 	dying = false;
 }
+void Player::die() {
+	b2Body_SetLinearVelocity(bodyId, { 0,0 });
+	dying = true;
+}
 
-void Player::update(sf::RenderWindow& window, float deltaTime) {
+sf::Vector2f Player::getCameraPosition(sf::View& view) {
+	sf::Vector2f position = rectangle.getPosition();
+	//if (wallJumps != 0) {
+	//	position.x = oldCameraPosition.x;
+	//}
+	//else if (position.y < lastGroundedPosition.y) {
+	//	position.y = oldCameraPosition.y;
+	//}
+	//else {
+		position.y -= view.getSize().y / 4;
+	//}
+	if (std::abs(position.y - oldCameraPosition.y) < 10) {
+		position.y = oldCameraPosition.y;
+	}
+	oldCameraPosition = position;
+	return position;
+}
+
+void Player::update(float deltaTime) {
 	const float delta = 0.05f;
 	const float deathRotationSpeed = 360;
 	const float deathAnimationTime = 0.75f;
@@ -49,8 +63,7 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 		rectangle.rotate(deltaTime * deathRotationSpeed);
 		eyeOffset = Casts::rotate(eyeOffset, -deathRotationSpeed * deltaTime * B2_PI/ 180.0f);
 		if (rectangle.getScale().x < delta) {
-			rectangle.setScale(sf::Vector2f(1, 1));
-			respawn();
+			TransitionManager::get().restartLevel();
 		}
 		eye.setScale(rectangle.getScale());
 		return;
@@ -82,12 +95,10 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 		else {
 			b2Body_SetLinearVelocity(bodyId, { 0, linearVelocity.y });
 		}
-		
 	}
 
 	b2Body_ApplyForceToCenter(bodyId, { xForce,0 }, true);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
-		//b2Body_SetLinearVelocity(bodyId, { linearVelocity.x - touchingWall*jumpSpeed, -jumpSpeed});
 		if (!touchingLeft && !touchingRight) {
 			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
 		}
@@ -111,9 +122,6 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 			}
 			b2Body_SetLinearVelocity(bodyId, b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed);
 		}
-
-
-		//b2Body_ApplyLinearImpulseToCenter(bodyId, { 0,-10 }, true);
 		canJump = false;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
@@ -123,17 +131,16 @@ void Player::update(sf::RenderWindow& window, float deltaTime) {
 	touchingLeft = false;
 	touchingRight = false;
 	touchingFloor = false;
-	//onGround(window);
 	Casts::move(rectangle, bodyId);
 }
 void Player::collide(Object* otherObject, b2Vec2 normal) {
-	LevelRectangle* rectangle = dynamic_cast<LevelRectangle*>(otherObject);
-	if (rectangle) {
+	LevelRectangle* levelRectangle = dynamic_cast<LevelRectangle*>(otherObject);
+	if (levelRectangle) {
 		// might not be a levelrectangle, but it does exist
-		if (rectangle->isDoor) {
+		if (levelRectangle->isDoor) {
 			TransitionManager::get().finishLevel();
 		}
-		if (rectangle->isKillbrick) {
+		if (levelRectangle->isKillbrick) {
 			die();
 		}
 	}
@@ -143,6 +150,7 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		canJump = true;
 		touchingFloor = true;
 		wallJumps = 0;
+		lastGroundedPosition = rectangle.getPosition();
 	}
 	if (linearVelocity.y >= -20.0f) {
 		if (normal.x > 0.9) {
