@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Casts.h"
 const int windowHeight = 800;
+const int cameraSpeed = 8;
 
 Camera::Camera(sf::RenderWindow& window) : target(nullptr), playerTarget(nullptr) {
 	view = sf::View();
@@ -12,25 +13,58 @@ void Camera::update(float deltaTime) {
     sf::Vector2f end = target->getPosition();
     if (playerTarget) {
         end = playerTarget->getCameraPosition(view);
+        sf::Vector2f centerDistance = end - view.getCenter();
+        float overshootX = abs(centerDistance.x) - 5.0f;
+        float overshootY = abs(centerDistance.y) - 1.0f;
+        if (overshootX > 0.0f) {
+            if (centerDistance.x > 0.0f) {
+                start.x += overshootX;
+            }
+            else {
+                start.x -= overshootX;
+            }
+        }
+        if (overshootY > 0.0f) {
+            if (centerDistance.y > 0.0f) {
+                start.y += overshootY;
+            }
+            else {
+                start.y -= overshootY;
+            }
+        }
     }
-    start = end + (start - end) * std::exp(-deltaTime * 8);
+    else {
+        start = end + (start - end) * std::exp(-deltaTime * cameraSpeed);
+    }
     sf::Vector2f viewTopLeft = start - view.getSize()/2.0f;
     sf::Vector2f viewBottomRight = start + view.getSize() / 2.0f;
-    float leftDistance = topLeft.x - viewTopLeft.x;
-    float topDistance = topLeft.y - viewTopLeft.y;
-    float rightDistance = bottomRight.x - viewBottomRight.x;
-    float bottomDistance = bottomRight.y - viewBottomRight.y;
-    if (leftDistance > 0) {
-        start.x += leftDistance;
+    sf::Vector2f levelSize = bottomRight - topLeft;
+    sf::Vector2f levelMiddle = topLeft + levelSize / 2.0f;
+    if (levelSize.x > view.getSize().x) {
+        float leftDistance = topLeft.x - viewTopLeft.x;
+        float rightDistance = bottomRight.x - viewBottomRight.x;
+        if (leftDistance > 0) {
+            start.x += leftDistance;
+        }
+        if (rightDistance < 0) {
+            start.x += rightDistance;
+        }
     }
-    if (topDistance > 0) {
-        start.y += topDistance;
+    else {
+        start.x = levelMiddle.x;
     }
-    if (rightDistance < 0) {
-        start.x += rightDistance;
+    if (levelSize.y > view.getSize().y) {
+        float topDistance = topLeft.y - viewTopLeft.y;
+        float bottomDistance = bottomRight.y - viewBottomRight.y;
+        if (topDistance > 0) {
+            start.y += topDistance;
+        }
+        if (bottomDistance < 0) {
+            start.y += bottomDistance;
+        }
     }
-    if (bottomDistance < 0) {
-        start.y += bottomDistance;
+    else {
+        start.y = levelMiddle.y;
     }
     view.setCenter(start);
 }

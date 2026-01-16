@@ -37,19 +37,7 @@ void Player::die() {
 
 sf::Vector2f Player::getCameraPosition(sf::View& view) {
 	sf::Vector2f position = rectangle.getPosition();
-	//if (wallJumps != 0) {
-	//	position.x = oldCameraPosition.x;
-	//}
-	//else if (position.y < lastGroundedPosition.y) {
-	//	position.y = oldCameraPosition.y;
-	//}
-	//else {
-		position.y -= view.getSize().y / 4;
-	//}
-	if (std::abs(position.y - oldCameraPosition.y) < 10) {
-		position.y = oldCameraPosition.y;
-	}
-	oldCameraPosition = position;
+	position.y -= view.getSize().y / 8;
 	return position;
 }
 
@@ -196,7 +184,7 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 //	}
 //}
 void Player::inputCallback(sf::Event event) {
-	if (event.key.code == sf::Keyboard::Key::Delete) {
+	if (event.key.code == sf::Keyboard::Key::Delete && event.type == sf::Event::EventType::KeyPressed) {
 		die();
 	}
 }

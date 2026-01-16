@@ -6,7 +6,7 @@
     "fileStates": {
         "level1.json": {
             "scale": 0.33,
-            "selectedLayer": 1,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 16.666666666666686,
                 "y": 13.636363636363626
@@ -22,8 +22,8 @@
         },
         "tutorial.json": {
             "expandedObjectLayers": [
-                3,
-                2
+                2,
+                3
             ],
             "scale": 0.5,
             "selectedLayer": 1,

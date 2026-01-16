@@ -36,7 +36,7 @@ private:
 	sf::Vector2f playerSize;
 
 	//camera//
-	sf::Vector2f oldCameraPosition;
+	bool snapCameraToPlayer = false;
 	
 
 	//debug//
