@@ -19,14 +19,13 @@ int main()
     Level::loadLevelList();
     Level::loadLevel(0);
 
-    ShowWindow(window.getSystemHandle(),SW_MAXIMIZE);
+    ShowWindow(window.getNativeHandle(),SW_MAXIMIZE);
     sf::Clock clock;
     sf::Time lastTime = clock.getElapsedTime();
     window.setFramerateLimit(240);
     while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+        while (const std::optional event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>())
                 window.close();
             else {
                 for (int i = 0; i < objectList.size(); i++) {

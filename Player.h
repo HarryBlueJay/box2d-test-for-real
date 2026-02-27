@@ -33,7 +33,6 @@ private:
 	//body//
 	sf::RectangleShape eye;
 	sf::Vector2f eyeOffset;
-	sf::Vector2f playerSize;
 
 	//camera//
 	bool snapCameraToPlayer = false;
@@ -52,7 +51,7 @@ public:
 	void update(float deltaTime) override;
 
 	void collide(Object* otherObject, b2Vec2 normal) override;
-	void inputCallback(sf::Event event) override;
+	void inputCallback(std::optional<sf::Event> event) override;
 
 	void draw(sf::RenderWindow& window) override;
 };

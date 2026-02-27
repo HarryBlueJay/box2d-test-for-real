@@ -5,11 +5,9 @@ namespace tson {
 	enum class ObjectType : unsigned char;
 };
 
-class LevelRectangle : public BaseCollider {
+class LevelPolygon : public BaseCollider {
 public:
 	tson::ObjectType objectType;
-	sf::ConvexShape polygon;
-	sf::Text text;
 	bool isDoor;
 	bool isKillbrick;
 	void draw(sf::RenderWindow& window) override;

@@ -6,12 +6,6 @@ bool showCasts = true;
 float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
 //also anything below 4 pixels causes trouble, don't expect to reach that
 
-
-class EmptyData : public BaseCollider {
-    void draw(sf::RenderWindow& window) override {};
-};
-std::unique_ptr<EmptyData> nothing;
-
 //vec2forSFML
 sf::Vector2f Casts::b2Vec2_to_sfVector2f(b2Vec2 input) {
     return sf::Vector2f(input.x, input.y);
@@ -52,23 +46,23 @@ void Casts::simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, sf::Rend
     b2ShapeProxy p = b2MakeProxy(points, 2, 0.5);
     b2World_CastShape(worldId, &p, offset * 0.5, b2DefaultQueryFilter(), CastCallback, &context);
     sf::Vertex line1[]{
-        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point2),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(point1),sf::Color::Red)
+        {b2Vec2_to_sfVector2f(point1),sf::Color::Red },
+        {b2Vec2_to_sfVector2f(point2),sf::Color::Red },
+        {b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red },
+        {b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red },
+        {b2Vec2_to_sfVector2f(point1),sf::Color::Red }
     };
 
     if (showCasts) {
-        window.draw(line1, 5, sf::LineStrip);
+        window.draw(line1, 5, sf::PrimitiveType::LineStrip);
     }
     if (context.hit) {
         sf::Vertex line2[]{
-            sf::Vertex(b2Vec2_to_sfVector2f(point1), sf::Color::Green),
-            sf::Vertex(b2Vec2_to_sfVector2f(context.point),sf::Color::Green),
+            { b2Vec2_to_sfVector2f(point1), sf::Color::Green },
+            { b2Vec2_to_sfVector2f(context.point),sf::Color::Green },
         };
         if (showCasts) {
-            window.draw(line2, 2, sf::Lines);
+            window.draw(line2, 2, sf::PrimitiveType::Lines);
         }
     }
 }
@@ -77,20 +71,20 @@ b2RayResult Casts::simpleRaycast(b2Vec2 start, b2Vec2 offset, sf::RenderWindow& 
 {
     b2RayResult result = b2World_CastRayClosest(worldId, start, offset, b2DefaultQueryFilter());
     sf::Vertex line1[]{
-        sf::Vertex(b2Vec2_to_sfVector2f(start),sf::Color::Red),
-        sf::Vertex(b2Vec2_to_sfVector2f(start + offset),sf::Color::Red),
+        { b2Vec2_to_sfVector2f(start),sf::Color::Red },
+        { b2Vec2_to_sfVector2f(start + offset),sf::Color::Red },
     };
 
     if (showCasts) {
-        window.draw(line1, 2, sf::Lines);
+        window.draw(line1, 2, sf::PrimitiveType::Lines);
     }
     if (result.hit) {
         sf::Vertex line2[]{
-            sf::Vertex(b2Vec2_to_sfVector2f(start), sf::Color::Green),
-            sf::Vertex(b2Vec2_to_sfVector2f(result.point),sf::Color::Green),
+            { b2Vec2_to_sfVector2f(start), sf::Color::Green },
+            { b2Vec2_to_sfVector2f(result.point),sf::Color::Green },
         };
         if (showCasts) {
-            window.draw(line2, 2, sf::Lines);
+            window.draw(line2, 2, sf::PrimitiveType::Lines);
         }
     }
     return result;
@@ -107,10 +101,10 @@ Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter 
     }
     if (showCasts) {
         sf::Vertex line1[]{
-            sf::Vertex(b2Vec2_to_sfVector2f(start),color),
-            sf::Vertex(b2Vec2_to_sfVector2f(end),color),
+            { b2Vec2_to_sfVector2f(start),color },
+            { b2Vec2_to_sfVector2f(end),color },
         };
-        window.draw(line1, 2, sf::Lines);
+        window.draw(line1, 2, sf::PrimitiveType::Lines);
     }
 
     return result;
@@ -119,30 +113,87 @@ Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter 
 float Casts::pixelsToMeters(float input) {
     return input * scaleFactor;
 }
-void Casts::move(sf::RectangleShape& rectangle, b2BodyId& id) {
+void Casts::move(sf::ConvexShape& rectangle, b2BodyId& id) {
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
-    rectangle.setRotation(b2Rot_GetAngle(b2Body_GetRotation(id)) * 180 / B2_PI);
+    rectangle.setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(id))));
 }
-
-void Casts::makeBoxWithBodyDef(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef) {
-    position = sf::Vector2f(pixelsToMeters(position.x), pixelsToMeters(position.y));
-    size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
-    bodyDef.position = sfVector2f_to_b2Vec2(position);
+void setupPolygon(b2Polygon& dynamicBox, b2BodyId& id, b2ShapeDef shapeDef, sf::ConvexShape& box, sf::Vector2f position, float rotation, b2BodyDef bodyDef) {
+    position = sf::Vector2f(Casts::pixelsToMeters(position.x), Casts::pixelsToMeters(position.y));
+    bodyDef.position = Casts::sfVector2f_to_b2Vec2(position);
     bodyDef.rotation = b2MakeRot(rotation * B2_PI / 180);
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
-    b2Polygon dynamicBox = b2MakeBox(size.x / 2, size.y / 2); // eventually do stuff with the scale factor
     id = b2CreateBody(worldId, &bodyDef);
     b2CreatePolygonShape(id, &shapeDef, &dynamicBox);
 
-    box.setSize(size);
-    box.setOrigin(size.x / 2, size.y / 2);
-    move(box, id);
+    Casts::move(box, id);
+}
+void setupBox(sf::ConvexShape& box, sf::Vector2f size) {
+    box.setPointCount(4);
+    //sf::Vector2f halfSize = size / 2.0f;
+    //box.setPoint(0, halfSize);
+    //box.setPoint(1, sf::Vector2f(-halfSize.x, halfSize.y));
+    //box.setPoint(2, -halfSize);
+    //box.setPoint(3, sf::Vector2f(halfSize.x, -halfSize.y));
+    box.setPoint(0, sf::Vector2f());
+    box.setPoint(1, sf::Vector2f(size.x, 0));
+    box.setPoint(2, size);
+    box.setPoint(3, sf::Vector2f(0, size.y));
+}
+void Casts::makeCircleWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef) {
+    position.x -= size.x;
+    size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
+    float smallestEdge = fmin(size.x / 2, size.y / 2);
+    float radius = smallestEdge * 0.9f;
+    float edgeSize = smallestEdge - radius;
+    setupBox(box, size);
+    b2Vec2 offsets[4];
+    for (int i = 0; i < 4; i++) {
+        offsets[i] = b2Vec2{size.x/2.0f, size.y/2.0f};
+        if (i < 2) {
+            offsets[i].x -= edgeSize / 2;
+        }
+        else {
+            offsets[i].x += edgeSize / 2;
+        }
+        if (i % 3 == 0) {
+            offsets[i].y += edgeSize / 2;
+        }
+        else {
+            offsets[i].y -= edgeSize / 2;
+        }
+    }
+    b2Hull hull = b2ComputeHull(offsets, 4);
+    b2Polygon polygon = b2MakePolygon(&hull, radius);
+    setupPolygon(polygon, id, shapeDef, box, position, rotation, bodyDef);
+}
 
-    b2Body_SetUserData(id, nothing.get());
+void Casts::makeBoxWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef) {
+    size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
+    setupBox(box, size);
+    b2Vec2 offsets[4];
+    for (int i = 0; i < box.getPointCount(); i++) {
+        offsets[i] = sfVector2f_to_b2Vec2(box.getPoint(i));
+    }
+    b2Hull hull = b2ComputeHull(offsets, 4);
+    b2Polygon polygon = b2MakePolygon(&hull, 0);
+    setupPolygon(polygon, id, shapeDef, box, position, rotation, bodyDef);
 }
 // maybe make a version that takes in a body def
-void Casts::makeBox(sf::RectangleShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {
+void Casts::makeBox(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = bodyType;
     makeBoxWithBodyDef(box, id, shapeDef, position, size, rotation, bodyDef);
+}
+
+void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId& id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType) {
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = bodyType;
+    b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&offsets[0]), offsets.size());
+    //b2Polygon polygon = b2MakeOffsetPolygon(&hull, sfVector2f_to_b2Vec2(position), b2MakeRot(rotation * B2_PI / 180));
+    b2Polygon polygon = b2MakePolygon(&hull, 0);
+    shape.setPointCount(offsets.size());
+    for (int i = 0; i < offsets.size(); i++) {
+        shape.setPoint(i, offsets[i]);
+    }
+    setupPolygon(polygon, id, shapeDef, shape, position, rotation, bodyDef);
 }

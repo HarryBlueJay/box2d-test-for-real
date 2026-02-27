@@ -14,19 +14,19 @@ Player::Player(b2Vec2 spawnLocation) {
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
-	bodyIdMaterial.friction = 0;
+	//bodyIdMaterial.friction = 0;
 	playerShapeDef.material = bodyIdMaterial;
-	Casts::makeBoxWithBodyDef(rectangle, bodyId, playerShapeDef, sf::Vector2f(50, 100), sf::Vector2f(64, 64), 0, bodyDef);
+	sf::Vector2f size = sf::Vector2f(64, 64);
+	Casts::makeCircleWithBodyDef(rectangle, bodyId, playerShapeDef, Casts::b2Vec2_to_sfVector2f(spawnLocation), size, 0, bodyDef);
 
 	bodyTexture.loadFromFile("resources/body.png");
 	rectangle.setTexture(&bodyTexture);
 	eyeTexture.loadFromFile("resources/eye.png");
 	eye.setTexture(&eyeTexture);
-	eye.setSize(rectangle.getSize());
+	eye.setSize(size/32.0f);
 	eye.setOrigin(rectangle.getOrigin());
-	playerSize = rectangle.getSize();
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
-	b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
+	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
 	Casts::move(rectangle, bodyId);
 	dying = false;
 }
@@ -36,7 +36,7 @@ void Player::die() {
 }
 
 sf::Vector2f Player::getCameraPosition(sf::View& view) {
-	sf::Vector2f position = rectangle.getPosition();
+	sf::Vector2f position = Casts::b2Vec2_to_sfVector2f(b2Body_GetPosition(bodyId));
 	position.y -= view.getSize().y / 8;
 	return position;
 }
@@ -47,8 +47,11 @@ void Player::update(float deltaTime) {
 	const float deathAnimationTime = 0.75f;
 	if (dying) {
 		deltaTime /= deathAnimationTime;
-		rectangle.setScale(rectangle.getScale() - sf::Vector2f(deltaTime, deltaTime));
-		rectangle.rotate(deltaTime * deathRotationSpeed);
+		sf::Vector2f shrink = sf::Vector2f(deltaTime, deltaTime);
+		sf::Vector2f center = rectangle.getGeometricCenter();
+		rectangle.setScale(rectangle.getScale() - shrink);
+		rectangle.move(shrink / 2.0f);
+		rectangle.rotate(sf::degrees(deltaTime * deathRotationSpeed));
 		eyeOffset = Casts::rotate(eyeOffset, -deathRotationSpeed * deltaTime * B2_PI/ 180.0f);
 		if (rectangle.getScale().x < delta) {
 			TransitionManager::get().restartLevel();
@@ -69,23 +72,9 @@ void Player::update(float deltaTime) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 		xForce += walkForce;
 	}
-	if (xForce == 0) {
-		if (abs(linearVelocity.x) >= delta) {
-			float friction = canJump ? groundFriction : airFriction;
-			friction *= maxWalkingSpeed;
-			if (std::signbit(linearVelocity.x)) {
-				xForce = friction;
-			}
-			else {
-				xForce = -friction;
-			}
-		}
-		else {
-			b2Body_SetLinearVelocity(bodyId, { 0, linearVelocity.y });
-		}
-	}
+	float drag = 0.1 * linearVelocity.x * linearVelocity.x * (linearVelocity.x < 0 ? 1 : -1);
 
-	b2Body_ApplyForceToCenter(bodyId, { xForce,0 }, true);
+	b2Body_ApplyForceToCenter(bodyId, { xForce+drag,0 }, true);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
 		if (!touchingLeft && !touchingRight) {
 			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
@@ -122,7 +111,7 @@ void Player::update(float deltaTime) {
 	Casts::move(rectangle, bodyId);
 }
 void Player::collide(Object* otherObject, b2Vec2 normal) {
-	LevelRectangle* levelRectangle = dynamic_cast<LevelRectangle*>(otherObject);
+	LevelPolygon* levelRectangle = dynamic_cast<LevelPolygon*>(otherObject);
 	if (levelRectangle) {
 		// might not be a levelrectangle, but it does exist
 		if (levelRectangle->isDoor) {
@@ -183,9 +172,11 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 //		wallJumps = 0;
 //	}
 //}
-void Player::inputCallback(sf::Event event) {
-	if (event.key.code == sf::Keyboard::Key::Delete && event.type == sf::Event::EventType::KeyPressed) {
-		die();
+void Player::inputCallback(std::optional<sf::Event> event) {
+	if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+		if (keyPressed->scancode == sf::Keyboard::Scancode::Delete) {
+			die();
+		}
 	}
 }
 
@@ -193,10 +184,10 @@ void Player::draw(sf::RenderWindow& window) {
 	eye.setPosition(rectangle.getPosition() + (eyeOffset * eye.getScale().x));
 	window.draw(rectangle);
 	window.draw(eye);
-	path.push_back(sf::Vertex(rectangle.getPosition(), sf::Color::Green));
+	path.push_back({ rectangle.getPosition(), sf::Color::Green });
 	if (path.size() > 14400) {
 		path.erase(path.begin());
 	}
 
-	window.draw(&path[0], path.size(), sf::LinesStrip);
+	window.draw(&path[0], path.size(), sf::PrimitiveType::LineStrip);
 }

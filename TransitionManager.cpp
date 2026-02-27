@@ -3,7 +3,7 @@
 
 TransitionManager::TransitionManager() {
 	fadeBox = sf::RectangleShape(sf::Vector2f(fadeBoxSize, fadeBoxSize));
-	fadeBox.setOrigin(fadeBoxSize/2, fadeBoxSize/2);
+	fadeBox.setOrigin(sf::Vector2f(fadeBoxSize / 2, fadeBoxSize / 2));
 	fadeBox.setFillColor(sf::Color::Transparent);
 }
 bool TransitionManager::isTransitioning() {

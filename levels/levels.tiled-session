@@ -5,11 +5,11 @@
     ],
     "fileStates": {
         "level1.json": {
-            "scale": 0.33,
-            "selectedLayer": 3,
+            "scale": 0.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 16.666666666666686,
-                "y": 13.636363636363626
+                "x": 1608,
+                "y": -968
             }
         },
         "level1old.json": {
@@ -22,26 +22,25 @@
         },
         "tutorial.json": {
             "expandedObjectLayers": [
-                2,
-                3
+                3,
+                2
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 16,
-                "y": 15
+                "x": -892,
+                "y": 1070
             }
         }
     },
     "openFiles": [
-        "level1.json",
-        "tutorial.json"
+        "level1.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "bool",
+    "property.type": "color",
     "recentFiles": [
-        "tutorial.json",
         "level1.json",
+        "tutorial.json",
         "level1old.json"
     ]
 }

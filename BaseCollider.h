@@ -5,7 +5,7 @@
 class BaseCollider : public Object {
 public:
 	//shapes//
-	sf::RectangleShape rectangle;
+	sf::ConvexShape rectangle;
 	b2BodyId bodyId;
 
 	virtual void collide(Object* otherObject, b2Vec2 normal) {};

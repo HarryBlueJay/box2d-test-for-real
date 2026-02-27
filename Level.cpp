@@ -29,7 +29,7 @@ sf::Color Level::tiledHexToSfColor(std::string color) {
 		std::strtoul(alpha.c_str(), nullptr, 16)
 	);
 }
-void LevelRectangle::draw(sf::RenderWindow& window) {
+void LevelPolygon::draw(sf::RenderWindow& window) {
 	window.draw(rectangle);
 }
 int Level::getCurrentLevel() {
@@ -43,9 +43,7 @@ void Level::loadLevelList() {
 		levelList.push_back(*it);
 	}
 }
-void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, tson::Vector2i coordinate, sf::Vector2i rotatedOffset) {
-	coordinate.x += rotatedOffset.x;
-	coordinate.y += rotatedOffset.y;
+void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
 	if (topLeft.x > coordinate.x) {
 		topLeft.x = coordinate.x;
 	}
@@ -85,66 +83,65 @@ void Level::loadLevel(int levelNumber) {
 	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
 	tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
-	spawnLocation.x = Casts::pixelsToMeters(spawnLocationPosition.x);
-	spawnLocation.y = Casts::pixelsToMeters(spawnLocationPosition.y);
+	//spawnLocation.x = Casts::pixelsToMeters(spawnLocationPosition.x);
+	//spawnLocation.y = Casts::pixelsToMeters(spawnLocationPosition.y);
+	spawnLocation.x = spawnLocationPosition.x;
+	spawnLocation.y = spawnLocationPosition.y;
 
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
 	for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
 		auto& object = collisionLayer->getObjects()[i];
 		tson::Vector2i objectPosition = object.getPosition();
-		tson::Vector2i objectSize = object.getSize();
 		float objectRotation = object.getRotation();
-		//Rotate (differences in the anchor point between tiled and box2d)
-		float angleBetweenMidpoints = objectRotation * B2_PI / 180;
-		sf::Vector2i offset(objectSize.x / 2.0f, objectSize.y / 2.0f);
-		sf::Vector2i rotatedOffset(
-			offset.x * std::cos(angleBetweenMidpoints) - offset.y * std::sin(angleBetweenMidpoints),
-			offset.x * std::sin(angleBetweenMidpoints) + offset.y * std::cos(angleBetweenMidpoints)
-		);
-		objectPosition.x += rotatedOffset.x;
-		objectPosition.y += rotatedOffset.y;
-		updateBounds(topLeft, bottomRight, objectPosition, rotatedOffset);
-		updateBounds(topLeft, bottomRight, objectPosition, -rotatedOffset);
-		updateBounds(topLeft, bottomRight, objectPosition, sf::Vector2i(-rotatedOffset.x, rotatedOffset.y));
-		updateBounds(topLeft, bottomRight, objectPosition, sf::Vector2i(rotatedOffset.x, -rotatedOffset.y));
-
 		tson::Colori objectColor = object.get<tson::Colori>("color");
-		LevelRectangle* levelRectangle = new LevelRectangle;
-		levelRectangle->isDoor = object.get<bool>("isDoor");
-		levelRectangle->isKillbrick = object.get<bool>("isKillbrick");
+		sf::Color polygonColor = sf::Color::Black;
+		polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+		LevelPolygon* levelPolygon = new LevelPolygon;
+		levelPolygon->rectangle.setFillColor(polygonColor);
+		levelPolygon->isDoor = object.get<bool>("isDoor");
+		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
+		b2BodyId bodyId{};
+		
 		tson::ObjectType objectType = object.getObjectType();
-		if (objectType == tson::ObjectType::Rectangle) {
-			sf::RectangleShape rectangle;
-			sf::Color rectangleColor = sf::Color::Black;
-			rectangleColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+		sf::Vector2f position = sf::Vector2f(
+			objectPosition.x,
+			objectPosition.y
+		);
+		switch (objectType) {
+		case tson::ObjectType::Rectangle: {
+			tson::Vector2i objectSize = object.getSize();
 			sf::Vector2f size = sf::Vector2f(
 				objectSize.x,
 				objectSize.y
 			);
-			sf::Vector2f position = sf::Vector2f(
-				objectPosition.x,
-				objectPosition.y
-			);
-
-			rectangle.setFillColor(rectangleColor);
-			b2BodyId bodyId{};
-			Casts::makeBox(rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
-			b2Body_SetUserData(bodyId, reinterpret_cast<void*>(i));
-
-			levelRectangle->rectangle = rectangle;
-			levelRectangle->bodyId = bodyId;
+			Casts::makeBox(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
+			break;
 		}
-		objectList.push_back(levelRectangle);
+		case tson::ObjectType::Polygon: {
+			std::vector<tson::Vector2i> points = object.getPolygons();
+			std::vector<sf::Vector2f> sfmlPoints;
+			for (tson::Vector2i point : points) {
+				sfmlPoints.push_back(
+					sf::Vector2f(
+						Casts::pixelsToMeters(point.x), 
+						Casts::pixelsToMeters(point.y)
+					)
+				);
+			}
+			Casts::makePolygon(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), sfmlPoints, position, objectRotation, b2_staticBody);
+			break;
+		}
+		}
+		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(i));
+		levelPolygon->bodyId = bodyId;
+		for (int i = 0; i < levelPolygon->rectangle.getPointCount(); i++) {
+			sf::FloatRect rect = levelPolygon->rectangle.getGlobalBounds();
+			updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
+			updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
+		}
+		objectList.push_back(levelPolygon);
 	}
-	topLeft = sf::Vector2f(
-		Casts::pixelsToMeters(topLeft.x),
-		Casts::pixelsToMeters(topLeft.y)
-	);
-	bottomRight = sf::Vector2f(
-		Casts::pixelsToMeters(bottomRight.x),
-		Casts::pixelsToMeters(bottomRight.y)
-	);
 	Player* player = new Player(spawnLocation);
 	Camera* camera = new Camera(window);
 	objectList.push_back(camera);

@@ -15,7 +15,7 @@ void Camera::update(float deltaTime) {
         end = playerTarget->getCameraPosition(view);
         sf::Vector2f centerDistance = end - view.getCenter();
         float overshootX = abs(centerDistance.x) - 5.0f;
-        float overshootY = abs(centerDistance.y) - 1.0f;
+        float overshootY = abs(centerDistance.y) - 5.0f;
         if (overshootX > 0.0f) {
             if (centerDistance.x > 0.0f) {
                 start.x += overshootX;
@@ -68,7 +68,7 @@ void Camera::update(float deltaTime) {
     }
     view.setCenter(start);
 }
-void Camera::setTarget(sf::RectangleShape* newTarget) {
+void Camera::setTarget(sf::ConvexShape* newTarget) {
     playerTarget = nullptr;
     target = newTarget;
     view.setCenter(target->getPosition());
@@ -84,10 +84,26 @@ void Camera::setBounds(sf::Vector2f boundTopLeft, sf::Vector2f boundBottomRight)
 }
 void Camera::draw(sf::RenderWindow& window) {
     sf::Vector2u windowSize = window.getSize();
+    if (windowSize.x < 1) {
+        windowSize.x = 1;
+    }
+    if (windowSize.y < 1) {
+        windowSize.y = 1;
+    }
     sf::Vector2f size(
-        Casts::pixelsToMeters(windowHeight * windowSize.x / windowSize.y),
-        Casts::pixelsToMeters(windowHeight)
+        windowHeight,
+        windowHeight
        );
+    if (windowSize.x > windowSize.y) {
+        size.x *= windowSize.x * 1.0f / windowSize.y;
+    }
+    else {
+        size.y *= windowSize.y * 1.0f / windowSize.x;
+    }
+    size = sf::Vector2f(
+        Casts::pixelsToMeters(size.x),
+        Casts::pixelsToMeters(size.y)
+    );
     view.setSize(size);
     window.setView(view);
 }

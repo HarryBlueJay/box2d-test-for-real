@@ -35,7 +35,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="levels\tutorial.json" />
     <None Include="levels\testlevel.json" />
     <None Include="levels\levels.json" />
