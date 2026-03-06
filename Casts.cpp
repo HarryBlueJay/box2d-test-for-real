@@ -185,15 +185,19 @@ void Casts::makeBox(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf:
     makeBoxWithBodyDef(box, id, shapeDef, position, size, rotation, bodyDef);
 }
 
-void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId& id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType) {
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = bodyType;
-    b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&offsets[0]), offsets.size());
-    //b2Polygon polygon = b2MakeOffsetPolygon(&hull, sfVector2f_to_b2Vec2(position), b2MakeRot(rotation * B2_PI / 180));
-    b2Polygon polygon = b2MakePolygon(&hull, 0);
+void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId* id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType) {
     shape.setPointCount(offsets.size());
     for (int i = 0; i < offsets.size(); i++) {
         shape.setPoint(i, offsets[i]);
     }
-    setupPolygon(polygon, id, shapeDef, shape, position, rotation, bodyDef);
+    if (id) {
+        b2BodyDef bodyDef = b2DefaultBodyDef();
+        bodyDef.type = bodyType;
+        b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&offsets[0]), offsets.size());
+        //b2Polygon polygon = b2MakeOffsetPolygon(&hull, sfVector2f_to_b2Vec2(position), b2MakeRot(rotation * B2_PI / 180));
+        b2Polygon polygon = b2MakePolygon(&hull, 0);
+        setupPolygon(polygon, *id, shapeDef, shape, position, rotation, bodyDef);
+    }
+
+    
 }

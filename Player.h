@@ -16,7 +16,7 @@ private:
 
 	//state//
 	//Game::PlayerState state;
-	bool canJump = false;
+	//bool canJump = false;
 	bool touchingLeft = false;
 	bool touchingRight = false;
 	bool touchingFloor = false;
@@ -25,9 +25,9 @@ private:
 	int wallJumps = 0;
 	float walkForce = 40;
 	float maxWalkingSpeed = 15;
-	float airFriction = 2;
-	float groundFriction = 4;
 	float jumpSpeed = 25;
+	float coyoteTime = 0.1f;
+	float coyoteCounter = 0.0f;
 	sf::Vector2f lastGroundedPosition;
 
 	//body//

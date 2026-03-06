@@ -14,7 +14,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
-	//bodyIdMaterial.friction = 0;
+	bodyIdMaterial.friction = 0;
 	playerShapeDef.material = bodyIdMaterial;
 	sf::Vector2f size = sf::Vector2f(64, 64);
 	Casts::makeCircleWithBodyDef(rectangle, bodyId, playerShapeDef, Casts::b2Vec2_to_sfVector2f(spawnLocation), size, 0, bodyDef);
@@ -42,40 +42,53 @@ sf::Vector2f Player::getCameraPosition(sf::View& view) {
 }
 
 void Player::update(float deltaTime) {
+	coyoteCounter -= deltaTime;
 	const float delta = 0.05f;
 	const float deathRotationSpeed = 360;
 	const float deathAnimationTime = 0.75f;
 	if (dying) {
 		deltaTime /= deathAnimationTime;
 		sf::Vector2f shrink = sf::Vector2f(deltaTime, deltaTime);
-		sf::Vector2f center = rectangle.getGeometricCenter();
+		sf::Vector2f center = rectangle.getGlobalBounds().getCenter();
 		rectangle.setScale(rectangle.getScale() - shrink);
 		rectangle.move(shrink / 2.0f);
 		rectangle.rotate(sf::degrees(deltaTime * deathRotationSpeed));
-		eyeOffset = Casts::rotate(eyeOffset, -deathRotationSpeed * deltaTime * B2_PI/ 180.0f);
+		sf::Vector2f newCenter = rectangle.getGlobalBounds().getCenter();
+		sf::Vector2f centerOffset = center - newCenter;
+		rectangle.move(centerOffset);
+		eye.setPosition(rectangle.getPosition());
+		eye.setRotation(rectangle.getRotation());
+		eye.setScale(rectangle.getScale());
 		if (rectangle.getScale().x < delta) {
 			TransitionManager::get().restartLevel();
 		}
-		eye.setScale(rectangle.getScale());
 		return;
 	}
-	float xForce = 0;
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
 	
 	sf::Vector2f end = Casts::b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
 	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
 	
 	b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
+	float xForce = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 		xForce -= walkForce;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 		xForce += walkForce;
 	}
+	b2ShapeId shape;
+	b2Body_GetShapes(bodyId, &shape, 1);
+	if (xForce != 0) {
+		b2Shape_SetFriction(shape, 0.0f);
+	}
+	else {
+		b2Shape_SetFriction(shape, 1.f);
+	}
 	float drag = 0.1 * linearVelocity.x * linearVelocity.x * (linearVelocity.x < 0 ? 1 : -1);
 
 	b2Body_ApplyForceToCenter(bodyId, { xForce+drag,0 }, true);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && canJump) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && coyoteCounter > 0) {
 		if (!touchingLeft && !touchingRight) {
 			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
 		}
@@ -99,12 +112,14 @@ void Player::update(float deltaTime) {
 			}
 			b2Body_SetLinearVelocity(bodyId, b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed);
 		}
-		canJump = false;
+		coyoteCounter = 0.0f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
 		b2Body_ApplyForceToCenter(bodyId, { 0,-100 }, true);
 	}
-	canJump = false;
+	if (b2Body_GetPosition(bodyId).y > Casts::pixelsToMeters(1080)) {
+		die();
+	}
 	touchingLeft = false;
 	touchingRight = false;
 	touchingFloor = false;
@@ -124,54 +139,23 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
 	if (normal.y < -0.5f) {
-		canJump = true;
+		coyoteCounter = coyoteTime;
 		touchingFloor = true;
 		wallJumps = 0;
 		lastGroundedPosition = rectangle.getPosition();
 	}
 	if (linearVelocity.y >= -20.0f) {
 		if (normal.x > 0.9) {
-			canJump = true;
+			coyoteCounter = coyoteTime;
 			touchingRight = true;
 		}
 		else if (normal.x < -0.9) {
-			canJump = true;
+			coyoteCounter = coyoteTime;
 			touchingLeft = true;
 		}
 	}
 }
 
-//void Player::onGround(sf::RenderWindow& window) {
-//	b2Vec2 topLeft = b2Body_GetWorldPoint(bodyId, { -0.5 * 2,-0.5 * 2 });
-//	b2Vec2 topRight = b2Body_GetWorldPoint(bodyId, { 0.5 * 2,-0.5 * 2 });
-//	b2Vec2 bottomLeft = b2Body_GetWorldPoint(bodyId, { -0.5 * 2,0.5 * 2 });
-//	b2Vec2 bottomRight = b2Body_GetWorldPoint(bodyId, { 0.5 * 2,0.5 * 2 });
-//
-//	Casts::OverlapResult bottomResult = Casts::lineOverlap(bottomLeft + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ -0.1,0.1 }, b2DefaultQueryFilter(), window);
-//	Casts::OverlapResult topResult = Casts::lineOverlap(topLeft + b2Vec2{ 0.1,-0.1 }, topRight + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-//	Casts::OverlapResult leftResult = Casts::lineOverlap(topLeft + b2Vec2{ -0.1,0.1 }, bottomLeft + b2Vec2{ -0.1,-0.1 }, b2DefaultQueryFilter(), window);
-//	Casts::OverlapResult rightResult = Casts::lineOverlap(topRight + b2Vec2{ 0.1,0.1 }, bottomRight + b2Vec2{ 0.1,-0.1 }, b2DefaultQueryFilter(), window);
-//	bottomLine = bottomResult.hit;
-//	topLine = topResult.hit;
-//	leftLine = leftResult.hit;
-//	rightLine = rightResult.hit;
-//
-//	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
-//	canJump = bottomLine;// || leftLine || rightLine;
-//	touchingWall = 0;
-//	if (linearVelocity.y + abs(linearVelocity.x) > 0) {
-//		canJump = bottomLine || leftLine || rightLine;
-//		if (leftLine) {
-//			touchingWall -= 1;
-//		}
-//		if (rightLine) {
-//			touchingWall += 1;
-//		}
-//	}
-//	if (bottomLine) {
-//		wallJumps = 0;
-//	}
-//}
 void Player::inputCallback(std::optional<sf::Event> event) {
 	if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 		if (keyPressed->scancode == sf::Keyboard::Scancode::Delete) {
@@ -181,7 +165,8 @@ void Player::inputCallback(std::optional<sf::Event> event) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-	eye.setPosition(rectangle.getPosition() + (eyeOffset * eye.getScale().x));
+	sf::Vector2f rotatedEyeOffset = eyeOffset.rotatedBy(-rectangle.getRotation());
+	eye.setPosition(rectangle.getPosition() + (rotatedEyeOffset * eye.getScale().x));
 	window.draw(rectangle);
 	window.draw(eye);
 	path.push_back({ rectangle.getPosition(), sf::Color::Green });

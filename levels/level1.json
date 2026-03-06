@@ -48,12 +48,29 @@
                          "type":"color",
                          "value":"#ff000000"
                         }],
-                 "rotation":-15,
+                 "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":1632,
-                 "x":192,
-                 "y":0
+                 "x":-32,
+                 "y":-480
+                }, 
+                {
+                 "height":64,
+                 "id":162,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":1632,
+                 "x":-32,
+                 "y":-1056
                 }, 
                 {
                  "height":128,
@@ -74,8 +91,8 @@
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":896,
-                 "y":-320
+                 "x":736,
+                 "y":-768
                 }, 
                 {
                  "height":1216,
@@ -120,17 +137,6 @@
                  "width":128,
                  "x":1888,
                  "y":-1056
-                }, 
-                {
-                 "height":320,
-                 "id":146,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":-32,
-                 "y":-928
                 }, 
                 {
                  "height":0,
@@ -199,7 +205,12 @@
                         {
                          "name":"color",
                          "type":"color",
-                         "value":"#ff000000"
+                         "value":"#ffff0000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":true
                         }],
                  "rotation":90,
                  "type":"",
@@ -208,8 +219,28 @@
                  "x":691,
                  "y":-334
                 }],
-         "offsetx":-21.2121212121212,
-         "offsety":-51.5151515151515,
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"Decoration",
+         "objects":[
+                {
+                 "height":64,
+                 "id":164,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":96,
+                 "y":-256
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -244,8 +275,6 @@
                  "x":32,
                  "y":-32
                 }],
-         "offsetx":-52,
-         "offsety":-18,
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -263,8 +292,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":162,
+ "nextlayerid":7,
+ "nextobjectid":165,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

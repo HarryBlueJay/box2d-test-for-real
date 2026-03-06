@@ -57,6 +57,53 @@ void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f
 		bottomRight.y = coordinate.y;
 	}
 }
+LevelPolygon* loadPolygon(tson::Object& object, b2BodyId* bodyId) {
+	tson::Vector2i objectPosition = object.getPosition();
+	float objectRotation = object.getRotation();
+	tson::Colori objectColor = object.get<tson::Colori>("color");
+	sf::Color polygonColor = sf::Color::Black;
+	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+	LevelPolygon* levelPolygon = new LevelPolygon;
+	levelPolygon->rectangle.setFillColor(polygonColor);
+	levelPolygon->isDoor = object.get<bool>("isDoor");
+	levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
+
+	tson::ObjectType objectType = object.getObjectType();
+	sf::Vector2f position = sf::Vector2f(
+		objectPosition.x,
+		objectPosition.y
+	);
+	switch (objectType) {
+	case tson::ObjectType::Rectangle: {
+		tson::Vector2i objectSize = object.getSize();
+		sf::Vector2f size = sf::Vector2f(
+			objectSize.x,
+			objectSize.y
+		);
+		Casts::makeBox(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
+		break;
+	}
+	case tson::ObjectType::Polygon: {
+		std::vector<tson::Vector2i> points = object.getPolygons();
+		std::vector<sf::Vector2f> sfmlPoints;
+		for (tson::Vector2i point : points) {
+			sfmlPoints.push_back(
+				sf::Vector2f(
+					Casts::pixelsToMeters(point.x),
+					Casts::pixelsToMeters(point.y)
+				)
+			);
+		}
+		Casts::makePolygon(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), sfmlPoints, position, objectRotation, b2_staticBody);
+		break;
+	}
+	}
+	if (bodyId) {
+		b2Body_SetUserData(*bodyId, reinterpret_cast<void*>(objectList.size()));
+		levelPolygon->bodyId = *bodyId;
+	}
+	objectList.push_back(levelPolygon);
+}
 void Level::loadLevel(int levelNumber) {
 	currentLevelNumber = levelNumber;
 	tson::Tileson t;
@@ -102,7 +149,7 @@ void Level::loadLevel(int levelNumber) {
 		levelPolygon->isDoor = object.get<bool>("isDoor");
 		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
 		b2BodyId bodyId{};
-		
+
 		tson::ObjectType objectType = object.getObjectType();
 		sf::Vector2f position = sf::Vector2f(
 			objectPosition.x,
@@ -124,7 +171,7 @@ void Level::loadLevel(int levelNumber) {
 			for (tson::Vector2i point : points) {
 				sfmlPoints.push_back(
 					sf::Vector2f(
-						Casts::pixelsToMeters(point.x), 
+						Casts::pixelsToMeters(point.x),
 						Casts::pixelsToMeters(point.y)
 					)
 				);
