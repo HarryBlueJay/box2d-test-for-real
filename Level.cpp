@@ -8,6 +8,7 @@
 #include "json.hpp"
 #include "Player.h"
 #include "Camera.h"
+#include "DrawableObject.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 extern sf::RenderWindow window;
@@ -28,9 +29,6 @@ sf::Color Level::tiledHexToSfColor(std::string color) {
 		std::strtoul(blue.c_str(), nullptr, 16),
 		std::strtoul(alpha.c_str(), nullptr, 16)
 	);
-}
-void LevelPolygon::draw(sf::RenderWindow& window) {
-	window.draw(rectangle);
 }
 int Level::getCurrentLevel() {
 	return currentLevelNumber;
@@ -57,16 +55,13 @@ void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f
 		bottomRight.y = coordinate.y;
 	}
 }
-LevelPolygon* loadPolygon(tson::Object& object, b2BodyId* bodyId) {
+static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2BodyId* bodyId = nullptr) {
 	tson::Vector2i objectPosition = object.getPosition();
 	float objectRotation = object.getRotation();
 	tson::Colori objectColor = object.get<tson::Colori>("color");
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
-	LevelPolygon* levelPolygon = new LevelPolygon;
 	levelPolygon->rectangle.setFillColor(polygonColor);
-	levelPolygon->isDoor = object.get<bool>("isDoor");
-	levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
 
 	tson::ObjectType objectType = object.getObjectType();
 	sf::Vector2f position = sf::Vector2f(
@@ -98,9 +93,9 @@ LevelPolygon* loadPolygon(tson::Object& object, b2BodyId* bodyId) {
 		break;
 	}
 	}
-	if (bodyId) {
-		b2Body_SetUserData(*bodyId, reinterpret_cast<void*>(objectList.size()));
-		levelPolygon->bodyId = *bodyId;
+	if (bodyId == nullptr) {
+		levelPolygon->rectangle.setPosition(Casts::pixelsToMeters(position));
+		levelPolygon->rectangle.setRotation(sf::degrees(objectRotation));
 	}
 	objectList.push_back(levelPolygon);
 }
@@ -130,64 +125,33 @@ void Level::loadLevel(int levelNumber) {
 	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
 	tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
-	//spawnLocation.x = Casts::pixelsToMeters(spawnLocationPosition.x);
-	//spawnLocation.y = Casts::pixelsToMeters(spawnLocationPosition.y);
 	spawnLocation.x = spawnLocationPosition.x;
 	spawnLocation.y = spawnLocationPosition.y;
 
+	//Background
+	tson::Layer* backgroundLayer = map->getLayer("Background");
+	for (int i = 0; i < backgroundLayer->getObjects().size(); i++) {
+		loadPolygon(backgroundLayer->getObjects()[i], new DrawableObject);
+	}
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
 	for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
 		auto& object = collisionLayer->getObjects()[i];
-		tson::Vector2i objectPosition = object.getPosition();
-		float objectRotation = object.getRotation();
-		tson::Colori objectColor = object.get<tson::Colori>("color");
-		sf::Color polygonColor = sf::Color::Black;
-		polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
+		b2BodyId bodyId;
+
 		LevelPolygon* levelPolygon = new LevelPolygon;
-		levelPolygon->rectangle.setFillColor(polygonColor);
+		loadPolygon(object, levelPolygon,  &bodyId);
 		levelPolygon->isDoor = object.get<bool>("isDoor");
 		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
-		b2BodyId bodyId{};
 
-		tson::ObjectType objectType = object.getObjectType();
-		sf::Vector2f position = sf::Vector2f(
-			objectPosition.x,
-			objectPosition.y
-		);
-		switch (objectType) {
-		case tson::ObjectType::Rectangle: {
-			tson::Vector2i objectSize = object.getSize();
-			sf::Vector2f size = sf::Vector2f(
-				objectSize.x,
-				objectSize.y
-			);
-			Casts::makeBox(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
-			break;
-		}
-		case tson::ObjectType::Polygon: {
-			std::vector<tson::Vector2i> points = object.getPolygons();
-			std::vector<sf::Vector2f> sfmlPoints;
-			for (tson::Vector2i point : points) {
-				sfmlPoints.push_back(
-					sf::Vector2f(
-						Casts::pixelsToMeters(point.x),
-						Casts::pixelsToMeters(point.y)
-					)
-				);
-			}
-			Casts::makePolygon(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), sfmlPoints, position, objectRotation, b2_staticBody);
-			break;
-		}
-		}
-		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(i));
+		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 		levelPolygon->bodyId = bodyId;
+
 		for (int i = 0; i < levelPolygon->rectangle.getPointCount(); i++) {
 			sf::FloatRect rect = levelPolygon->rectangle.getGlobalBounds();
 			updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
 			updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
 		}
-		objectList.push_back(levelPolygon);
 	}
 	Player* player = new Player(spawnLocation);
 	Camera* camera = new Camera(window);

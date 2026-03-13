@@ -170,6 +170,7 @@
     <ClInclude Include="BasicIncludes.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Casts.h" />
+    <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Object.h" />

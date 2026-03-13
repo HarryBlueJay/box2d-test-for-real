@@ -100,10 +100,7 @@ void Camera::draw(sf::RenderWindow& window) {
     else {
         size.y *= windowSize.y * 1.0f / windowSize.x;
     }
-    size = sf::Vector2f(
-        Casts::pixelsToMeters(size.x),
-        Casts::pixelsToMeters(size.y)
-    );
+    size = Casts::pixelsToMeters(size);
     view.setSize(size);
     window.setView(view);
 }

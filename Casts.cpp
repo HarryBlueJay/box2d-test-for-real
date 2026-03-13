@@ -3,8 +3,6 @@
 #include "BaseCollider.h"
 extern b2WorldId worldId;
 bool showCasts = true;
-float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
-//also anything below 4 pixels causes trouble, don't expect to reach that
 
 //vec2forSFML
 sf::Vector2f Casts::b2Vec2_to_sfVector2f(b2Vec2 input) {
@@ -110,15 +108,12 @@ Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter 
     return result;
 }
 
-float Casts::pixelsToMeters(float input) {
-    return input * scaleFactor;
-}
 void Casts::move(sf::ConvexShape& rectangle, b2BodyId& id) {
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
     rectangle.setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(id))));
 }
 void setupPolygon(b2Polygon& dynamicBox, b2BodyId& id, b2ShapeDef shapeDef, sf::ConvexShape& box, sf::Vector2f position, float rotation, b2BodyDef bodyDef) {
-    position = sf::Vector2f(Casts::pixelsToMeters(position.x), Casts::pixelsToMeters(position.y));
+    position = Casts::pixelsToMeters(position);
     bodyDef.position = Casts::sfVector2f_to_b2Vec2(position);
     bodyDef.rotation = b2MakeRot(rotation * B2_PI / 180);
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
@@ -166,23 +161,21 @@ void Casts::makeCircleWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef
     b2Polygon polygon = b2MakePolygon(&hull, radius);
     setupPolygon(polygon, id, shapeDef, box, position, rotation, bodyDef);
 }
-
-void Casts::makeBoxWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef) {
+// maybe make a version that takes in a body def
+void Casts::makeBox(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {
     size = sf::Vector2f(pixelsToMeters(size.x), pixelsToMeters(size.y));
     setupBox(box, size);
-    b2Vec2 offsets[4];
-    for (int i = 0; i < box.getPointCount(); i++) {
-        offsets[i] = sfVector2f_to_b2Vec2(box.getPoint(i));
+    if (id) {
+        b2BodyDef bodyDef = b2DefaultBodyDef();
+        bodyDef.type = bodyType;
+        b2Vec2 offsets[4];
+        for (int i = 0; i < box.getPointCount(); i++) {
+            offsets[i] = sfVector2f_to_b2Vec2(box.getPoint(i));
+        }
+        b2Hull hull = b2ComputeHull(offsets, 4);
+        b2Polygon polygon = b2MakePolygon(&hull, 0);
+        setupPolygon(polygon, *id, shapeDef, box, position, rotation, bodyDef);
     }
-    b2Hull hull = b2ComputeHull(offsets, 4);
-    b2Polygon polygon = b2MakePolygon(&hull, 0);
-    setupPolygon(polygon, id, shapeDef, box, position, rotation, bodyDef);
-}
-// maybe make a version that takes in a body def
-void Casts::makeBox(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType) {
-    b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.type = bodyType;
-    makeBoxWithBodyDef(box, id, shapeDef, position, size, rotation, bodyDef);
 }
 
 void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId* id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType) {
@@ -198,6 +191,4 @@ void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId* id, b2ShapeDef shapeDe
         b2Polygon polygon = b2MakePolygon(&hull, 0);
         setupPolygon(polygon, *id, shapeDef, shape, position, rotation, bodyDef);
     }
-
-    
 }

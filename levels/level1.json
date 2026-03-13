@@ -228,17 +228,57 @@
         {
          "draworder":"topdown",
          "id":6,
-         "name":"Decoration",
+         "name":"Background",
          "objects":[
                 {
                  "height":64,
                  "id":164,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":64,
                  "x":96,
+                 "y":-256
+                }, 
+                {
+                 "height":64,
+                 "id":165,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff0000ff"
+                        }],
+                 "rotation":45,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":288,
+                 "y":-256
+                }, 
+                {
+                 "height":64,
+                 "id":166,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff0000ff"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":288,
                  "y":-256
                 }],
          "opacity":1,
@@ -293,7 +333,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":165,
+ "nextobjectid":167,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

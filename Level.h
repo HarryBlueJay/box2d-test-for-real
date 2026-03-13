@@ -10,7 +10,6 @@ public:
 	tson::ObjectType objectType;
 	bool isDoor;
 	bool isKillbrick;
-	void draw(sf::RenderWindow& window) override;
 };
 
 

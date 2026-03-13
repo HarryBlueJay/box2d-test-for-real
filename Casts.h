@@ -1,7 +1,9 @@
 #pragma once
 #include "BasicIncludes.h"
 
-namespace Casts { 
+namespace Casts {
+    const float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
+    //also anything below 4 pixels causes trouble, don't expect to reach that
     //vec2forSFML
     sf::Vector2f b2Vec2_to_sfVector2f(b2Vec2 input);
     b2Vec2 sfVector2f_to_b2Vec2(sf::Vector2f input);
@@ -31,12 +33,14 @@ namespace Casts {
 
     OverlapResult lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter, sf::RenderWindow& window);
 
-    float pixelsToMeters(float input);
+    template <typename T = float>
+    T pixelsToMeters(T input) {
+        return input * scaleFactor;
+    };
     void move(sf::ConvexShape& rectangle, b2BodyId& id);
 
-    void makeBoxWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef);
     void makeCircleWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef);
     // maybe make a version that takes in a body def
-    void makeBox(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType);
-    void makePolygon(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType);
+    void makeBox(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType);
+    void makePolygon(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType);
 }

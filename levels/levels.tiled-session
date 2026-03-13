@@ -9,7 +9,7 @@
                 2
             ],
             "scale": 0.5,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 84,
                 "y": 15
@@ -36,8 +36,8 @@
         },
         "tutorial.json": {
             "expandedObjectLayers": [
-                3,
-                2
+                2,
+                3
             ],
             "scale": 0.75,
             "selectedLayer": 1,
@@ -54,7 +54,7 @@
         "tutorial.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "bool",
+    "property.type": "color",
     "recentFiles": [
         "tutorial.json",
         "testlevel.json",
