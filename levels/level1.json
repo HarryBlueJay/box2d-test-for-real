@@ -218,6 +218,43 @@
                  "width":0,
                  "x":691,
                  "y":-334
+                }, 
+                {
+                 "height":64,
+                 "id":174,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"moveSpeed",
+                         "type":"float",
+                         "value":64
+                        }, 
+                        {
+                         "name":"offsetX",
+                         "type":"float",
+                         "value":0
+                        }, 
+                        {
+                         "name":"offsetY",
+                         "type":"float",
+                         "value":-496
+                        }, 
+                        {
+                         "name":"waitTime",
+                         "type":"float",
+                         "value":1
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":288,
+                 "x":1600,
+                 "y":32
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -289,6 +326,47 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"Foreground",
+         "objects":[
+                {
+                 "height":64,
+                 "id":169,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":416,
+                 "y":-256
+                }, 
+                {
+                 "height":96,
+                 "id":173,
+                 "name":"",
+                 "rotation":0,
+                 "text":
+                    {
+                     "fontfamily":"Sansation",
+                     "kerning":false,
+                     "pixelsize":96,
+                     "text":"Hello World",
+                     "wrap":true
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":671,
+                 "x":454.5,
+                 "y":-140
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"Collectibles",
          "objects":[],
@@ -332,8 +410,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":167,
+ "nextlayerid":8,
+ "nextobjectid":183,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

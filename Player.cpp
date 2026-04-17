@@ -14,7 +14,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
-	bodyIdMaterial.friction = 0;
+	bodyIdMaterial.friction = 0.5f;
 	playerShapeDef.material = bodyIdMaterial;
 	sf::Vector2f size = sf::Vector2f(64, 64);
 	Casts::makeCircleWithBodyDef(rectangle, bodyId, playerShapeDef, Casts::b2Vec2_to_sfVector2f(spawnLocation), size, 0, bodyDef);
@@ -29,6 +29,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
 	Casts::move(rectangle, bodyId);
 	dying = false;
+	eye.setFillColor(sf::Color::Black);
 }
 void Player::die() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
@@ -69,7 +70,7 @@ void Player::update(float deltaTime) {
 	sf::Vector2f end = Casts::b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
 	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
 	
-	b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
+	//b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
 	float xForce = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 		xForce -= walkForce;
@@ -79,15 +80,15 @@ void Player::update(float deltaTime) {
 	}
 	b2ShapeId shape;
 	b2Body_GetShapes(bodyId, &shape, 1);
-	if (xForce != 0) {
-		b2Shape_SetFriction(shape, 0.0f);
+	//if (xForce != 0) {
+	//	b2Shape_SetFriction(shape, 0.0f);
+	//}
+	//else {
+	//	b2Shape_SetFriction(shape, 1.f);
+	//}
+	if (abs(linearVelocity.x) < 15 || std::signbit(xForce) != std::signbit(linearVelocity.x)) {
+		b2Body_ApplyForceToCenter(bodyId, { xForce, 0 }, true);
 	}
-	else {
-		b2Shape_SetFriction(shape, 1.f);
-	}
-	float drag = 0.1 * linearVelocity.x * linearVelocity.x * (linearVelocity.x < 0 ? 1 : -1);
-
-	b2Body_ApplyForceToCenter(bodyId, { xForce+drag,0 }, true);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && coyoteCounter > 0) {
 		if (!touchingLeft && !touchingRight) {
 			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
@@ -143,6 +144,8 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		touchingFloor = true;
 		wallJumps = 0;
 		lastGroundedPosition = rectangle.getPosition();
+		dashes = maxDashes;
+		eye.setFillColor(sf::Color::Black);
 	}
 	if (linearVelocity.y >= -20.0f) {
 		if (normal.x > 0.9) {
@@ -160,6 +163,28 @@ void Player::inputCallback(std::optional<sf::Event> event) {
 	if (const sf::Event::KeyPressed* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 		if (keyPressed->scancode == sf::Keyboard::Scancode::Delete) {
 			die();
+		}
+		if (keyPressed->code == sf::Keyboard::Key::Space && dashes != 0 && coyoteCounter <= 0.0f) {
+			b2Vec2 direction = {};
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
+				direction.x -= 1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
+				direction.x += 1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
+				direction.y -= 1;
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
+				direction.y += 1;
+			}
+			if (direction.x == 0 && direction.y == 0) {
+				direction = b2Body_GetLinearVelocity(bodyId);
+			}
+			direction = b2Normalize(direction) * dashSpeed;
+			b2Body_SetLinearVelocity(bodyId, direction);
+			dashes--;
+			eye.setFillColor(sf::Color(200, 200, 200));
 		}
 	}
 }

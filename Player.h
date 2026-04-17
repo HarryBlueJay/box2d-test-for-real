@@ -26,6 +26,9 @@ private:
 	float walkForce = 40;
 	float maxWalkingSpeed = 15;
 	float jumpSpeed = 25;
+	float dashSpeed = 30;
+	int maxDashes = 1;
+	int dashes = maxDashes;
 	float coyoteTime = 0.1f;
 	float coyoteCounter = 0.0f;
 	sf::Vector2f lastGroundedPosition;

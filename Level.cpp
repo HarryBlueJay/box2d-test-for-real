@@ -9,10 +9,13 @@
 #include "Player.h"
 #include "Camera.h"
 #include "DrawableObject.h"
+#include "MovingPlatform.h"
+#include "TextObject.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 extern sf::RenderWindow window;
 int currentLevelNumber = 0;
+sf::Font font = sf::Font("resources\\sansation.ttf");
 std::vector<std::string> levelList;
 extern std::vector<Object*> objectList;
 sf::Color Level::tiledHexToSfColor(std::string color) {
@@ -41,7 +44,7 @@ void Level::loadLevelList() {
 		levelList.push_back(*it);
 	}
 }
-void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
+static void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
 	if (topLeft.x > coordinate.x) {
 		topLeft.x = coordinate.x;
 	}
@@ -55,7 +58,7 @@ void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f
 		bottomRight.y = coordinate.y;
 	}
 }
-static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2BodyId* bodyId = nullptr) {
+static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2BodyId* bodyId = nullptr, b2ShapeDef shapeDef = b2DefaultShapeDef()) {
 	tson::Vector2i objectPosition = object.getPosition();
 	float objectRotation = object.getRotation();
 	tson::Colori objectColor = object.get<tson::Colori>("color");
@@ -75,7 +78,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 			objectSize.x,
 			objectSize.y
 		);
-		Casts::makeBox(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), position, size, objectRotation, b2_staticBody);
+		Casts::makeBox(levelPolygon->rectangle, bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
 		break;
 	}
 	case tson::ObjectType::Polygon: {
@@ -89,7 +92,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 				)
 			);
 		}
-		Casts::makePolygon(levelPolygon->rectangle, bodyId, b2DefaultShapeDef(), sfmlPoints, position, objectRotation, b2_staticBody);
+		Casts::makePolygon(levelPolygon->rectangle, bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
 		break;
 	}
 	}
@@ -98,6 +101,75 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 		levelPolygon->rectangle.setRotation(sf::degrees(objectRotation));
 	}
 	objectList.push_back(levelPolygon);
+}
+static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
+	tson::ObjectType objectType = object.getObjectType();
+	switch (objectType) {
+	case tson::ObjectType::Rectangle:
+	case tson::ObjectType::Polygon: {
+		if (bodyId) {
+			LevelPolygon* levelPolygon = nullptr;
+			b2ShapeDef shapeDef = b2DefaultShapeDef();
+			if (object.get<float>("moveSpeed") != 0) {
+				levelPolygon = new MovingPlatform;
+			}
+			else {
+				levelPolygon = new LevelPolygon;
+			}
+			// default is exactly zero
+			if (float friction = object.get<float>("friction") > 0) {
+				shapeDef.material.friction = friction;
+			}
+			shapeDef.material.restitution = object.get<float>("restitution");
+			shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
+			loadPolygon(object, levelPolygon, bodyId, shapeDef);
+			levelPolygon->isDoor = object.get<bool>("isDoor");
+			levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
+
+			b2Body_SetUserData(*bodyId, reinterpret_cast<void*>(objectList.size() - 1));
+			levelPolygon->bodyId = *bodyId;
+			if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
+				platform->parse(object);
+			}
+			return levelPolygon;
+		}
+		DrawableObject* drawableObject = new DrawableObject;
+		loadPolygon(object, drawableObject);
+		return drawableObject;
+	}
+	case tson::ObjectType::Text: {		
+		TextObject* textObject = new TextObject(font);
+		tson::Text text = object.getText();
+		//textObject->text.setFont(font);
+		textObject->text.setString(text.text);
+		textObject->text.setCharacterSize(text.pixelSize);
+		unsigned int style = sf::Text::Regular;
+		if (text.bold) {
+			style |= sf::Text::Bold;
+		}
+		if (text.italic) {
+			style |= sf::Text::Italic;
+		}
+		if (text.strikeout) {
+			style |= sf::Text::StrikeThrough;
+		}
+		if (text.underline) {
+			style |= sf::Text::Underlined;
+		}
+		textObject->text.setStyle(style);
+		tson::Vector2i objectPosition = object.getPosition();
+		sf::Vector2f position = sf::Vector2f(
+			objectPosition.x,
+			objectPosition.y
+		);
+		textObject->text.setPosition(Casts::pixelsToMeters(position));
+		sf::Color polygonColor = sf::Color(text.color.r, text.color.g, text.color.b, text.color.a);
+		textObject->text.setScale(sf::Vector2f(1.0f / 32.0f, 1.0f / 32.0f));
+		textObject->text.setFillColor(polygonColor);
+		objectList.push_back(textObject);
+		return textObject;
+	}
+	}
 }
 void Level::loadLevel(int levelNumber) {
 	currentLevelNumber = levelNumber;
@@ -130,23 +202,17 @@ void Level::loadLevel(int levelNumber) {
 
 	//Background
 	tson::Layer* backgroundLayer = map->getLayer("Background");
-	for (int i = 0; i < backgroundLayer->getObjects().size(); i++) {
-		loadPolygon(backgroundLayer->getObjects()[i], new DrawableObject);
+	if (backgroundLayer) {
+		for (int i = 0; i < backgroundLayer->getObjects().size(); i++) {
+			loadObject(backgroundLayer->getObjects()[i]);
+		}
 	}
 	//Collision
 	tson::Layer* collisionLayer = map->getLayer("Collision");
 	for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
 		auto& object = collisionLayer->getObjects()[i];
 		b2BodyId bodyId;
-
-		LevelPolygon* levelPolygon = new LevelPolygon;
-		loadPolygon(object, levelPolygon,  &bodyId);
-		levelPolygon->isDoor = object.get<bool>("isDoor");
-		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
-
-		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(objectList.size() - 1));
-		levelPolygon->bodyId = bodyId;
-
+		LevelPolygon* levelPolygon = dynamic_cast<LevelPolygon*>(loadObject(object, &bodyId));
 		for (int i = 0; i < levelPolygon->rectangle.getPointCount(); i++) {
 			sf::FloatRect rect = levelPolygon->rectangle.getGlobalBounds();
 			updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
@@ -159,4 +225,11 @@ void Level::loadLevel(int levelNumber) {
 	camera->setBounds(topLeft, bottomRight);
 	camera->setTarget(player);
 	objectList.push_back(player);
+	//Foreground
+	tson::Layer* foregroundLayer = map->getLayer("Foreground");
+	if (foregroundLayer) {
+		for (int i = 0; i < foregroundLayer->getObjects().size(); i++) {
+			loadObject(foregroundLayer->getObjects()[i]);
+		}
+	}
 }

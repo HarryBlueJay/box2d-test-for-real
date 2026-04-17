@@ -20,6 +20,7 @@ int main()
     Level::loadLevel(0);
 
     ShowWindow(window.getNativeHandle(),SW_MAXIMIZE);
+    window.setKeyRepeatEnabled(false);
     sf::Clock clock;
     sf::Time lastTime = clock.getElapsedTime();
     window.setFramerateLimit(240);

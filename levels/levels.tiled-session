@@ -6,10 +6,12 @@
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
+                7,
+                6,
                 2
             ],
             "scale": 0.5,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 84,
                 "y": 15
@@ -19,16 +21,16 @@
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 0.33,
+            "scale": 0.25,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 15.151515151515127,
-                "y": 16.66666666666663
+                "x": 424,
+                "y": 80
             }
         },
         "testlevel.json": {
             "scale": 0.33,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 15.151515151515127,
                 "y": 16.66666666666663
@@ -39,26 +41,25 @@
                 2,
                 3
             ],
-            "scale": 0.75,
+            "scale": 0.33,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 16,
-                "y": 15.333333333333371
+                "x": 15.151515151515127,
+                "y": 16.66666666666663
             }
         }
     },
     "openFiles": [
         "level1.json",
-        "level1old.json",
-        "testlevel.json",
-        "tutorial.json"
+        "tutorial.json",
+        "testlevel.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "color",
+    "property.type": "float",
     "recentFiles": [
-        "tutorial.json",
         "testlevel.json",
-        "level1old.json",
-        "level1.json"
+        "tutorial.json",
+        "level1.json",
+        "level1old.json"
     ]
 }
