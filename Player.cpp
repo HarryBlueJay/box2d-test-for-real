@@ -129,9 +129,8 @@ void Player::update(float deltaTime) {
 void Player::collide(Object* otherObject, b2Vec2 normal) {
 	LevelPolygon* levelRectangle = dynamic_cast<LevelPolygon*>(otherObject);
 	if (levelRectangle) {
-		// might not be a levelrectangle, but it does exist
-		if (levelRectangle->isDoor) {
-			TransitionManager::get().finishLevel();
+		if (levelRectangle->nextLevel >= 0) {
+			TransitionManager::get().finishLevel(levelRectangle->nextLevel);
 		}
 		if (levelRectangle->isKillbrick) {
 			die();

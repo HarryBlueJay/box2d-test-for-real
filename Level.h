@@ -8,7 +8,7 @@ namespace tson {
 class LevelPolygon : public BaseCollider {
 public:
 	tson::ObjectType objectType;
-	bool isDoor;
+	int nextLevel;
 	bool isKillbrick;
 };
 

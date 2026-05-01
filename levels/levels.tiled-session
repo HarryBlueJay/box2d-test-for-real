@@ -6,15 +6,16 @@
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
+                3,
                 7,
                 6,
                 2
             ],
             "scale": 0.5,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 84,
-                "y": 15
+                "x": -34,
+                "y": -274
             }
         },
         "level1old.json": {
@@ -26,6 +27,45 @@
             "viewCenter": {
                 "x": 424,
                 "y": 80
+            }
+        },
+        "level2.json": {
+            "expandedObjectLayers": [
+                3,
+                7,
+                2
+            ],
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 612,
+                "y": -156
+            }
+        },
+        "level3.json": {
+            "expandedObjectLayers": [
+                7,
+                6,
+                2
+            ],
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 644,
+                "y": -290
+            }
+        },
+        "level4.json": {
+            "expandedObjectLayers": [
+                3,
+                6,
+                2
+            ],
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 84,
+                "y": 14
             }
         },
         "testlevel.json": {
@@ -51,15 +91,19 @@
     },
     "openFiles": [
         "level1.json",
-        "tutorial.json",
-        "testlevel.json"
+        "level2.json",
+        "level3.json",
+        "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "float",
+    "property.type": "int",
     "recentFiles": [
+        "level4.json",
+        "level3.json",
+        "level2.json",
+        "level1.json",
         "testlevel.json",
         "tutorial.json",
-        "level1.json",
         "level1old.json"
     ]
 }

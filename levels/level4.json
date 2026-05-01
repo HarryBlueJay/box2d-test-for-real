@@ -35,13 +35,13 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
-                 "y":64
+                 "width":192,
+                 "x":-32,
+                 "y":-416
                 }, 
                 {
-                 "height":64,
-                 "id":162,
+                 "height":128,
+                 "id":216,
                  "name":"",
                  "opacity":1,
                  "properties":[
@@ -53,13 +53,36 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
-                 "y":-640
+                 "width":384,
+                 "x":768,
+                 "y":32
                 }, 
                 {
                  "height":64,
-                 "id":183,
+                 "id":223,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ffff0000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":608,
+                 "x":160,
+                 "y":96
+                }, 
+                {
+                 "height":64,
+                 "id":219,
                  "name":"",
                  "opacity":1,
                  "properties":[
@@ -71,13 +94,123 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":992,
-                 "x":-512,
+                 "width":640,
+                 "x":512,
+                 "y":-288
+                }, 
+                {
+                 "height":64,
+                 "id":204,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":608,
+                 "x":-32,
+                 "y":-672
+                }, 
+                {
+                 "height":320,
+                 "id":205,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":-96,
+                 "y":-672
+                }, 
+                {
+                 "height":320,
+                 "id":220,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":512,
+                 "y":-608
+                }, 
+                {
+                 "height":512,
+                 "id":221,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":96,
+                 "y":-352
+                }, 
+                {
+                 "height":448,
+                 "id":218,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1152,
                  "y":-288
                 }, 
                 {
                  "height":128,
-                 "id":91,
+                 "id":227,
                  "name":"",
                  "opacity":1,
                  "properties":[
@@ -89,106 +222,14 @@
                         {
                          "name":"nextLevel",
                          "type":"int",
-                         "value":1
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-512,
-                 "y":-576
-                }, 
-                {
-                 "height":128,
-                 "id":189,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":3
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":352,
-                 "y":-576
-                }, 
-                {
-                 "height":128,
-                 "id":190,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":-64,
-                 "y":-576
-                }, 
-                {
-                 "height":768,
-                 "id":109,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }, 
-                        {
-                         "name":"isKillbrick",
-                         "type":"bool",
-                         "value":false
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":-704,
-                 "y":-640
-                }, 
-                {
-                 "height":768,
-                 "id":143,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }, 
-                        {
-                         "name":"isKillbrick",
-                         "type":"bool",
-                         "value":false
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":608,
-                 "y":-640
+                 "x":960,
+                 "y":-160
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -200,7 +241,45 @@
          "draworder":"topdown",
          "id":6,
          "name":"Background",
-         "objects":[],
+         "objects":[
+                {
+                 "height":96,
+                 "id":224,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "text":
+                    {
+                     "fontfamily":"Sansation",
+                     "pixelsize":64,
+                     "text":"[Space]",
+                     "wrap":true
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":256,
+                 "x":352,
+                 "y":-128
+                }, 
+                {
+                 "height":64,
+                 "id":225,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "text":
+                    {
+                     "fontfamily":"Sansation",
+                     "pixelsize":64,
+                     "text":"->",
+                     "wrap":true
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":586,
+                 "y":-120
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -211,26 +290,7 @@
          "draworder":"topdown",
          "id":7,
          "name":"Foreground",
-         "objects":[
-                {
-                 "height":109,
-                 "id":187,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "text":
-                    {
-                     "fontfamily":"Sansation",
-                     "pixelsize":64,
-                     "text":"Left\/Right: [A]\/[D]",
-                     "wrap":true
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":555,
-                 "x":-576,
-                 "y":-544
-                }],
+         "objects":[],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -264,7 +324,7 @@
                  "visible":true,
                  "width":0,
                  "x":64,
-                 "y":-352
+                 "y":-480
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -284,7 +344,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":192,
+ "nextobjectid":228,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

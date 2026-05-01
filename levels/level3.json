@@ -36,8 +36,8 @@
                  "type":"",
                  "visible":true,
                  "width":1248,
-                 "x":-640,
-                 "y":64
+                 "x":-32,
+                 "y":32
                 }, 
                 {
                  "height":64,
@@ -53,13 +53,13 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
-                 "y":-640
+                 "width":864,
+                 "x":-32,
+                 "y":-224
                 }, 
                 {
                  "height":64,
-                 "id":183,
+                 "id":202,
                  "name":"",
                  "opacity":1,
                  "properties":[
@@ -71,9 +71,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":992,
-                 "x":-512,
-                 "y":-288
+                 "width":320,
+                 "x":896,
+                 "y":-1216
                 }, 
                 {
                  "height":128,
@@ -89,63 +89,17 @@
                         {
                          "name":"nextLevel",
                          "type":"int",
-                         "value":1
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-512,
-                 "y":-576
+                 "x":992,
+                 "y":-1120
                 }, 
                 {
-                 "height":128,
-                 "id":189,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":3
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":352,
-                 "y":-576
-                }, 
-                {
-                 "height":128,
-                 "id":190,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":-64,
-                 "y":-576
-                }, 
-                {
-                 "height":768,
+                 "height":320,
                  "id":109,
                  "name":"",
                  "opacity":1,
@@ -164,11 +118,34 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":-704,
-                 "y":-640
+                 "x":-96,
+                 "y":-224
                 }, 
                 {
-                 "height":768,
+                 "height":1056,
+                 "id":192,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":832,
+                 "y":-1216
+                }, 
+                {
+                 "height":1312,
                  "id":143,
                  "name":"",
                  "opacity":1,
@@ -187,8 +164,8 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":608,
-                 "y":-640
+                 "x":1216,
+                 "y":-1216
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -200,7 +177,166 @@
          "draworder":"topdown",
          "id":6,
          "name":"Background",
-         "objects":[],
+         "objects":[
+                {
+                 "height":10,
+                 "id":193,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":45,
+                 "type":"",
+                 "visible":true,
+                 "width":226.27,
+                 "x":992.333333333333,
+                 "y":-308
+                }, 
+                {
+                 "height":10,
+                 "id":217,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":45,
+                 "type":"",
+                 "visible":true,
+                 "width":226.27,
+                 "x":993.666666666667,
+                 "y":-796
+                }, 
+                {
+                 "height":10,
+                 "id":199,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":-45,
+                 "type":"",
+                 "visible":true,
+                 "width":226.27,
+                 "x":960.666666666667,
+                 "y":-382
+                }, 
+                {
+                 "height":0,
+                 "id":206,
+                 "name":"",
+                 "opacity":1,
+                 "polygon":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":32,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":0
+                        }],
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":963.83,
+                 "y":-297.499666666667
+                }, 
+                {
+                 "height":0,
+                 "id":216,
+                 "name":"",
+                 "opacity":1,
+                 "polygon":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":32,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":0
+                        }],
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":965.163333333333,
+                 "y":-785.499666666667
+                }, 
+                {
+                 "height":0,
+                 "id":207,
+                 "name":"",
+                 "opacity":1,
+                 "polygon":[
+                        {
+                         "x":0,
+                         "y":0
+                        }, 
+                        {
+                         "x":32,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":-32
+                        }, 
+                        {
+                         "x":0,
+                         "y":0
+                        }],
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff7a7a7a"
+                        }],
+                 "rotation":90,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1121.66666666667,
+                 "y":-564
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -211,26 +347,7 @@
          "draworder":"topdown",
          "id":7,
          "name":"Foreground",
-         "objects":[
-                {
-                 "height":109,
-                 "id":187,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "text":
-                    {
-                     "fontfamily":"Sansation",
-                     "pixelsize":64,
-                     "text":"Left\/Right: [A]\/[D]",
-                     "wrap":true
-                    },
-                 "type":"",
-                 "visible":true,
-                 "width":555,
-                 "x":-576,
-                 "y":-544
-                }],
+         "objects":[],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -263,8 +380,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":64,
-                 "y":-352
+                 "x":32,
+                 "y":-32
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -284,7 +401,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":192,
+ "nextobjectid":220,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

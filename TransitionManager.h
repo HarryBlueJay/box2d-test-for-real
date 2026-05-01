@@ -15,7 +15,7 @@ public:
 		static TransitionManager singleton;
 		return singleton;
 	};
-	void finishLevel();
+	void finishLevel(int nextLevel);
 	void restartLevel();
 	void draw(sf::RenderWindow& window) override;
 	void update(float deltaTime) override;

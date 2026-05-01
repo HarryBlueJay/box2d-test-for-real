@@ -17,6 +17,7 @@ extern sf::RenderWindow window;
 int currentLevelNumber = 0;
 sf::Font font = sf::Font("resources\\sansation.ttf");
 std::vector<std::string> levelList;
+std::vector<bool> levelCompletions;
 extern std::vector<Object*> objectList;
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
@@ -37,11 +38,21 @@ int Level::getCurrentLevel() {
 	return currentLevelNumber;
 }
 void Level::loadLevelList() {
-	std::ifstream f("levels\\levels.json");
-	nlohmann::json data = nlohmann::json::parse(f);
+	std::ifstream levelListJSON("levels\\levels.json");
+	nlohmann::json data = nlohmann::json::parse(levelListJSON);
 	nlohmann::json object = data["levels"];
 	for (nlohmann::json::iterator it = object.begin(); it != object.end(); ++it) {
 		levelList.push_back(*it);
+		levelCompletions.push_back(false);
+	}
+	std::fstream completedLevelList("levels\\completedLevels.json");
+	if (!completedLevelList.fail()) {
+		nlohmann::json levelData = nlohmann::json::parse(completedLevelList);
+		int index = 0;
+		for (nlohmann::json::iterator it = levelData.begin(); it != levelData.end(); ++it) {
+			levelCompletions[index] = *it;
+			index++;
+		}
 	}
 }
 static void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
@@ -123,10 +134,25 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 			shapeDef.material.restitution = object.get<float>("restitution");
 			shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
 			loadPolygon(object, levelPolygon, bodyId, shapeDef);
-			levelPolygon->isDoor = object.get<bool>("isDoor");
+			b2Body_SetUserData(*bodyId, reinterpret_cast<void*>(objectList.size() - 1));
+			if (object.getProperties().hasProperty("nextLevel")) {
+				levelPolygon->nextLevel = object.get<int>("nextLevel");
+				if (levelPolygon->nextLevel > 0) {
+					TextObject* text = new TextObject(font);
+					text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
+					text->text.setCharacterSize(60);
+					text->text.setScale(sf::Vector2f(Casts::scaleFactor, Casts::scaleFactor));
+					//text->text.setOrigin(text->text.getLocalBounds().size * 0.5f + sf::Vector2f(0, 30));
+					text->text.setPosition(levelPolygon->rectangle.getPosition());
+					text->text.setRotation(levelPolygon->rectangle.getRotation());
+					objectList.push_back(text);
+				}
+			}
+			else {
+				levelPolygon->nextLevel = -1;
+			}
 			levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
 
-			b2Body_SetUserData(*bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 			levelPolygon->bodyId = *bodyId;
 			if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
 				platform->parse(object);
@@ -164,7 +190,7 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 		);
 		textObject->text.setPosition(Casts::pixelsToMeters(position));
 		sf::Color polygonColor = sf::Color(text.color.r, text.color.g, text.color.b, text.color.a);
-		textObject->text.setScale(sf::Vector2f(1.0f / 32.0f, 1.0f / 32.0f));
+		textObject->text.setScale(sf::Vector2f(Casts::scaleFactor, Casts::scaleFactor));
 		textObject->text.setFillColor(polygonColor);
 		objectList.push_back(textObject);
 		return textObject;

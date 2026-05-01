@@ -159,8 +159,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="levels\completedLevels.json" />
     <None Include="levels\level1.json" />
     <None Include="levels\level1old.json" />
+    <None Include="levels\level2.json" />
+    <None Include="levels\level3.json" />
+    <None Include="levels\level4.json" />
     <None Include="levels\levels.json" />
     <None Include="levels\levels.tiled-project" />
     <None Include="levels\testlevel.json" />

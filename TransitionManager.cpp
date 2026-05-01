@@ -9,10 +9,10 @@ TransitionManager::TransitionManager() {
 bool TransitionManager::isTransitioning() {
 	return transitionState != 0;
 }
-void TransitionManager::finishLevel() {
+void TransitionManager::finishLevel(int nextLevel) {
 	transitionState = 1;
 	fadeTimeCounter = 0;
-	transitionLevel = Level::getCurrentLevel() + 1;
+	transitionLevel = nextLevel;
 }
 void TransitionManager::restartLevel() {
 	transitionState = 1;

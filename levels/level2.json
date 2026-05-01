@@ -22,7 +22,7 @@
          "name":"Collision",
          "objects":[
                 {
-                 "height":64,
+                 "height":128,
                  "id":24,
                  "name":"",
                  "opacity":1,
@@ -35,9 +35,27 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
-                 "y":64
+                 "width":416,
+                 "x":-32,
+                 "y":32
+                }, 
+                {
+                 "height":128,
+                 "id":188,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":416,
+                 "x":800,
+                 "y":32
                 }, 
                 {
                  "height":64,
@@ -54,26 +72,8 @@
                  "type":"",
                  "visible":true,
                  "width":1248,
-                 "x":-640,
-                 "y":-640
-                }, 
-                {
-                 "height":64,
-                 "id":183,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":992,
-                 "x":-512,
-                 "y":-288
+                 "x":-32,
+                 "y":-736
                 }, 
                 {
                  "height":128,
@@ -89,63 +89,17 @@
                         {
                          "name":"nextLevel",
                          "type":"int",
-                         "value":1
+                         "value":0
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-512,
-                 "y":-576
+                 "x":960,
+                 "y":-224
                 }, 
                 {
-                 "height":128,
-                 "id":189,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":3
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":352,
-                 "y":-576
-                }, 
-                {
-                 "height":128,
-                 "id":190,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff00ff00"
-                        }, 
-                        {
-                         "name":"nextLevel",
-                         "type":"int",
-                         "value":2
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":-64,
-                 "y":-576
-                }, 
-                {
-                 "height":768,
+                 "height":896,
                  "id":109,
                  "name":"",
                  "opacity":1,
@@ -164,11 +118,11 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":-704,
-                 "y":-640
+                 "x":-96,
+                 "y":-736
                 }, 
                 {
-                 "height":768,
+                 "height":896,
                  "id":143,
                  "name":"",
                  "opacity":1,
@@ -187,8 +141,31 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":608,
-                 "y":-640
+                 "x":1216,
+                 "y":-736
+                }, 
+                {
+                 "height":64,
+                 "id":189,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ffff0000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":416,
+                 "x":384,
+                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -213,8 +190,8 @@
          "name":"Foreground",
          "objects":[
                 {
-                 "height":109,
-                 "id":187,
+                 "height":83,
+                 "id":191,
                  "name":"",
                  "opacity":1,
                  "rotation":0,
@@ -222,14 +199,14 @@
                     {
                      "fontfamily":"Sansation",
                      "pixelsize":64,
-                     "text":"Left\/Right: [A]\/[D]",
+                     "text":"[Space]",
                      "wrap":true
                     },
                  "type":"",
                  "visible":true,
-                 "width":555,
-                 "x":-576,
-                 "y":-544
+                 "width":231,
+                 "x":496.5,
+                 "y":-197.5
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -263,8 +240,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":64,
-                 "y":-352
+                 "x":32,
+                 "y":-32
                 }],
          "opacity":1,
          "type":"objectgroup",
