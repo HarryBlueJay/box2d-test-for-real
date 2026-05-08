@@ -13,6 +13,7 @@ void TransitionManager::finishLevel(int nextLevel) {
 	transitionState = 1;
 	fadeTimeCounter = 0;
 	transitionLevel = nextLevel;
+	Level::completeCurrentLevel();
 }
 void TransitionManager::restartLevel() {
 	transitionState = 1;

@@ -159,7 +159,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="levels\completedLevels.json" />
+    <None Include="levels\completedLevels.txt" />
     <None Include="levels\level1.json" />
     <None Include="levels\level1old.json" />
     <None Include="levels\level2.json" />

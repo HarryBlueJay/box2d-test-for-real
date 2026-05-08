@@ -17,5 +17,6 @@ namespace Level {
 	sf::Color tiledHexToSfColor(std::string color);
 	void loadLevel(int levelNumber);
 	void loadLevelList();
+	void completeCurrentLevel();
 	int getCurrentLevel();
 }

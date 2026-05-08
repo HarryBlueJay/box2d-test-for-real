@@ -18,6 +18,7 @@ int currentLevelNumber = 0;
 sf::Font font = sf::Font("resources\\sansation.ttf");
 std::vector<std::string> levelList;
 std::vector<bool> levelCompletions;
+b2Vec2 spawnLocation;
 extern std::vector<Object*> objectList;
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
@@ -40,19 +41,39 @@ int Level::getCurrentLevel() {
 void Level::loadLevelList() {
 	std::ifstream levelListJSON("levels\\levels.json");
 	nlohmann::json data = nlohmann::json::parse(levelListJSON);
+	levelListJSON.close();
 	nlohmann::json object = data["levels"];
 	for (nlohmann::json::iterator it = object.begin(); it != object.end(); ++it) {
 		levelList.push_back(*it);
 		levelCompletions.push_back(false);
 	}
-	std::fstream completedLevelList("levels\\completedLevels.json");
+	std::ifstream completedLevelList("levels\\completedLevels.txt");
 	if (!completedLevelList.fail()) {
-		nlohmann::json levelData = nlohmann::json::parse(completedLevelList);
+		std::string line;
 		int index = 0;
-		for (nlohmann::json::iterator it = levelData.begin(); it != levelData.end(); ++it) {
-			levelCompletions[index] = *it;
+		while (std::getline(completedLevelList, line)) {
+			if (index == 0) {
+				currentLevelNumber = std::stoi(line);
+			} else {
+				levelCompletions[index] = line == "1";
+			}
 			index++;
 		}
+		completedLevelList.close();
+	}
+}
+void Level::completeCurrentLevel() {
+	levelCompletions[currentLevelNumber] = true;
+	std::ofstream completedLevelList("levels\\completedLevels.txt");
+	if (!completedLevelList.fail()) {
+		for (int i = 0; i < levelCompletions.size(); i++) {
+			if (i == 0) {
+				completedLevelList << currentLevelNumber << "\n";
+				continue;
+			}
+			completedLevelList << levelCompletions[i] << "\n";
+		}
+		completedLevelList.close();
 	}
 }
 static void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
@@ -138,6 +159,9 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 			if (object.getProperties().hasProperty("nextLevel")) {
 				levelPolygon->nextLevel = object.get<int>("nextLevel");
 				if (levelPolygon->nextLevel > 0) {
+					if (levelPolygon->nextLevel == currentLevelNumber) {
+						spawnLocation = Casts::sfVector2f_to_b2Vec2((levelPolygon->rectangle.getPosition() / Casts::scaleFactor) + sf::Vector2f(96, 192));
+					}
 					TextObject* text = new TextObject(font);
 					text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
 					text->text.setCharacterSize(60);
@@ -145,6 +169,10 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 					//text->text.setOrigin(text->text.getLocalBounds().size * 0.5f + sf::Vector2f(0, 30));
 					text->text.setPosition(levelPolygon->rectangle.getPosition());
 					text->text.setRotation(levelPolygon->rectangle.getRotation());
+					text->text.setOutlineThickness(1.0f);
+					if (!levelCompletions[levelPolygon->nextLevel]) {
+						text->text.setFillColor(sf::Color::Red);
+					}
 					objectList.push_back(text);
 				}
 			}
@@ -198,7 +226,6 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 	}
 }
 void Level::loadLevel(int levelNumber) {
-	currentLevelNumber = levelNumber;
 	tson::Tileson t;
 	std::unique_ptr<tson::Map> map = t.parse("levels\\" + levelList[levelNumber]);
 	if (map->getStatus() != tson::ParseStatus::OK) {
@@ -219,7 +246,6 @@ void Level::loadLevel(int levelNumber) {
 	sf::Vector2f bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
 
 	//SpawnLocation
-	b2Vec2 spawnLocation;
 	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
 	tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
 	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
@@ -258,4 +284,5 @@ void Level::loadLevel(int levelNumber) {
 			loadObject(foregroundLayer->getObjects()[i]);
 		}
 	}
+	currentLevelNumber = levelNumber;
 }
