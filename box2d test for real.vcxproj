@@ -169,6 +169,7 @@
     <None Include="levels\levels.tiled-project" />
     <None Include="levels\testlevel.json" />
     <None Include="levels\tutorial.json" />
+    <None Include="resources\time lapse.ogg" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseCollider.h" />
@@ -184,6 +185,20 @@
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="tileson.hpp" />
     <ClInclude Include="TransitionManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\ball.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\body.png" />
+    <Image Include="resources\eye.png" />
+    <Image Include="resources\eyeleft.png" />
+    <Image Include="resources\eyeright.png" />
+    <Image Include="resources\eyestatic.png" />
+    <Image Include="resources\placeholder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\sansation.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

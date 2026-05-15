@@ -21,6 +21,7 @@ void MovingPlatform::update(float deltaTime) {
 	}
 	b2Vec2 position = b2Body_GetPosition(bodyId);
 	if (b2Dot(endPoint - position, endPoint - startPoint) < 0) {
+		b2Body_SetTransform(bodyId, endPoint, b2Body_GetRotation(bodyId));
 		b2Body_SetLinearVelocity(bodyId, {});
 		std::swap(startPoint, endPoint);
 		waitCounter = waitTime;

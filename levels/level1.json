@@ -23,24 +23,6 @@
          "objects":[
                 {
                  "height":64,
-                 "id":24,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":256,
-                 "x":-320,
-                 "y":64
-                }, 
-                {
-                 "height":64,
                  "id":193,
                  "name":"",
                  "opacity":1,
@@ -53,8 +35,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":544,
-                 "x":64,
+                 "width":1088,
+                 "x":-480,
                  "y":64
                 }, 
                 {
@@ -71,8 +53,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":544,
-                 "x":64,
+                 "width":320,
+                 "x":32,
                  "y":-704
                 }, 
                 {
@@ -89,8 +71,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
+                 "width":3072,
+                 "x":-1536,
                  "y":-1600
                 }, 
                 {
@@ -107,8 +89,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1248,
-                 "x":-640,
+                 "width":3200,
+                 "x":-1600,
                  "y":576
                 }, 
                 {
@@ -121,6 +103,11 @@
                          "name":"color",
                          "type":"color",
                          "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"texture",
+                         "type":"string",
+                         "value":"resources\\placeholder.png"
                         }],
                  "rotation":0,
                  "type":"",
@@ -130,9 +117,27 @@
                  "y":-192
                 }, 
                 {
+                 "height":64,
+                 "id":201,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":-416,
+                 "y":-192
+                }, 
+                {
                  "height":128,
                  "id":91,
-                 "name":"",
+                 "name":"Level 1",
                  "opacity":1,
                  "properties":[
                         {
@@ -149,13 +154,13 @@
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-64,
-                 "y":32
+                 "x":-384,
+                 "y":-224
                 }, 
                 {
                  "height":128,
                  "id":189,
-                 "name":"",
+                 "name":"Level 3",
                  "opacity":1,
                  "properties":[
                         {
@@ -178,7 +183,7 @@
                 {
                  "height":128,
                  "id":190,
-                 "name":"",
+                 "name":"Level 2",
                  "opacity":1,
                  "properties":[
                         {
@@ -195,11 +200,11 @@
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":448,
-                 "y":256
+                 "x":128,
+                 "y":-992
                 }, 
                 {
-                 "height":1472,
+                 "height":1408,
                  "id":109,
                  "name":"",
                  "opacity":1,
@@ -218,11 +223,11 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":-320,
-                 "y":-1600
+                 "x":-480,
+                 "y":-1536
                 }, 
                 {
-                 "height":1728,
+                 "height":1664,
                  "id":143,
                  "name":"",
                  "opacity":1,
@@ -242,10 +247,10 @@
                  "visible":true,
                  "width":64,
                  "x":608,
-                 "y":-1600
+                 "y":-1536
                 }, 
                 {
-                 "height":512,
+                 "height":2176,
                  "id":195,
                  "name":"",
                  "opacity":1,
@@ -264,8 +269,69 @@
                  "type":"",
                  "visible":true,
                  "width":64,
-                 "x":608,
-                 "y":128
+                 "x":1536,
+                 "y":-1600
+                }, 
+                {
+                 "height":2176,
+                 "id":200,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"isKillbrick",
+                         "type":"bool",
+                         "value":false
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":-1600,
+                 "y":-1600
+                }, 
+                {
+                 "height":64,
+                 "id":202,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"moveSpeed",
+                         "type":"float",
+                         "value":256
+                        }, 
+                        {
+                         "name":"offsetX",
+                         "type":"float",
+                         "value":0
+                        }, 
+                        {
+                         "name":"offsetY",
+                         "type":"float",
+                         "value":-512
+                        }, 
+                        {
+                         "name":"waitTime",
+                         "type":"float",
+                         "value":1
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":256,
+                 "x":352,
+                 "y":-192
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -290,23 +356,40 @@
          "name":"Foreground",
          "objects":[
                 {
-                 "height":109,
-                 "id":187,
-                 "name":"",
+                 "height":128,
+                 "id":208,
+                 "name":"ArrowKeys",
                  "opacity":1,
+                 "properties":[
+                        {
+                         "name":"texture",
+                         "type":"string",
+                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_arrows_horizontal_outline.png"
+                        }],
                  "rotation":0,
-                 "text":
-                    {
-                     "fontfamily":"Sansation",
-                     "pixelsize":64,
-                     "text":"Left\/Right: [A]\/[D]",
-                     "wrap":true
-                    },
                  "type":"",
                  "visible":true,
-                 "width":555,
-                 "x":-192,
-                 "y":-442
+                 "width":128,
+                 "x":0,
+                 "y":-480
+                }, 
+                {
+                 "height":128,
+                 "id":209,
+                 "name":"Space",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"texture",
+                         "type":"string",
+                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_space_outline.png"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":160,
+                 "y":-480
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -361,7 +444,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":198,
+ "nextobjectid":210,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

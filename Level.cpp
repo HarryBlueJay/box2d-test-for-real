@@ -94,6 +94,12 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	tson::Vector2i objectPosition = object.getPosition();
 	float objectRotation = object.getRotation();
 	tson::Colori objectColor = object.get<tson::Colori>("color");
+	std::string texturePath = object.get<std::string>("texture");
+	if (texturePath != "") {
+		levelPolygon->texture = new sf::Texture(texturePath);
+		levelPolygon->texture->setSmooth(false);
+		levelPolygon->rectangle.setTexture(levelPolygon->texture);
+	}
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
 	levelPolygon->rectangle.setFillColor(polygonColor);

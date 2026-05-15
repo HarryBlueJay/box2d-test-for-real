@@ -6,16 +6,16 @@
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
-                7,
                 6,
+                3,
                 2,
-                3
+                7
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 84,
-                "y": 15
+                "x": 316,
+                "y": 14
             }
         },
         "level1old.json": {
@@ -31,41 +31,41 @@
         },
         "level2.json": {
             "expandedObjectLayers": [
-                7,
+                3,
                 2,
-                3
+                7
+            ],
+            "scale": 0.5,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 746,
+                "y": -250
+            }
+        },
+        "level3.json": {
+            "expandedObjectLayers": [
+                6,
+                2,
+                7
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 16,
-                "y": 15
+                "y": 14
             }
         },
-        "level3.json": {
+        "level4.json": {
             "expandedObjectLayers": [
-                7,
                 6,
+                3,
                 2
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 16,
-                "y": 15
-            }
-        },
-        "level4.json": {
-            "expandedObjectLayers": [
-                6,
-                2,
-                3
-            ],
-            "scale": 0.5,
-            "selectedLayer": 1,
-            "viewCenter": {
-                "x": 16,
-                "y": 15
+                "y": 14
             }
         },
         "testlevel.json": {
@@ -96,7 +96,7 @@
         "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "int",
+    "property.type": "string",
     "recentFiles": [
         "level4.json",
         "level3.json",
