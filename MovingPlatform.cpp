@@ -9,6 +9,7 @@ void MovingPlatform::parse(tson::Object object) {
 	velocity = b2Normalize(offset) * object.get<float>("moveSpeed") * Casts::scaleFactor;
 	b2Body_SetLinearVelocity(bodyId, velocity);
 	waitTime = object.get<float>("waitTime");
+	b2Body_SetAngularVelocity(bodyId, object.get<float>("spinSpeed"));
 }
 
 void MovingPlatform::update(float deltaTime) {

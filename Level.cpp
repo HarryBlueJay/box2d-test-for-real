@@ -20,6 +20,7 @@ std::vector<std::string> levelList;
 std::vector<bool> levelCompletions;
 b2Vec2 spawnLocation;
 extern std::vector<Object*> objectList;
+std::vector<b2BodyId> objectIds;
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
 	std::string red = color.substr(3, 2);
@@ -95,6 +96,11 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	float objectRotation = object.getRotation();
 	tson::Colori objectColor = object.get<tson::Colori>("color");
 	std::string texturePath = object.get<std::string>("texture");
+	unsigned int weldNumber = object.get<unsigned int>("weld");
+	if (object.getId() >= objectIds.size()) {
+		objectIds.resize(object.getId() + 1);
+	}
+	objectIds[object.getId()] = *bodyId;
 	if (texturePath != "") {
 		levelPolygon->texture = new sf::Texture(texturePath);
 		levelPolygon->texture->setSmooth(false);
@@ -148,7 +154,7 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 		if (bodyId) {
 			LevelPolygon* levelPolygon = nullptr;
 			b2ShapeDef shapeDef = b2DefaultShapeDef();
-			if (object.get<float>("moveSpeed") != 0) {
+			if (object.get<float>("moveSpeed") != 0 || object.get<float>("spinSpeed") != 0) {
 				levelPolygon = new MovingPlatform;
 			}
 			else {

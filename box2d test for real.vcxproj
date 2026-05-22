@@ -152,6 +152,7 @@
     <ClCompile Include="MovingPlatform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TransitionManager.cpp" />
+    <ClCompile Include="Weld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\box2d-3.1.0\build\src\box2d.vcxproj">
@@ -185,6 +186,7 @@
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="tileson.hpp" />
     <ClInclude Include="TransitionManager.h" />
+    <ClInclude Include="Weld.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\ball.wav" />
