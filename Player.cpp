@@ -12,6 +12,8 @@ Player::Player(b2Vec2 spawnLocation) {
 	bodyDef.fixedRotation = true;
 
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
+	playerShapeDef.filter.maskBits = LEVEL;
+	playerShapeDef.filter.categoryBits = PLAYER;
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
 	bodyIdMaterial.friction = 0.5f;

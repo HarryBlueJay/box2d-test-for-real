@@ -4,6 +4,10 @@
 namespace tson {
 	enum class ObjectType : unsigned char;
 };
+enum CollisionGroups {
+	LEVEL	= 0b0001,
+	PLAYER	= 0b0010,
+};
 
 class LevelPolygon : public BaseCollider {
 public:

@@ -11,6 +11,7 @@
 #include "DrawableObject.h"
 #include "MovingPlatform.h"
 #include "TextObject.h"
+#include "Weld.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 extern sf::RenderWindow window;
@@ -97,10 +98,6 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	tson::Colori objectColor = object.get<tson::Colori>("color");
 	std::string texturePath = object.get<std::string>("texture");
 	unsigned int weldNumber = object.get<unsigned int>("weld");
-	if (object.getId() >= objectIds.size()) {
-		objectIds.resize(object.getId() + 1);
-	}
-	objectIds[object.getId()] = *bodyId;
 	if (texturePath != "") {
 		levelPolygon->texture = new sf::Texture(texturePath);
 		levelPolygon->texture->setSmooth(false);
@@ -144,6 +141,18 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 		levelPolygon->rectangle.setPosition(Casts::pixelsToMeters(position));
 		levelPolygon->rectangle.setRotation(sf::degrees(objectRotation));
 	}
+	else {
+		if (object.getId() >= objectIds.size()) {
+			objectIds.resize(object.getId() + 1);
+		}
+		objectIds[object.getId()] = *bodyId;
+		if (weldNumber > 0) {
+			Weld* weld = new Weld();
+			weld->objectA = dynamic_cast<LevelPolygon*>(levelPolygon);
+			weld->objectB = weldNumber;
+			objectList.push_back(weld);
+		}
+	}
 	objectList.push_back(levelPolygon);
 }
 static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
@@ -154,6 +163,8 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 		if (bodyId) {
 			LevelPolygon* levelPolygon = nullptr;
 			b2ShapeDef shapeDef = b2DefaultShapeDef();
+			shapeDef.filter.categoryBits = LEVEL;
+			shapeDef.filter.maskBits = PLAYER;
 			if (object.get<float>("moveSpeed") != 0 || object.get<float>("spinSpeed") != 0) {
 				levelPolygon = new MovingPlatform;
 			}
@@ -236,6 +247,7 @@ static Object* loadObject(tson::Object& object, b2BodyId* bodyId = nullptr) {
 		return textObject;
 	}
 	}
+	return nullptr;
 }
 void Level::loadLevel(int levelNumber) {
 	tson::Tileson t;
@@ -256,6 +268,20 @@ void Level::loadLevel(int levelNumber) {
 	//Level bounds
 	sf::Vector2f topLeft = sf::Vector2f(FLT_MAX, FLT_MAX);
 	sf::Vector2f bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
+
+	auto parseLayer = [&topLeft, &bottomRight, map = std::move(map)](std::string layerName, bool hasCollision) {
+		tson::Layer* collisionLayer = map->getLayer("Collision");
+		for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
+			auto& object = collisionLayer->getObjects()[i];
+			b2BodyId bodyId;
+			LevelPolygon* levelPolygon = dynamic_cast<LevelPolygon*>(loadObject(object, &bodyId));
+			for (int i = 0; i < levelPolygon->rectangle.getPointCount(); i++) {
+				sf::FloatRect rect = levelPolygon->rectangle.getGlobalBounds();
+				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
+				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
+			}
+		}
+		};
 
 	//SpawnLocation
 	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
@@ -295,6 +321,9 @@ void Level::loadLevel(int levelNumber) {
 		for (int i = 0; i < foregroundLayer->getObjects().size(); i++) {
 			loadObject(foregroundLayer->getObjects()[i]);
 		}
+	}
+	for (int i = 0; i < objectList.size(); i++) {
+		objectList[i]->start();
 	}
 	currentLevelNumber = levelNumber;
 }

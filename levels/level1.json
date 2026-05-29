@@ -118,6 +118,96 @@
                 }, 
                 {
                  "height":64,
+                 "id":213,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":224,
+                 "x":-416,
+                 "y":-288
+                }, 
+                {
+                 "height":256,
+                 "id":214,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":64,
+                 "y":-1056
+                }, 
+                {
+                 "height":256,
+                 "id":215,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":256,
+                 "y":-1056
+                }, 
+                {
+                 "height":64,
+                 "id":216,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":128,
+                 "y":-1056
+                }, 
+                {
+                 "height":64,
+                 "id":217,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":128,
+                 "y":-864
+                }, 
+                {
+                 "height":64,
                  "id":201,
                  "name":"",
                  "opacity":1,
@@ -248,7 +338,8 @@
                  "width":64,
                  "x":608,
                  "y":-1536
-                }, 
+                },
+            
                 {
                  "height":2176,
                  "id":195,
@@ -345,6 +436,24 @@
                          "value":"#ffaa5500"
                         }, 
                         {
+                         "name":"weld",
+                         "type":"object",
+                         "value":211
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":256,
+                 "x":320,
+                 "y":-320
+                }, 
+                {
+                 "height":1,
+                 "id":211,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
                          "name":"pivotX",
                          "type":"float",
                          "value":0
@@ -357,34 +466,12 @@
                         {
                          "name":"spinSpeed",
                          "type":"float",
-                         "value":256
-                        }, 
-                        {
-                         "name":"waitTime",
-                         "type":"float",
-                         "value":1
-                        }, 
-                        {
-                         "name":"weld",
-                         "type":"object",
-                         "value":91
+                         "value":10
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":256,
-                 "x":320,
-                 "y":-320
-                }, 
-                {
-                 "height":64,
-                 "id":211,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
+                 "width":1,
                  "x":-256,
                  "y":-480
                 }],
@@ -499,7 +586,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":213,
+ "nextobjectid":219,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",
