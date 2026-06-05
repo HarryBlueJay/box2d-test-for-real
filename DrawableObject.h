@@ -7,10 +7,9 @@ public:
 	//shapes//
 	sf::ConvexShape rectangle;
 	sf::Texture* texture;
+	float parallaxFactor;
 
-	void draw(sf::RenderWindow& window) {
-		window.draw(rectangle);
-	}
+	void draw(sf::RenderWindow& window);
 	~DrawableObject() {
 		if (texture) {
 			delete texture;

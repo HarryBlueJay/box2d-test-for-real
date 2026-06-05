@@ -438,21 +438,37 @@
                         {
                          "name":"weld",
                          "type":"object",
-                         "value":211
+                         "value":219
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":256,
                  "x":320,
-                 "y":-320
-                }, 
+                 "y":-480
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"Background",
+         "objects":[
                 {
-                 "height":1,
-                 "id":211,
+                 "height":32,
+                 "id":219,
                  "name":"",
                  "opacity":1,
                  "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#00000000"
+                        }, 
                         {
                          "name":"pivotX",
                          "type":"float",
@@ -466,26 +482,15 @@
                         {
                          "name":"spinSpeed",
                          "type":"float",
-                         "value":10
+                         "value":1
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":1,
+                 "width":32,
                  "x":-256,
                  "y":-480
                 }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":6,
-         "name":"Background",
-         "objects":[],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -534,6 +539,8 @@
                  "y":-480
                 }],
          "opacity":1,
+         "parallaxx":1.05,
+         "parallaxy":1.05,
          "type":"objectgroup",
          "visible":true,
          "x":0,
@@ -586,7 +593,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":219,
+ "nextobjectid":220,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

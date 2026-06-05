@@ -6,16 +6,16 @@
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
-                3,
-                7,
                 6,
-                2
+                2,
+                3,
+                7
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 84,
-                "y": 15
+                "x": 206,
+                "y": -342
             }
         },
         "level1old.json": {
@@ -31,22 +31,22 @@
         },
         "level2.json": {
             "expandedObjectLayers": [
+                2,
                 3,
-                7,
-                2
+                7
             ],
             "scale": 0.5,
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 16,
-                "y": 15
+                "y": 14
             }
         },
         "level3.json": {
             "expandedObjectLayers": [
-                7,
                 6,
-                2
+                2,
+                7
             ],
             "scale": 0.5,
             "selectedLayer": 1,
@@ -57,9 +57,9 @@
         },
         "level4.json": {
             "expandedObjectLayers": [
-                3,
                 6,
-                2
+                2,
+                3
             ],
             "scale": 0.5,
             "selectedLayer": 1,

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Casts.cpp" />
+    <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovingPlatform.cpp" />
