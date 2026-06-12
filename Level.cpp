@@ -150,7 +150,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	objectIds[object.getId()] = bodyId;
 	objectList.push_back(levelPolygon);
 }
-static Object* loadObject(tson::Object& object, b2BodyId& bodyId, int layerCategory, int layerMask) {
+static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layerCategory, uint64_t layerMask) {
 	tson::ObjectType objectType = object.getObjectType();
 	switch (objectType) {
 	case tson::ObjectType::Rectangle:
@@ -259,20 +259,29 @@ void Level::loadLevel(int levelNumber) {
 	sf::Vector2f topLeft = sf::Vector2f(FLT_MAX, FLT_MAX);
 	sf::Vector2f bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
 
-	//SpawnLocation
-	tson::Layer* spawnLocationLayer = map->getLayer("SpawnLocation");
-	tson::Object* spawnLocationObject = spawnLocationLayer->firstObj("");
-	tson::Vector2i spawnLocationPosition = spawnLocationObject->getPosition();
-	spawnLocation.x = spawnLocationPosition.x;
-	spawnLocation.y = spawnLocationPosition.y;
-
-	auto parseLayer = [&topLeft, &bottomRight, map = std::move(map)](std::string layerName, int layerCategory, int layerMask) {
-		tson::Layer* collisionLayer = map->getLayer(layerName);
-		float parallaxFactor = collisionLayer->getParallax().x;
-		for (int i = 0; i < collisionLayer->getObjects().size(); i++) {
-			auto& object = collisionLayer->getObjects()[i];
+	std::vector<tson::Layer>& layers = map->getLayers();
+	uint64_t mask = 0x80'00'00'00'00'00'00'00;
+	for (tson::Layer layer : layers) {
+		std::cout << layer.getName() << std::endl;
+		float parallaxFactor = layer.getParallax().x;
+		uint64_t hitsPlayer = 0;
+		if (parallaxFactor == 1.0f) { hitsPlayer = PLAYER; }
+		for (int i = 0; i < layer.getObjects().size(); i++) {
+			auto& object = layer.getObjects()[i];
+			if (object.isPoint()) {
+				tson::Vector2i spawnLocationPosition = object.getPosition();
+				spawnLocation.x = spawnLocationPosition.x;
+				spawnLocation.y = spawnLocationPosition.y;
+				Player* player = new Player(spawnLocation);
+				Camera* camera = new Camera(window);
+				objectList.push_back(camera);
+				camera->setBounds(topLeft, bottomRight);
+				camera->setTarget(player);
+				objectList.push_back(player);
+				continue;
+			}
 			b2BodyId bodyId;
-			Object* loadedObject = loadObject(object, bodyId, layerCategory, layerMask);
+			Object* loadedObject = loadObject(object, bodyId, mask | hitsPlayer, mask | hitsPlayer);
 			LevelPolygon* levelPolygon = dynamic_cast<LevelPolygon*>(loadedObject);
 			if (levelPolygon == nullptr) { continue; }
 			levelPolygon->parallaxFactor = parallaxFactor;
@@ -282,20 +291,15 @@ void Level::loadLevel(int levelNumber) {
 				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
 			}
 		}
-		};
-
-	//Background
-	parseLayer("Background", BACKGROUND, BACKGROUND);
-	//Collision
-	parseLayer("Collision", LEVEL, LEVEL | PLAYER);
-	Player* player = new Player(spawnLocation);
-	Camera* camera = new Camera(window);
-	objectList.push_back(camera);
-	camera->setBounds(topLeft, bottomRight);
-	camera->setTarget(player);
-	objectList.push_back(player);
-	//Foreground
-	parseLayer("Foreground", FOREGROUND, FOREGROUND);
+		mask >>= 1;
+	}
+	////Background
+	//parseLayer("Background", BACKGROUND, BACKGROUND);
+	////Collision
+	//parseLayer("Collision", LEVEL, LEVEL | PLAYER);
+	
+	////Foreground
+	//parseLayer("Foreground", FOREGROUND, FOREGROUND);
 	for (int i = 0; i < objectList.size(); i++) {
 		objectList[i]->start();
 	}
