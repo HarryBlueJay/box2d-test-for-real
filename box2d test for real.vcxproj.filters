@@ -48,13 +48,13 @@
     <None Include="levels\testlevel.json" />
     <None Include="levels\levels.json" />
     <None Include="levels\level1old.json" />
-    <None Include="levels\level1.json" />
     <None Include="levels\levels.tiled-project" />
     <None Include="levels\level2.json" />
     <None Include="levels\level3.json" />
     <None Include="levels\level4.json" />
     <None Include="levels\completedLevels.txt" />
     <None Include="resources\time lapse.ogg" />
+    <None Include="levels\level1.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">
@@ -127,5 +127,17 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\sansation.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="extlibs\bin\sfml-window-d-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-audio-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-audio-d-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-graphics-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-graphics-d-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-network-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-network-d-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-system-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-system-d-3.dll" />
+    <CopyFileToFolders Include="extlibs\bin\sfml-window-3.dll" />
   </ItemGroup>
 </Project>

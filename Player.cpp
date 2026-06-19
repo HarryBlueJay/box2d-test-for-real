@@ -12,7 +12,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	bodyDef.fixedRotation = true;
 
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-	playerShapeDef.filter.maskBits = PLAYER;
+	playerShapeDef.filter.maskBits = PLAYER | LEVEL;
 	playerShapeDef.filter.categoryBits = PLAYER;
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
