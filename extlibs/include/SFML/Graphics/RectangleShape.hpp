@@ -39,7 +39,7 @@
 namespace sf
 {
 ////////////////////////////////////////////////////////////
-/// \brief Specialized shape representing a rectangle
+/// \brief Specialized shape representing a transform
 ///
 ////////////////////////////////////////////////////////////
 class SFML_GRAPHICS_API RectangleShape : public Shape
@@ -48,15 +48,15 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
-    /// \param size Size of the rectangle
+    /// \param size Size of the transform
     ///
     ////////////////////////////////////////////////////////////
     explicit RectangleShape(Vector2f size = {});
 
     ////////////////////////////////////////////////////////////
-    /// \brief Set the size of the rectangle
+    /// \brief Set the size of the transform
     ///
-    /// \param size New size of the rectangle
+    /// \param size New size of the transform
     ///
     /// \see `getSize`
     ///
@@ -64,9 +64,9 @@ public:
     void setSize(Vector2f size);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the size of the rectangle
+    /// \brief Get the size of the transform
     ///
-    /// \return Size of the rectangle
+    /// \return Size of the transform
     ///
     /// \see `setSize`
     ///
@@ -76,14 +76,14 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Get the number of points defining the shape
     ///
-    /// \return Number of points of the shape. For rectangle
+    /// \return Number of points of the shape. For transform
     ///         shapes, this number is always 4.
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] std::size_t getPointCount() const override;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get a point of the rectangle
+    /// \brief Get a point of the transform
     ///
     /// The returned point is in local coordinates, that is,
     /// the shape's transforms (position, rotation, scale) are
@@ -98,7 +98,7 @@ public:
     [[nodiscard]] Vector2f getPoint(std::size_t index) const override;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the geometric center of the rectangle
+    /// \brief Get the geometric center of the transform
     ///
     /// The returned point is in local coordinates, that is,
     /// the shape's transforms (position, rotation, scale) are
@@ -113,7 +113,7 @@ private:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    Vector2f m_size; //!< Size of the rectangle
+    Vector2f m_size; //!< Size of the transform
 };
 
 } // namespace sf
@@ -129,13 +129,13 @@ private:
 ///
 /// Usage example:
 /// \code
-/// sf::RectangleShape rectangle;
-/// rectangle.setSize(sf::Vector2f(100, 50));
-/// rectangle.setOutlineColor(sf::Color::Red);
-/// rectangle.setOutlineThickness(5);
-/// rectangle.setPosition({10, 20});
+/// sf::RectangleShape transform;
+/// transform.setSize(sf::Vector2f(100, 50));
+/// transform.setOutlineColor(sf::Color::Red);
+/// transform.setOutlineThickness(5);
+/// transform.setPosition({10, 20});
 /// ...
-/// window.draw(rectangle);
+/// window.draw(transform);
 /// \endcode
 ///
 /// \see `sf::Shape`, `sf::CircleShape`, `sf::ConvexShape`

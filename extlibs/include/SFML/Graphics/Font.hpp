@@ -423,12 +423,12 @@ private:
     Glyph loadGlyph(char32_t codePoint, unsigned int characterSize, bool bold, float outlineThickness) const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Find a suitable rectangle within the texture for a glyph
+    /// \brief Find a suitable transform within the texture for a glyph
     ///
     /// \param page Page of glyphs to search in
-    /// \param size Width and height of the rectangle
+    /// \param size Width and height of the transform
     ///
-    /// \return Found rectangle within the texture
+    /// \return Found transform within the texture
     ///
     ////////////////////////////////////////////////////////////
     IntRect findGlyphRect(Page& page, Vector2u size) const;

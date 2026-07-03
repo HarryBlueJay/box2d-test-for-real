@@ -108,7 +108,7 @@ Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter 
     return result;
 }
 
-void Casts::move(sf::ConvexShape& rectangle, b2BodyId& id) {
+void Casts::move(sf::Transformable& rectangle, b2BodyId& id) {
     rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
     rectangle.setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(id))));
 }

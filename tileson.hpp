@@ -5796,7 +5796,7 @@ namespace tson
 			tson::Tileset *             m_tileset;                                   /*! A pointer to the tileset where this Tile comes from */
 			tson::Map *                 m_map;                                       /*! A pointer to the map where this tile is contained */
 			tson::Rect                  m_drawingRect;                               /*! A rect that shows which part of the tileset that is used for this tile */
-			tson::Rect                  m_subRect;                                   /*! Tiled 1.9: Contains the newly added sub-rectangle variables: 'x', 'y', 'width' and 'height'*/
+			tson::Rect                  m_subRect;                                   /*! Tiled 1.9: Contains the newly added sub-transform variables: 'x', 'y', 'width' and 'height'*/
 			tson::TileFlipFlags         m_flipFlags = TileFlipFlags::None;           /*! Resolved using bit 32, 31 and 30 from gid */
 			inline void performDataCalculations();                                   /*! Declared in tileson_forward.hpp - Calculate all the values used in the tile class. */
 			inline void manageFlipFlagsByIdThenRemoveFlags(uint32_t &id);
@@ -6028,7 +6028,7 @@ void tson::Tile::setProperties(const tson::PropertyCollection &properties)
 }
 
 /*!
- * Tiled 1.9: Contains the newly added sub-rectangle variables: 'x', 'y', 'width' and 'height'
+ * Tiled 1.9: Contains the newly added sub-transform variables: 'x', 'y', 'width' and 'height'
  * @return A tson::Rect with the 'x', 'y', 'width' and 'height' values
  */
 const tson::Rect &tson::Tile::getSubRectangle() const

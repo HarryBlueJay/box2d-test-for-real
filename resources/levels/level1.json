@@ -37,20 +37,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":-256,
-                 "y":-480
-                }, 
-                {
-                 "height":96,
-                 "id":230,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":-128,
-                 "y":-288
+                 "x":-1440,
+                 "y":-768
                 }],
          "opacity":1,
          "parallaxx":1.001,
@@ -159,42 +147,6 @@
                  "width":608,
                  "x":-256,
                  "y":-192
-                }, 
-                {
-                 "height":64,
-                 "id":213,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":224,
-                 "x":-416,
-                 "y":-288
-                }, 
-                {
-                 "height":736,
-                 "id":214,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":64,
-                 "y":-1536
                 }, 
                 {
                  "height":64,
@@ -412,8 +364,7 @@
                  "width":256,
                  "x":352,
                  "y":-192
-                },
-            
+                }, 
                 {
                  "height":32,
                  "id":210,
@@ -434,8 +385,26 @@
                  "type":"",
                  "visible":true,
                  "width":256,
-                 "x":320,
-                 "y":-480
+                 "x":-864,
+                 "y":-768
+                }, 
+                {
+                 "height":224,
+                 "id":245,
+                 "name":"Gravity",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"gravityStrength",
+                         "type":"float",
+                         "value":1
+                        }],
+                 "rotation":315,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":352,
+                 "y":-416
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -613,295 +582,36 @@
                  "width":0,
                  "x":-384,
                  "y":448
+                }, 
+                {
+                 "height":83,
+                 "id":243,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "text":
+                    {
+                     "fontfamily":"Sansation",
+                     "pixelsize":64,
+                     "text":"[Space]",
+                     "wrap":true
+                    },
+                 "type":"",
+                 "visible":true,
+                 "width":231,
+                 "x":212.812,
+                 "y":-509.984
                 }],
          "opacity":1,
-         "parallaxx":1.5,
-         "parallaxy":1.5,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":8,
-         "name":"Foreground",
-         "objects":[
-                {
-                 "height":128,
-                 "id":232,
-                 "name":"ArrowKeys",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"texture",
-                         "type":"string",
-                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_arrows_horizontal_outline.png"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":0,
-                 "y":-480
-                }, 
-                {
-                 "height":128,
-                 "id":233,
-                 "name":"Space",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"texture",
-                         "type":"string",
-                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_space_outline.png"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":160,
-                 "y":-480
-                }, 
-                {
-                 "height":224,
-                 "id":234,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#80ff0004"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":-384,
-                 "y":352
-                }, 
-                {
-                 "height":0,
-                 "id":235,
-                 "name":"",
-                 "opacity":1,
-                 "polygon":[
-                        {
-                         "x":0,
-                         "y":0
-                        }, 
-                        {
-                         "x":256,
-                         "y":0
-                        }, 
-                        {
-                         "x":128,
-                         "y":-160
-                        }],
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#800022ff"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-480,
-                 "y":352
-                }, 
-                {
-                 "height":0,
-                 "id":236,
-                 "name":"",
-                 "opacity":1,
-                 "polygon":[
-                        {
-                         "x":0,
-                         "y":0
-                        }, 
-                        {
-                         "x":-192,
-                         "y":-32
-                        }, 
-                        {
-                         "x":-192,
-                         "y":0
-                        }, 
-                        {
-                         "x":0,
-                         "y":32
-                        }],
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#80ff8000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-384,
-                 "y":448
-                }],
-         "opacity":1,
-         "parallaxx":1.6,
-         "parallaxy":1.6,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":9,
-         "name":"Foreground",
-         "objects":[
-                {
-                 "height":128,
-                 "id":237,
-                 "name":"ArrowKeys",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"texture",
-                         "type":"string",
-                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_arrows_horizontal_outline.png"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":0,
-                 "y":-480
-                }, 
-                {
-                 "height":128,
-                 "id":238,
-                 "name":"Space",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"texture",
-                         "type":"string",
-                         "value":".\\resources\\Keyboard & Mouse\\Default\\keyboard_space_outline.png"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":160,
-                 "y":-480
-                }, 
-                {
-                 "height":224,
-                 "id":239,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#80ff0004"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":64,
-                 "x":-384,
-                 "y":352
-                }, 
-                {
-                 "height":0,
-                 "id":240,
-                 "name":"",
-                 "opacity":1,
-                 "polygon":[
-                        {
-                         "x":0,
-                         "y":0
-                        }, 
-                        {
-                         "x":256,
-                         "y":0
-                        }, 
-                        {
-                         "x":128,
-                         "y":-160
-                        }],
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#800022ff"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-480,
-                 "y":352
-                }, 
-                {
-                 "height":0,
-                 "id":241,
-                 "name":"",
-                 "opacity":1,
-                 "polygon":[
-                        {
-                         "x":0,
-                         "y":0
-                        }, 
-                        {
-                         "x":-192,
-                         "y":-32
-                        }, 
-                        {
-                         "x":-192,
-                         "y":0
-                        }, 
-                        {
-                         "x":0,
-                         "y":32
-                        }],
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#80ff8000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-384,
-                 "y":448
-                }, 
-                {
-                 "height":0,
-                 "id":242,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-320,
-                 "y":334.4
-                }],
-         "opacity":1,
-         "parallaxx":1.7,
-         "parallaxy":1.7,
+         "parallaxx":1.001,
+         "parallaxy":1.001,
          "type":"objectgroup",
          "visible":true,
          "x":0,
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":243,
+ "nextobjectid":247,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

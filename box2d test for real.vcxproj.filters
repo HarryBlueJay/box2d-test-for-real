@@ -44,17 +44,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="levels\tutorial.json" />
-    <None Include="levels\testlevel.json" />
-    <None Include="levels\levels.json" />
-    <None Include="levels\level1old.json" />
-    <None Include="levels\levels.tiled-project" />
-    <None Include="levels\level2.json" />
-    <None Include="levels\level3.json" />
-    <None Include="levels\level4.json" />
-    <None Include="levels\completedLevels.txt" />
+    <None Include="resources\levels\tutorial.json" />
+    <None Include="resources\levels\testlevel.json" />
+    <None Include="resources\levels\levels.json" />
+    <None Include="resources\levels\level1old.json" />
+    <None Include="resources\levels\levels.tiled-project" />
+    <None Include="resources\levels\level2.json" />
+    <None Include="resources\levels\level3.json" />
+    <None Include="resources\levels\level4.json" />
+    <None Include="resources\levels\completedLevels.txt" />
     <None Include="resources\time lapse.ogg" />
-    <None Include="levels\level1.json" />
+    <None Include="resources\levels\level1.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Player.h">

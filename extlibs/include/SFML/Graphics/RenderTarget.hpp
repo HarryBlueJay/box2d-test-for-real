@@ -175,27 +175,27 @@ public:
     ///
     /// The viewport is defined in the view as a ratio, this function
     /// simply applies this ratio to the current dimensions of the
-    /// render target to calculate the pixels rectangle that the viewport
+    /// render target to calculate the pixels transform that the viewport
     /// actually covers in the target.
     ///
     /// \param view The view for which we want to compute the viewport
     ///
-    /// \return Viewport rectangle, expressed in pixels
+    /// \return Viewport transform, expressed in pixels
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] IntRect getViewport(const View& view) const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the scissor rectangle of a view, applied to this render target
+    /// \brief Get the scissor transform of a view, applied to this render target
     ///
-    /// The scissor rectangle is defined in the view as a ratio. This
+    /// The scissor transform is defined in the view as a ratio. This
     /// function simply applies this ratio to the current dimensions
-    /// of the render target to calculate the pixels rectangle
-    /// that the scissor rectangle actually covers in the target.
+    /// of the render target to calculate the pixels transform
+    /// that the scissor transform actually covers in the target.
     ///
-    /// \param view The view for which we want to compute the scissor rectangle
+    /// \param view The view for which we want to compute the scissor transform
     ///
-    /// \return Scissor rectangle, expressed in pixels
+    /// \return Scissor transform, expressed in pixels
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] IntRect getScissor(const View& view) const;

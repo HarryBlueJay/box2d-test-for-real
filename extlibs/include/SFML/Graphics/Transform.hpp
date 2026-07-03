@@ -116,17 +116,17 @@ public:
     [[nodiscard]] constexpr Vector2f transformPoint(Vector2f point) const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Transform a rectangle
+    /// \brief Transform a transform
     ///
     /// Since SFML doesn't provide support for oriented rectangles,
     /// the result of this function is always an axis-aligned
-    /// rectangle. Which means that if the transform contains a
-    /// rotation, the bounding rectangle of the transformed rectangle
+    /// transform. Which means that if the transform contains a
+    /// rotation, the bounding transform of the transformed transform
     /// is returned.
     ///
-    /// \param rectangle Rectangle to transform
+    /// \param transform Rectangle to transform
     ///
-    /// \return Transformed rectangle
+    /// \return Transformed transform
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] constexpr FloatRect transformRect(const FloatRect& rectangle) const;

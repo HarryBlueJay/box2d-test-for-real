@@ -67,10 +67,10 @@ public:
     explicit Sprite(const Texture&& texture) = delete;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the sprite from a sub-rectangle of a source texture
+    /// \brief Construct the sprite from a sub-transform of a source texture
     ///
     /// \param texture   Source texture
-    /// \param rectangle Sub-rectangle of the texture to assign to the sprite
+    /// \param transform Sub-transform of the texture to assign to the sprite
     ///
     /// \see `setTexture`, `setTextureRect`
     ///
@@ -111,13 +111,13 @@ public:
     void setTexture(const Texture&& texture, bool resetRect = false) = delete;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Set the sub-rectangle of the texture that the sprite will display
+    /// \brief Set the sub-transform of the texture that the sprite will display
     ///
     /// The texture rect is useful when you don't want to display
     /// the whole texture, but rather a part of it.
     /// By default, the texture rect covers the entire texture.
     ///
-    /// \param rectangle Rectangle defining the region of the texture to display
+    /// \param transform Rectangle defining the region of the texture to display
     ///
     /// \see `getTextureRect`, `setTexture`
     ///
@@ -153,9 +153,9 @@ public:
     [[nodiscard]] const Texture& getTexture() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the sub-rectangle of the texture displayed by the sprite
+    /// \brief Get the sub-transform of the texture displayed by the sprite
     ///
-    /// \return Texture rectangle of the sprite
+    /// \return Texture transform of the sprite
     ///
     /// \see `setTextureRect`
     ///
@@ -173,29 +173,29 @@ public:
     [[nodiscard]] Color getColor() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the local bounding rectangle of the entity
+    /// \brief Get the local bounding transform of the entity
     ///
-    /// The returned rectangle is in local coordinates, which means
+    /// The returned transform is in local coordinates, which means
     /// that it ignores the transformations (translation, rotation,
     /// scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// entity in the entity's coordinate system.
     ///
-    /// \return Local bounding rectangle of the entity
+    /// \return Local bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getLocalBounds() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the global bounding rectangle of the entity
+    /// \brief Get the global bounding transform of the entity
     ///
-    /// The returned rectangle is in global coordinates, which means
+    /// The returned transform is in global coordinates, which means
     /// that it takes into account the transformations (translation,
     /// rotation, scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// sprite in the global 2D world's coordinate system.
     ///
-    /// \return Global bounding rectangle of the entity
+    /// \return Global bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getGlobalBounds() const;
@@ -238,7 +238,7 @@ private:
 /// position, rotation, scale, origin. It also adds sprite-specific
 /// properties such as the texture to use, the part of it to display,
 /// and some convenience functions to change the overall color of the
-/// sprite, or to get its bounding rectangle.
+/// sprite, or to get its bounding transform.
 ///
 /// `sf::Sprite` works in combination with the `sf::Texture` class, which
 /// loads and provides the pixel data of a given texture.

@@ -43,7 +43,7 @@ struct SFML_GRAPHICS_API Glyph
     float     advance{};   //!< Offset to move horizontally to the next character
     int       lsbDelta{};  //!< Left offset after forced autohint. Internally used by getKerning()
     int       rsbDelta{};  //!< Right offset after forced autohint. Internally used by getKerning()
-    FloatRect bounds;      //!< Bounding rectangle of the glyph, in coordinates relative to the baseline
+    FloatRect bounds;      //!< Bounding transform of the glyph, in coordinates relative to the baseline
     IntRect   textureRect; //!< Texture coordinates of the glyph inside the font's texture
 };
 
@@ -59,7 +59,7 @@ struct SFML_GRAPHICS_API Glyph
 /// The `sf::Glyph` structure provides the information needed
 /// to handle the glyph:
 /// \li its coordinates in the font's texture
-/// \li its bounding rectangle
+/// \li its bounding transform
 /// \li the offset to apply to get the starting position of the next glyph
 ///
 /// \see `sf::Font`

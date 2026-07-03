@@ -291,7 +291,7 @@ public:
     ///
     /// \param source     Source image to copy
     /// \param dest       Coordinates of the destination position
-    /// \param sourceRect Sub-rectangle of the source image to copy
+    /// \param sourceRect Sub-transform of the source image to copy
     /// \param applyAlpha Should the copy take into account the source transparency?
     ///
     /// \return `true` if the operation was successful, `false` otherwise

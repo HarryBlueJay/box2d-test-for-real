@@ -7,6 +7,7 @@ sf::Texture eyeTexture;
 
 
 Player::Player(b2Vec2 spawnLocation) {
+	transform = new sf::ConvexShape();
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.fixedRotation = true;
@@ -19,17 +20,17 @@ Player::Player(b2Vec2 spawnLocation) {
 	bodyIdMaterial.friction = 0.5f;
 	playerShapeDef.material = bodyIdMaterial;
 	sf::Vector2f size = sf::Vector2f(64, 64);
-	Casts::makeCircleWithBodyDef(rectangle, bodyId, playerShapeDef, Casts::b2Vec2_to_sfVector2f(spawnLocation), size, 0, bodyDef);
+	Casts::makeCircleWithBodyDef(*getConvexShape(), bodyId, playerShapeDef, Casts::b2Vec2_to_sfVector2f(spawnLocation), size, 0, bodyDef);
 
 	bodyTexture.loadFromFile("resources/body.png");
-	rectangle.setTexture(&bodyTexture);
+	getShape()->setTexture(&bodyTexture);
 	eyeTexture.loadFromFile("resources/eye.png");
 	eye.setTexture(&eyeTexture);
 	eye.setSize(size/32.0f);
-	eye.setOrigin(rectangle.getOrigin());
+	eye.setOrigin(transform->getOrigin());
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
-	Casts::move(rectangle, bodyId);
+	Casts::move(*transform, bodyId);
 	dying = false;
 	eye.setFillColor(sf::Color::Black);
 }
@@ -52,17 +53,17 @@ void Player::update(float deltaTime) {
 	if (dying) {
 		deltaTime /= deathAnimationTime;
 		sf::Vector2f shrink = sf::Vector2f(deltaTime, deltaTime);
-		sf::Vector2f center = rectangle.getGlobalBounds().getCenter();
-		rectangle.setScale(rectangle.getScale() - shrink);
-		rectangle.move(shrink / 2.0f);
-		rectangle.rotate(sf::degrees(deltaTime * deathRotationSpeed));
-		sf::Vector2f newCenter = rectangle.getGlobalBounds().getCenter();
+		sf::Vector2f center = getShape()->getGlobalBounds().getCenter();
+		transform->setScale(transform->getScale() - shrink);
+		transform->move(shrink / 2.0f);
+		transform->rotate(sf::degrees(deltaTime * deathRotationSpeed));
+		sf::Vector2f newCenter = getShape()->getGlobalBounds().getCenter();
 		sf::Vector2f centerOffset = center - newCenter;
-		rectangle.move(centerOffset);
-		eye.setPosition(rectangle.getPosition());
-		eye.setRotation(rectangle.getRotation());
-		eye.setScale(rectangle.getScale());
-		if (rectangle.getScale().x < delta) {
+		transform->move(centerOffset);
+		eye.setPosition(transform->getPosition());
+		eye.setRotation(transform->getRotation());
+		eye.setScale(transform->getScale());
+		if (transform->getScale().x < delta) {
 			TransitionManager::get().restartLevel();
 		}
 		return;
@@ -126,7 +127,7 @@ void Player::update(float deltaTime) {
 	touchingLeft = false;
 	touchingRight = false;
 	touchingFloor = false;
-	Casts::move(rectangle, bodyId);
+	Casts::move(*transform, bodyId);
 }
 void Player::collide(Object* otherObject, b2Vec2 normal) {
 	LevelPolygon* levelRectangle = dynamic_cast<LevelPolygon*>(otherObject);
@@ -137,6 +138,10 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		if (levelRectangle->isKillbrick) {
 			die();
 		}
+		if (levelRectangle->gravityStrength >= 0) {
+			b2Vec2 newGravity = Casts::sfVector2f_to_b2Vec2(levelRectangle->transform->getTransform() * sf::Vector2f(0, 1)) * levelRectangle->gravityStrength;
+			b2World_SetGravity(b2Body_GetWorld(bodyId), newGravity);
+		}
 	}
 
 	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
@@ -144,7 +149,7 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		coyoteCounter = coyoteTime;
 		touchingFloor = true;
 		wallJumps = 0;
-		lastGroundedPosition = rectangle.getPosition();
+		lastGroundedPosition = transform->getPosition();
 		dashes = maxDashes;
 		eye.setFillColor(sf::Color::Black);
 	}
@@ -191,11 +196,11 @@ void Player::inputCallback(std::optional<sf::Event> event) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-	sf::Vector2f rotatedEyeOffset = eyeOffset.rotatedBy(-rectangle.getRotation());
-	eye.setPosition(rectangle.getPosition() + (rotatedEyeOffset * eye.getScale().x));
-	window.draw(rectangle);
+	sf::Vector2f rotatedEyeOffset = eyeOffset.rotatedBy(-transform->getRotation());
+	eye.setPosition(transform->getPosition() + (rotatedEyeOffset * eye.getScale().x));
+	window.draw(*getShape());
 	window.draw(eye);
-	path.push_back({ rectangle.getPosition(), sf::Color::Green });
+	path.push_back({ transform->getPosition(), sf::Color::Green });
 	if (path.size() > 14400) {
 		path.erase(path.begin());
 	}

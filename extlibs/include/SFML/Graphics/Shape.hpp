@@ -77,7 +77,7 @@ public:
     void setTexture(const Texture* texture, bool resetRect = false);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Set the sub-rectangle of the texture that the shape will display
+    /// \brief Set the sub-transform of the texture that the shape will display
     ///
     /// The texture rect is useful when you don't want to display
     /// the whole texture, but rather a part of it.
@@ -149,9 +149,9 @@ public:
     [[nodiscard]] const Texture* getTexture() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the sub-rectangle of the texture displayed by the shape
+    /// \brief Get the sub-transform of the texture displayed by the shape
     ///
-    /// \return Texture rectangle of the shape
+    /// \return Texture transform of the shape
     ///
     /// \see `setTextureRect`
     ///
@@ -228,36 +228,36 @@ public:
     [[nodiscard]] virtual Vector2f getGeometricCenter() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the local bounding rectangle of the entity
+    /// \brief Get the local bounding transform of the entity
     ///
-    /// The returned rectangle is in local coordinates, which means
+    /// The returned transform is in local coordinates, which means
     /// that it ignores the transformations (translation, rotation,
     /// scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// entity in the entity's coordinate system.
     ///
-    /// \return Local bounding rectangle of the entity
+    /// \return Local bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getLocalBounds() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the global (non-minimal) bounding rectangle of the entity
+    /// \brief Get the global (non-minimal) bounding transform of the entity
     ///
-    /// The returned rectangle is in global coordinates, which means
+    /// The returned transform is in global coordinates, which means
     /// that it takes into account the transformations (translation,
     /// rotation, scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// shape in the global 2D world's coordinate system.
     ///
     /// This function does not necessarily return the _minimal_
-    /// bounding rectangle. It merely ensures that the returned
-    /// rectangle covers all the vertices (but possibly more).
+    /// bounding transform. It merely ensures that the returned
+    /// transform covers all the vertices (but possibly more).
     /// This allows for a fast approximation of the bounds as a
     /// first check; you may want to use more precise checks
     /// on top of that.
     ///
-    /// \return Global bounding rectangle of the entity
+    /// \return Global bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getGlobalBounds() const;
@@ -317,8 +317,8 @@ private:
     float          m_outlineThickness{};         //!< Thickness of the shape's outline
     VertexArray    m_vertices{PrimitiveType::TriangleFan};          //!< Vertex array containing the fill geometry
     VertexArray    m_outlineVertices{PrimitiveType::TriangleStrip}; //!< Vertex array containing the outline geometry
-    FloatRect      m_insideBounds;                                  //!< Bounding rectangle of the inside (fill)
-    FloatRect      m_bounds; //!< Bounding rectangle of the whole shape (outline + fill)
+    FloatRect      m_insideBounds;                                  //!< Bounding transform of the inside (fill)
+    FloatRect      m_bounds; //!< Bounding transform of the whole shape (outline + fill)
 };
 
 } // namespace sf
@@ -331,13 +331,13 @@ private:
 /// `sf::Shape` is a drawable class that allows to define and
 /// display a custom convex shape on a render target.
 /// It's only an abstract base, it needs to be specialized for
-/// concrete types of shapes (circle, rectangle, convex polygon,
+/// concrete types of shapes (circle, transform, convex polygon,
 /// star, ...).
 ///
 /// In addition to the attributes provided by the specialized
 /// shape classes, a shape always has the following attributes:
 /// \li a texture
-/// \li a texture rectangle
+/// \li a texture transform
 /// \li a fill color
 /// \li an outline color
 /// \li an outline thickness

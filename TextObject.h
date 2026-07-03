@@ -2,13 +2,11 @@
 #include "BasicIncludes.h"
 #include "Object.h"
 
-class TextObject : public Object {
+class TextObject : public DrawableObject {
 public:
 	//shapes//
 	sf::Text text;
-	TextObject(sf::Font& font): text(font) {}
-
-	void draw(sf::RenderWindow& window) {
-		window.draw(text);
+	TextObject(sf::Font& font): text(font) {
+		transform = &text;
 	}
 };

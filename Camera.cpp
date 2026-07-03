@@ -68,14 +68,14 @@ void Camera::update(float deltaTime) {
     }
     view.setCenter(start);
 }
-void Camera::setTarget(sf::ConvexShape* newTarget) {
+void Camera::setTarget(sf::Transformable* newTarget) {
     playerTarget = nullptr;
     target = newTarget;
     view.setCenter(target->getPosition());
     update(0);
 }
 void Camera::setTarget(Player* newTarget) {
-    setTarget(&newTarget->rectangle);
+    setTarget(newTarget->transform);
     playerTarget = newTarget;
 }
 void Camera::setBounds(sf::Vector2f boundTopLeft, sf::Vector2f boundBottomRight) {

@@ -144,6 +144,9 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY "$(SolutionDir)resources" "$(TargetDir)\resources\" /S /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
@@ -192,22 +195,22 @@
     <CopyFileToFolders Include="extlibs\bin\sfml-window-d-3.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-    <None Include="levels\completedLevels.txt" />
-    <None Include="levels\level1.json">
+    <None Include="resources\levels\completedLevels.txt" />
+    <None Include="resources\levels\level1.json">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </DeploymentContent>
     </None>
-    <None Include="levels\level1old.json" />
-    <None Include="levels\level2.json" />
-    <None Include="levels\level3.json" />
-    <None Include="levels\level4.json" />
-    <None Include="levels\levels.json" />
-    <None Include="levels\levels.tiled-project" />
-    <None Include="levels\testlevel.json" />
-    <None Include="levels\tutorial.json" />
+    <None Include="resources\levels\level1old.json" />
+    <None Include="resources\levels\level2.json" />
+    <None Include="resources\levels\level3.json" />
+    <None Include="resources\levels\level4.json" />
+    <None Include="resources\levels\levels.json" />
+    <None Include="resources\levels\levels.tiled-project" />
+    <None Include="resources\levels\testlevel.json" />
+    <None Include="resources\levels\tutorial.json" />
     <None Include="resources\time lapse.ogg" />
   </ItemGroup>
   <ItemGroup>

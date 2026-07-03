@@ -16,5 +16,5 @@ void Weld::start() {
 	b2JointId joint = b2CreateWeldJoint(worldId, &jointDef);
 }
 void Weld::update(float deltaTime) {
-	Casts::move(objectA->rectangle, objectA->bodyId);
+	Casts::move(*objectA->transform, objectA->bodyId);
 }

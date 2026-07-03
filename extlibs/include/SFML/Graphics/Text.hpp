@@ -363,29 +363,29 @@ public:
     [[nodiscard]] Vector2f findCharacterPos(std::size_t index) const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the local bounding rectangle of the entity
+    /// \brief Get the local bounding transform of the entity
     ///
-    /// The returned rectangle is in local coordinates, which means
+    /// The returned transform is in local coordinates, which means
     /// that it ignores the transformations (translation, rotation,
     /// scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// entity in the entity's coordinate system.
     ///
-    /// \return Local bounding rectangle of the entity
+    /// \return Local bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getLocalBounds() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the global bounding rectangle of the entity
+    /// \brief Get the global bounding transform of the entity
     ///
-    /// The returned rectangle is in global coordinates, which means
+    /// The returned transform is in global coordinates, which means
     /// that it takes into account the transformations (translation,
     /// rotation, scale, ...) that are applied to the entity.
     /// In other words, this function returns the bounds of the
     /// text in the global 2D world's coordinate system.
     ///
-    /// \return Global bounding rectangle of the entity
+    /// \return Global bounding transform of the entity
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getGlobalBounds() const;
@@ -423,7 +423,7 @@ private:
     float                 m_outlineThickness{0.f};                     //!< Thickness of the text's outline
     mutable VertexArray   m_vertices{PrimitiveType::Triangles};        //!< Vertex array containing the fill geometry
     mutable VertexArray   m_outlineVertices{PrimitiveType::Triangles}; //!< Vertex array containing the outline geometry
-    mutable FloatRect     m_bounds;               //!< Bounding rectangle of the text (in local coordinates)
+    mutable FloatRect     m_bounds;               //!< Bounding transform of the text (in local coordinates)
     mutable bool          m_geometryNeedUpdate{}; //!< Does the geometry need to be recomputed?
     mutable std::uint64_t m_fontTextureId{};      //!< The font texture id
 };

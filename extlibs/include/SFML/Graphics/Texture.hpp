@@ -114,12 +114,12 @@ public:
     explicit Texture(const std::filesystem::path& filename, bool sRgb = false);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the texture from a sub-rectangle of a file on disk
+    /// \brief Construct the texture from a sub-transform of a file on disk
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -154,12 +154,12 @@ public:
     Texture(const void* data, std::size_t size, bool sRgb = false);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the texture from a sub-rectangle of a file in memory
+    /// \brief Construct the texture from a sub-transform of a file in memory
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -194,12 +194,12 @@ public:
     explicit Texture(InputStream& stream, bool sRgb = false);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the texture from a sub-rectangle of a custom stream
+    /// \brief Construct the texture from a sub-transform of a custom stream
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -233,11 +233,11 @@ public:
     explicit Texture(const Image& image, bool sRgb = false);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the texture from a sub-rectangle of an image
+    /// \brief Construct the texture from a sub-transform of an image
     ///
-    /// The `area` argument is used to load only a sub-rectangle
+    /// The `area` argument is used to load only a sub-transform
     /// of the whole image.
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -281,10 +281,10 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Load the texture from a file on disk
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -306,10 +306,10 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Load the texture from a file in memory
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -332,10 +332,10 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Load the texture from a custom stream
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -357,10 +357,10 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Load the texture from an image
     ///
-    /// The `area` argument can be used to load only a sub-rectangle
+    /// The `area` argument can be used to load only a sub-transform
     /// of the whole image. If you want the entire image then leave
     /// the default value (which is an empty `IntRect`).
-    /// If the `area` rectangle crosses the bounds of the image, it
+    /// If the `area` transform crosses the bounds of the image, it
     /// is adjusted to fit the image size.
     ///
     /// The maximum size for a texture depends on the graphics
@@ -406,7 +406,7 @@ public:
     /// \brief Update the whole texture from an array of pixels
     ///
     /// The pixel array is assumed to have the same size as
-    /// the `area` rectangle, and to contain 32-bits RGBA pixels.
+    /// the `area` transform, and to contain 32-bits RGBA pixels.
     ///
     /// No additional check is performed on the size of the pixel
     /// array. Passing invalid arguments will lead to an undefined
@@ -591,7 +591,7 @@ public:
     /// \brief Enable or disable repeating
     ///
     /// Repeating is involved when using texture coordinates
-    /// outside the texture rectangle [0, 0, width, height].
+    /// outside the texture transform [0, 0, width, height].
     /// In this case, if repeat mode is enabled, the whole texture
     /// will be repeated as many times as needed to reach the
     /// coordinate (for example, if the X texture coordinate is

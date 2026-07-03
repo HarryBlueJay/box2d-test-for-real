@@ -56,7 +56,7 @@ constexpr bool Rect<T>::contains(Vector2<T> point) const
 
     // Rectangles with negative dimensions are allowed, so we must handle them correctly
 
-    // Compute the real min and max of the rectangle on both axes
+    // Compute the real min and max of the transform on both axes
     const T minX = min(position.x, static_cast<T>(position.x + size.x));
     const T maxX = max(position.x, static_cast<T>(position.x + size.x));
     const T minY = min(position.y, static_cast<T>(position.y + size.y));
@@ -76,13 +76,13 @@ constexpr std::optional<Rect<T>> Rect<T>::findIntersection(const Rect<T>& rectan
 
     // Rectangles with negative dimensions are allowed, so we must handle them correctly
 
-    // Compute the min and max of the first rectangle on both axes
+    // Compute the min and max of the first transform on both axes
     const T r1MinX = min(position.x, static_cast<T>(position.x + size.x));
     const T r1MaxX = max(position.x, static_cast<T>(position.x + size.x));
     const T r1MinY = min(position.y, static_cast<T>(position.y + size.y));
     const T r1MaxY = max(position.y, static_cast<T>(position.y + size.y));
 
-    // Compute the min and max of the second rectangle on both axes
+    // Compute the min and max of the second transform on both axes
     const T r2MinX = min(rectangle.position.x, static_cast<T>(rectangle.position.x + rectangle.size.x));
     const T r2MaxX = max(rectangle.position.x, static_cast<T>(rectangle.position.x + rectangle.size.x));
     const T r2MinY = min(rectangle.position.y, static_cast<T>(rectangle.position.y + rectangle.size.y));

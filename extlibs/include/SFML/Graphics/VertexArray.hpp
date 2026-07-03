@@ -165,12 +165,12 @@ public:
     [[nodiscard]] PrimitiveType getPrimitiveType() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Compute the bounding rectangle of the vertex array
+    /// \brief Compute the bounding transform of the vertex array
     ///
-    /// This function returns the minimal axis-aligned rectangle
+    /// This function returns the minimal axis-aligned transform
     /// that contains all the vertices of the array.
     ///
-    /// \return Bounding rectangle of the vertex array
+    /// \return Bounding transform of the vertex array
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] FloatRect getBounds() const;

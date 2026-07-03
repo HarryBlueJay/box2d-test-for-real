@@ -41,7 +41,7 @@ int Level::getCurrentLevel() {
 	return currentLevelNumber;
 }
 void Level::loadLevelList() {
-	std::ifstream levelListJSON("levels\\levels.json");
+	std::ifstream levelListJSON("resources\\levels\\levels.json");
 	nlohmann::json data = nlohmann::json::parse(levelListJSON);
 	levelListJSON.close();
 	nlohmann::json object = data["levels"];
@@ -49,7 +49,7 @@ void Level::loadLevelList() {
 		levelList.push_back(*it);
 		levelCompletions.push_back(false);
 	}
-	std::ifstream completedLevelList("levels\\completedLevels.txt");
+	std::ifstream completedLevelList("resources\\levels\\completedLevels.txt");
 	if (!completedLevelList.fail()) {
 		std::string line;
 		int index = 0;
@@ -66,7 +66,7 @@ void Level::loadLevelList() {
 }
 void Level::completeCurrentLevel() {
 	levelCompletions[currentLevelNumber] = true;
-	std::ofstream completedLevelList("levels\\completedLevels.txt");
+	std::ofstream completedLevelList("resources\\levels\\completedLevels.txt");
 	if (!completedLevelList.fail()) {
 		for (int i = 0; i < levelCompletions.size(); i++) {
 			if (i == 0) {
@@ -100,11 +100,11 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	if (texturePath != "") {
 		levelPolygon->texture = new sf::Texture(texturePath);
 		levelPolygon->texture->setSmooth(false);
-		levelPolygon->rectangle.setTexture(levelPolygon->texture);
+		levelPolygon->getShape()->setTexture(levelPolygon->texture);
 	}
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
-	levelPolygon->rectangle.setFillColor(polygonColor);
+	levelPolygon->getShape()->setFillColor(polygonColor);
 
 	tson::ObjectType objectType = object.getObjectType();
 	sf::Vector2f position = sf::Vector2f(
@@ -118,7 +118,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 			objectSize.x,
 			objectSize.y
 		);
-		Casts::makeBox(levelPolygon->rectangle, &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
+		Casts::makeBox(*levelPolygon->getConvexShape(), &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
 		break;
 	}
 	case tson::ObjectType::Polygon: {
@@ -132,7 +132,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 				)
 			);
 		}
-		Casts::makePolygon(levelPolygon->rectangle, &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
+		Casts::makePolygon(*levelPolygon->getConvexShape(), &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
 		break;
 	}
 	}
@@ -157,6 +157,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		else {
 			levelPolygon = new LevelPolygon;
 		}
+		levelPolygon->transform = new sf::ConvexShape();
 		unsigned int weldNumber = object.get<unsigned int>("weld");
 		if (weldNumber > 0) {
 			Weld* weld = new Weld();
@@ -177,15 +178,15 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			levelPolygon->nextLevel = object.get<int>("nextLevel");
 			if (levelPolygon->nextLevel > 0) {
 				if (levelPolygon->nextLevel == currentLevelNumber) {
-					spawnLocation = Casts::sfVector2f_to_b2Vec2((levelPolygon->rectangle.getPosition() / Casts::scaleFactor) + sf::Vector2f(96, 192));
+					spawnLocation = Casts::sfVector2f_to_b2Vec2((levelPolygon->transform->getPosition() / Casts::scaleFactor) + sf::Vector2f(96, 192));
 				}
 				TextObject* text = new TextObject(font);
 				text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
 				text->text.setCharacterSize(60);
 				text->text.setScale(sf::Vector2f(Casts::scaleFactor, Casts::scaleFactor));
 				//text->text.setOrigin(text->text.getLocalBounds().size * 0.5f + sf::Vector2f(0, 30));
-				text->text.setPosition(levelPolygon->rectangle.getPosition());
-				text->text.setRotation(levelPolygon->rectangle.getRotation());
+				text->text.setPosition(levelPolygon->transform->getPosition());
+				text->text.setRotation(levelPolygon->transform->getRotation());
 				text->text.setOutlineThickness(1.0f);
 				if (!levelCompletions[levelPolygon->nextLevel]) {
 					text->text.setFillColor(sf::Color::Red);
@@ -197,6 +198,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			levelPolygon->nextLevel = -1;
 		}
 		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
+		levelPolygon->gravityStrength = object.getProperties().hasProperty("gravityStrength") ? object.get<float>("gravityStrength") : -1;
 
 
 		levelPolygon->bodyId = bodyId;
@@ -242,7 +244,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 }
 void Level::loadLevel(int levelNumber) {
 	tson::Tileson t;
-	std::unique_ptr<tson::Map> map = t.parse("levels\\" + levelList[levelNumber]);
+	std::unique_ptr<tson::Map> map = t.parse("resources\\levels\\" + levelList[levelNumber]);
 	if (map->getStatus() != tson::ParseStatus::OK) {
 		std::cout << "Failed to parse" << std::endl;
 		return;
@@ -287,11 +289,12 @@ void Level::loadLevel(int levelNumber) {
 			}
 			b2BodyId bodyId;
 			Object* loadedObject = loadObject(object, bodyId, layerMask, hitsPlayer);
-			LevelPolygon* levelPolygon = dynamic_cast<LevelPolygon*>(loadedObject);
+			DrawableObject* levelPolygon = dynamic_cast<DrawableObject*>(loadedObject);
 			if (levelPolygon == nullptr) { continue; }
 			levelPolygon->parallaxFactor = parallaxFactor;
-			for (int i = 0; i < levelPolygon->rectangle.getPointCount(); i++) {
-				sf::FloatRect rect = levelPolygon->rectangle.getGlobalBounds();
+			if (levelPolygon->getShape() == nullptr) { continue; }
+			for (int i = 0; i < levelPolygon->getShape()->getPointCount(); i++) {
+				sf::FloatRect rect = levelPolygon->getShape()->getGlobalBounds();
 				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
 				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
 			}

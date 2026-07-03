@@ -45,36 +45,36 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
-    /// Creates an empty rectangle (it is equivalent to calling
+    /// Creates an empty transform (it is equivalent to calling
     /// `Rect({0, 0}, {0, 0})`).
     ///
     ////////////////////////////////////////////////////////////
     constexpr Rect() = default;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the rectangle from position and size
+    /// \brief Construct the transform from position and size
     ///
     /// Be careful, the last parameter is the size,
     /// not the bottom-right corner!
     ///
-    /// \param position Position of the top-left corner of the rectangle
-    /// \param size     Size of the rectangle
+    /// \param position Position of the top-left corner of the transform
+    /// \param size     Size of the transform
     ///
     ////////////////////////////////////////////////////////////
     constexpr Rect(Vector2<T> position, Vector2<T> size);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Converts the rectangle to another type of rectangle
+    /// \brief Converts the transform to another type of transform
     ///
     ////////////////////////////////////////////////////////////
     template <typename U>
     constexpr explicit operator Rect<U>() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Check if a point is inside the rectangle's area
+    /// \brief Check if a point is inside the transform's area
     ///
     /// This check is non-inclusive. If the point lies on the
-    /// edge of the rectangle, this function will return `false`.
+    /// edge of the transform, this function will return `false`.
     ///
     /// \param point Point to test
     ///
@@ -88,9 +88,9 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Check the intersection between two rectangles
     ///
-    /// \param rectangle Rectangle to test
+    /// \param transform Rectangle to test
     ///
-    /// \return Intersection rectangle if intersecting, `std::nullopt` otherwise
+    /// \return Intersection transform if intersecting, `std::nullopt` otherwise
     ///
     /// \see `contains`
     ///
@@ -98,9 +98,9 @@ public:
     [[nodiscard]] constexpr std::optional<Rect<T>> findIntersection(const Rect<T>& rectangle) const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the position of the center of the rectangle
+    /// \brief Get the position of the center of the transform
     ///
-    /// \return Center of rectangle
+    /// \return Center of transform
     ///
     ////////////////////////////////////////////////////////////
     [[nodiscard]] constexpr Vector2<T> getCenter() const;
@@ -108,8 +108,8 @@ public:
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    Vector2<T> position{}; //!< Position of the top-left corner of the rectangle
-    Vector2<T> size{};     //!< Size of the rectangle
+    Vector2<T> position{}; //!< Position of the top-left corner of the transform
+    Vector2<T> size{};     //!< Size of the transform
 };
 
 ////////////////////////////////////////////////////////////
@@ -118,8 +118,8 @@ public:
 ///
 /// This operator compares strict equality between two rectangles.
 ///
-/// \param lhs Left operand (a rectangle)
-/// \param rhs Right operand (a rectangle)
+/// \param lhs Left operand (a transform)
+/// \param rhs Right operand (a transform)
 ///
 /// \return `true` if \a lhs is equal to \a rhs
 ///
@@ -133,8 +133,8 @@ template <typename T>
 ///
 /// This operator compares strict difference between two rectangles.
 ///
-/// \param lhs Left operand (a rectangle)
-/// \param rhs Right operand (a rectangle)
+/// \param lhs Left operand (a transform)
+/// \param rhs Right operand (a transform)
 ///
 /// \return `true` if \a lhs is not equal to \a rhs
 ///
@@ -155,7 +155,7 @@ using FloatRect = Rect<float>;
 /// \class sf::Rect
 /// \ingroup graphics
 ///
-/// A rectangle is defined by its top-left corner and its size.
+/// A transform is defined by its top-left corner and its size.
 /// It is a very simple class defined for convenience, so
 /// its member variables (position and size) are public
 /// and can be accessed directly, just like the vector classes
@@ -167,8 +167,8 @@ using FloatRect = Rect<float>;
 /// only provides intersection functions.
 ///
 /// `sf::Rect` uses the usual rules for its boundaries:
-/// \li The left and top edges are included in the rectangle's area
-/// \li The right and bottom edges are excluded from the rectangle's area
+/// \li The left and top edges are included in the transform's area
+/// \li The right and bottom edges are excluded from the transform's area
 ///
 /// This means that `sf::IntRect({0, 0}, {1, 1})` and `sf::IntRect({1, 1}, {1, 1})`
 /// don't intersect.
@@ -182,10 +182,10 @@ using FloatRect = Rect<float>;
 ///
 /// Usage example:
 /// \code
-/// // Define a rectangle, located at (0, 0) with a size of 20x5
+/// // Define a transform, located at (0, 0) with a size of 20x5
 /// sf::IntRect r1({0, 0}, {20, 5});
 ///
-/// // Define another rectangle, located at (4, 2) with a size of 18x10
+/// // Define another transform, located at (4, 2) with a size of 18x10
 /// sf::Vector2i position(4, 2);
 /// sf::Vector2i size(18, 10);
 /// sf::IntRect r2(position, size);

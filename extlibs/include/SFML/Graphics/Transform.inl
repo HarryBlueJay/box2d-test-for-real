@@ -97,13 +97,13 @@ constexpr Vector2f Transform::transformPoint(Vector2f point) const
 ////////////////////////////////////////////////////////////
 constexpr FloatRect Transform::transformRect(const FloatRect& rectangle) const
 {
-    // Transform the 4 corners of the rectangle
+    // Transform the 4 corners of the transform
     const std::array points = {transformPoint(rectangle.position),
                                transformPoint(rectangle.position + Vector2f(0.f, rectangle.size.y)),
                                transformPoint(rectangle.position + Vector2f(rectangle.size.x, 0.f)),
                                transformPoint(rectangle.position + rectangle.size)};
 
-    // Compute the bounding rectangle of the transformed points
+    // Compute the bounding transform of the transformed points
     Vector2f pmin = points[0];
     Vector2f pmax = points[0];
 

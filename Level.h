@@ -14,6 +14,7 @@ public:
 	tson::ObjectType objectType;
 	int nextLevel;
 	bool isKillbrick;
+	float gravityStrength;
 };
 
 

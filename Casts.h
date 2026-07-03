@@ -37,7 +37,7 @@ namespace Casts {
     T pixelsToMeters(T input) {
         return input * scaleFactor;
     };
-    void move(sf::ConvexShape& rectangle, b2BodyId& id);
+    void move(sf::Transformable& rectangle, b2BodyId& id);
 
     void makeCircleWithBodyDef(sf::ConvexShape& box, b2BodyId& id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyDef bodyDef);
     // maybe make a version that takes in a body def

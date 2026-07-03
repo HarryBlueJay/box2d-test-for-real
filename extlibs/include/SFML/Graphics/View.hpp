@@ -54,9 +54,9 @@ public:
     View() = default;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Construct the view from a rectangle
+    /// \brief Construct the view from a transform
     ///
-    /// \param rectangle Rectangle defining the zone to display
+    /// \param transform Rectangle defining the zone to display
     ///
     ////////////////////////////////////////////////////////////
     explicit View(const FloatRect& rectangle);
@@ -105,14 +105,14 @@ public:
     ////////////////////////////////////////////////////////////
     /// \brief Set the target viewport
     ///
-    /// The viewport is the rectangle into which the contents of the
+    /// The viewport is the transform into which the contents of the
     /// view are displayed, expressed as a factor (between 0 and 1)
     /// of the size of the RenderTarget to which the view is applied.
     /// For example, a view which takes the left side of the target would
     /// be defined with `view.setViewport(sf::FloatRect({0.f, 0.f}, {0.5f, 1.f}))`.
     /// By default, a view has a viewport which covers the entire target.
     ///
-    /// \param viewport New viewport rectangle
+    /// \param viewport New viewport transform
     ///
     /// \see `getViewport`
     ///
@@ -120,23 +120,23 @@ public:
     void setViewport(const FloatRect& viewport);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Set the target scissor rectangle
+    /// \brief Set the target scissor transform
     ///
-    /// The scissor rectangle, expressed as a factor (between 0 and 1) of
+    /// The scissor transform, expressed as a factor (between 0 and 1) of
     /// the RenderTarget, specifies the region of the RenderTarget whose
     /// pixels are able to be modified by draw or clear operations.
-    /// Any pixels which lie outside of the scissor rectangle will
+    /// Any pixels which lie outside of the scissor transform will
     /// not be modified by draw or clear operations.
-    /// For example, a scissor rectangle which only allows modifications
+    /// For example, a scissor transform which only allows modifications
     /// to the right side of the target would be defined
     /// with `view.setScissor(sf::FloatRect({0.5f, 0.f}, {0.5f, 1.f}))`.
-    /// By default, a view has a scissor rectangle which allows
+    /// By default, a view has a scissor transform which allows
     /// modifications to the entire target. This is equivalent to
     /// disabling the scissor test entirely. Passing the default
-    /// scissor rectangle to this function will also disable
+    /// scissor transform to this function will also disable
     /// scissor testing.
     ///
-    /// \param scissor New scissor rectangle
+    /// \param scissor New scissor transform
     ///
     /// \see `getScissor`
     ///
@@ -174,9 +174,9 @@ public:
     [[nodiscard]] Angle getRotation() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the target viewport rectangle of the view
+    /// \brief Get the target viewport transform of the view
     ///
-    /// \return Viewport rectangle, expressed as a factor of the target size
+    /// \return Viewport transform, expressed as a factor of the target size
     ///
     /// \see `setViewport`
     ///
@@ -184,9 +184,9 @@ public:
     [[nodiscard]] const FloatRect& getViewport() const;
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the scissor rectangle of the view
+    /// \brief Get the scissor transform of the view
     ///
-    /// \return Scissor rectangle, expressed as a factor of the target size
+    /// \return Scissor transform, expressed as a factor of the target size
     ///
     /// \see `setScissor`
     ///
@@ -214,7 +214,7 @@ public:
     void rotate(Angle angle);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Resize the view rectangle relative to its current size
+    /// \brief Resize the view transform relative to its current size
     ///
     /// Resizing the view simulates a zoom, as the zone displayed on
     /// screen grows or shrinks.
@@ -260,9 +260,9 @@ private:
     ////////////////////////////////////////////////////////////
     Vector2f  m_center{500, 500};           //!< Center of the view, in scene coordinates
     Vector2f  m_size{1000, 1000};           //!< Size of the view, in scene coordinates
-    Angle     m_rotation;                   //!< Angle of rotation of the view rectangle
-    FloatRect m_viewport{{0, 0}, {1, 1}};   //!< Viewport rectangle, expressed as a factor of the render-target's size
-    FloatRect m_scissor{{0, 0}, {1, 1}};    //!< Scissor rectangle, expressed as a factor of the render-target's size
+    Angle     m_rotation;                   //!< Angle of rotation of the view transform
+    FloatRect m_viewport{{0, 0}, {1, 1}};   //!< Viewport transform, expressed as a factor of the render-target's size
+    FloatRect m_scissor{{0, 0}, {1, 1}};    //!< Scissor transform, expressed as a factor of the render-target's size
     mutable Transform m_transform;          //!< Precomputed projection transform corresponding to the view
     mutable Transform m_inverseTransform;   //!< Precomputed inverse projection transform corresponding to the view
     mutable bool      m_transformUpdated{}; //!< Internal state telling if the transform needs to be updated
@@ -281,25 +281,25 @@ private:
 /// the entire scene without altering the way that your
 /// drawable objects are drawn.
 ///
-/// A view is composed of a source rectangle, which defines
+/// A view is composed of a source transform, which defines
 /// what part of the 2D scene is shown, and a target viewport,
-/// which defines where the contents of the source rectangle
+/// which defines where the contents of the source transform
 /// will be displayed on the render target (window or texture).
 ///
 /// The viewport allows to map the scene to a custom part
 /// of the render target, and can be used for split-screen
 /// or for displaying a minimap, for example. If the source
-/// rectangle doesn't have the same size as the viewport, its
+/// transform doesn't have the same size as the viewport, its
 /// contents will be stretched to fit in.
 ///
-/// The scissor rectangle allows for specifying regions of the
+/// The scissor transform allows for specifying regions of the
 /// render target to which modifications can be made by draw
 /// and clear operations. Only pixels that are within the region
 /// will be able to be modified. Pixels outside of the region will
 /// not be modified by draw or clear operations.
 ///
 /// Certain effects can be created by either using the viewport or
-/// scissor rectangle. While the results appear identical, there
+/// scissor transform. While the results appear identical, there
 /// can be times where one method should be preferred over the other.
 /// Viewport transformations are applied during the vertex processing
 /// stage of the graphics pipeline, before the primitives are
@@ -328,7 +328,7 @@ private:
 /// \code
 /// sf::RenderWindow window;
 ///
-/// // Initialize the view to a rectangle located at (100, 100) and with a size of 400x200
+/// // Initialize the view to a transform located at (100, 100) and with a size of 400x200
 /// sf::View view(sf::FloatRect({100, 100}, {400, 200}));
 ///
 /// // Rotate it by 45 degrees
