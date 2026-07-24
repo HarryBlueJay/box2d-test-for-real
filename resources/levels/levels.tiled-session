@@ -11,8 +11,8 @@
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 416,
-                "y": -304
+                "x": -718,
+                "y": 578
             }
         },
         "level1old.json": {
@@ -28,41 +28,39 @@
         },
         "level2.json": {
             "expandedObjectLayers": [
-                2,
-                7,
                 3
             ],
             "scale": 0.5,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 876,
-                "y": 54
+                "x": 724,
+                "y": 40
             }
         },
         "level3.json": {
             "expandedObjectLayers": [
-                2,
                 6,
+                2,
                 7
             ],
             "scale": 0.5,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 16,
-                "y": 16
+                "x": 742,
+                "y": 72
             }
         },
         "level4.json": {
             "expandedObjectLayers": [
-                2,
+                3,
                 6,
-                3
+                2
             ],
             "scale": 0.5,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 16,
-                "y": 16
+                "y": 14
             }
         },
         "testlevel.json": {
@@ -93,7 +91,7 @@
         "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "float",
+    "property.type": "bool",
     "recentFiles": [
         "level4.json",
         "level3.json",

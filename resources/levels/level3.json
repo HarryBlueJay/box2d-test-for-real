@@ -338,6 +338,8 @@
                  "y":-564
                 }],
          "opacity":1,
+         "parallaxx":1.001,
+         "parallaxy":1.001,
          "type":"objectgroup",
          "visible":true,
          "x":0,

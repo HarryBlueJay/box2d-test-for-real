@@ -22,6 +22,24 @@ std::vector<bool> levelCompletions;
 b2Vec2 spawnLocation;
 extern std::vector<Object*> objectList;
 std::vector<b2BodyId> objectIds;
+sf::Vector2f topLeft;
+sf::Vector2f bottomRight;
+sf::Vector2f Level::getTopLeft() {
+	return topLeft;
+}
+sf::Vector2f Level::getBottomRight() {
+	return bottomRight;
+}
+b2Vec2 Level::rotateByGravity(const b2Vec2& vector) {
+	if (vector == b2Vec2_zero) { return vector; }
+	b2Rot gravityAngle = b2ComputeRotationBetweenUnitVectors(b2Vec2{ 0, 1 }, b2Normalize(b2World_GetGravity(worldId)));
+	return b2RotateVector(gravityAngle, vector);
+}
+b2Vec2 Level::unrotateByGravity(const b2Vec2& vector) {
+	if (vector == b2Vec2_zero) { return vector; }
+	b2Rot gravityAngle = b2ComputeRotationBetweenUnitVectors(b2Vec2{ 0, 1 }, b2Normalize(b2World_GetGravity(worldId)));
+	return b2InvRotateVector(gravityAngle, vector);
+}
 sf::Color Level::tiledHexToSfColor(std::string color) {
 	std::string alpha = color.substr(1, 2);
 	std::string red = color.substr(3, 2);
@@ -78,7 +96,7 @@ void Level::completeCurrentLevel() {
 		completedLevelList.close();
 	}
 }
-static void updateBounds(sf::Vector2f& topLeft, sf::Vector2f& bottomRight, sf::Vector2f coordinate) {
+static void updateBounds(sf::Vector2f coordinate) {
 	if (topLeft.x > coordinate.x) {
 		topLeft.x = coordinate.x;
 	}
@@ -172,6 +190,10 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		}
 		shapeDef.material.restitution = object.get<float>("restitution");
 		shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
+		if (object.get<bool>("sensor")) {
+			shapeDef.isSensor = true;
+			shapeDef.enableSensorEvents = true;
+		}
 		loadPolygon(object, levelPolygon, bodyId, shapeDef);
 		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 		if (object.getProperties().hasProperty("nextLevel")) {
@@ -199,7 +221,6 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		}
 		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
 		levelPolygon->gravityStrength = object.getProperties().hasProperty("gravityStrength") ? object.get<float>("gravityStrength") : -1;
-
 
 		levelPolygon->bodyId = bodyId;
 		if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
@@ -259,8 +280,8 @@ void Level::loadLevel(int levelNumber) {
 	worldId = b2CreateWorld(&worldDef);
 
 	//Level bounds
-	sf::Vector2f topLeft = sf::Vector2f(FLT_MAX, FLT_MAX);
-	sf::Vector2f bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
+	topLeft = sf::Vector2f(FLT_MAX, FLT_MAX);
+	bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
 
 	std::vector<tson::Layer>& layers = map->getLayers();
 	uint64_t mask = 0x80'00'00'00'00'00'00'00;
@@ -282,9 +303,9 @@ void Level::loadLevel(int levelNumber) {
 				Player* player = new Player(spawnLocation);
 				Camera* camera = new Camera(window);
 				objectList.push_back(camera);
-				camera->setBounds(topLeft, bottomRight);
 				camera->setTarget(player);
 				objectList.push_back(player);
+				b2Body_SetUserData(player->bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 				continue;
 			}
 			b2BodyId bodyId;
@@ -295,8 +316,8 @@ void Level::loadLevel(int levelNumber) {
 			if (levelPolygon->getShape() == nullptr) { continue; }
 			for (int i = 0; i < levelPolygon->getShape()->getPointCount(); i++) {
 				sf::FloatRect rect = levelPolygon->getShape()->getGlobalBounds();
-				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x, rect.position.y));
-				updateBounds(topLeft, bottomRight, sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
+				updateBounds(sf::Vector2f(rect.position.x, rect.position.y));
+				updateBounds(sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
 			}
 		}
 		mask >>= 1;

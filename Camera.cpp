@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Casts.h"
+#include "Level.h"
 const int windowHeight = 800;
 const int cameraSpeed = 8;
 
@@ -38,11 +39,11 @@ void Camera::update(float deltaTime) {
     }
     sf::Vector2f viewTopLeft = start - view.getSize()/2.0f;
     sf::Vector2f viewBottomRight = start + view.getSize() / 2.0f;
-    sf::Vector2f levelSize = bottomRight - topLeft;
-    sf::Vector2f levelMiddle = topLeft + levelSize / 2.0f;
+    sf::Vector2f levelSize = Level::getBottomRight() - Level::getTopLeft();
+    sf::Vector2f levelMiddle = Level::getTopLeft() + levelSize / 2.0f;
     if (levelSize.x > view.getSize().x) {
-        float leftDistance = topLeft.x - viewTopLeft.x;
-        float rightDistance = bottomRight.x - viewBottomRight.x;
+        float leftDistance = Level::getTopLeft().x - viewTopLeft.x;
+        float rightDistance = Level::getBottomRight().x - viewBottomRight.x;
         if (leftDistance > 0) {
             start.x += leftDistance;
         }
@@ -54,8 +55,8 @@ void Camera::update(float deltaTime) {
         start.x = levelMiddle.x;
     }
     if (levelSize.y > view.getSize().y) {
-        float topDistance = topLeft.y - viewTopLeft.y;
-        float bottomDistance = bottomRight.y - viewBottomRight.y;
+        float topDistance = Level::getTopLeft().y - viewTopLeft.y;
+        float bottomDistance = Level::getBottomRight().y - viewBottomRight.y;
         if (topDistance > 0) {
             start.y += topDistance;
         }
@@ -77,10 +78,6 @@ void Camera::setTarget(sf::Transformable* newTarget) {
 void Camera::setTarget(Player* newTarget) {
     setTarget(newTarget->transform);
     playerTarget = newTarget;
-}
-void Camera::setBounds(sf::Vector2f boundTopLeft, sf::Vector2f boundBottomRight) {
-    topLeft = boundTopLeft;
-    bottomRight = boundBottomRight;
 }
 void Camera::draw(sf::RenderWindow& window) {
     sf::Vector2u windowSize = window.getSize();

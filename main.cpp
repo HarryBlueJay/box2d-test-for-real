@@ -64,6 +64,16 @@ int main()
                     collider->collide(objectList[k], normal);
                 }
             }
+            // Sensors
+            b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
+            for (int i = 0; i < sensorEvents.beginCount; ++i) {
+                b2SensorBeginTouchEvent* beginTouch = sensorEvents.beginEvents + i;
+                int colliderIndex = reinterpret_cast<int>(b2Body_GetUserData(b2Shape_GetBody(beginTouch->visitorShapeId)));
+                int sensorIndex = reinterpret_cast<int>(b2Body_GetUserData(b2Shape_GetBody(beginTouch->sensorShapeId)));
+                BaseCollider* collider = dynamic_cast<BaseCollider*>(objectList[colliderIndex]);
+                collider->touch(objectList[sensorIndex]);
+                // process begin event
+            }
             // Update objects
             for (int i = 0; i < objectList.size(); i++) {
                 objectList[i]->update(deltaTime);

@@ -397,9 +397,14 @@
                         {
                          "name":"gravityStrength",
                          "type":"float",
-                         "value":1
+                         "value":40
+                        }, 
+                        {
+                         "name":"sensor",
+                         "type":"bool",
+                         "value":true
                         }],
-                 "rotation":315,
+                 "rotation":90,
                  "type":"",
                  "visible":true,
                  "width":128,

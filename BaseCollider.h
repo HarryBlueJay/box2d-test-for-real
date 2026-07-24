@@ -8,4 +8,5 @@ public:
 	b2BodyId bodyId;
 
 	virtual void collide(Object* otherObject, b2Vec2 normal) {};
+	virtual void touch(Object* otherObject) {};
 };

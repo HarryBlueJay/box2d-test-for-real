@@ -15,6 +15,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
 	playerShapeDef.filter.maskBits = PLAYER | LEVEL;
 	playerShapeDef.filter.categoryBits = PLAYER;
+	playerShapeDef.enableSensorEvents = true;
 	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
 	playerShapeDef.density /= 4;
 	bodyIdMaterial.friction = 0.5f;
@@ -33,6 +34,9 @@ Player::Player(b2Vec2 spawnLocation) {
 	Casts::move(*transform, bodyId);
 	dying = false;
 	eye.setFillColor(sf::Color::Black);
+
+	gravityPath[0].color = sf::Color::Red;
+	gravityPath[1].color = sf::Color::Red;
 }
 void Player::die() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
@@ -72,8 +76,9 @@ void Player::update(float deltaTime) {
 	
 	sf::Vector2f end = Casts::b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
 	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
+
+	linearVelocity = Level::unrotateByGravity(linearVelocity);
 	
-	//b2Body_SetLinearVelocity(bodyId, { std::clamp(linearVelocity.x,-maxWalkingSpeed,maxWalkingSpeed), linearVelocity.y });
 	float xForce = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 		xForce -= walkForce;
@@ -81,20 +86,12 @@ void Player::update(float deltaTime) {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 		xForce += walkForce;
 	}
-	b2ShapeId shape;
-	b2Body_GetShapes(bodyId, &shape, 1);
-	//if (xForce != 0) {
-	//	b2Shape_SetFriction(shape, 0.0f);
-	//}
-	//else {
-	//	b2Shape_SetFriction(shape, 1.f);
-	//}
 	if (abs(linearVelocity.x) < 15 || std::signbit(xForce) != std::signbit(linearVelocity.x)) {
-		b2Body_ApplyForceToCenter(bodyId, { xForce, 0 }, true);
+		b2Body_ApplyForceToCenter(bodyId, Level::rotateByGravity({ xForce, 0 }), true);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && coyoteCounter > 0) {
 		if (!touchingLeft && !touchingRight) {
-			b2Body_SetLinearVelocity(bodyId, b2Vec2{ linearVelocity.x, -jumpSpeed });
+			b2Body_SetLinearVelocity(bodyId, Level::rotateByGravity(b2Vec2{ linearVelocity.x, -jumpSpeed }));
 		}
 		else {
 			float touchingWall = 0;
@@ -114,37 +111,30 @@ void Player::update(float deltaTime) {
 			else {
 				wallJumps = touchingWall;
 			}
-			b2Body_SetLinearVelocity(bodyId, b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed);
+			b2Body_SetLinearVelocity(bodyId, Level::rotateByGravity(b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed));
 		}
 		coyoteCounter = 0.0f;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::End)) {
-		b2Body_ApplyForceToCenter(bodyId, { 0,-100 }, true);
+		b2Body_ApplyForceToCenter(bodyId, Level::rotateByGravity({ 0,-100 }), true);
 	}
-	if (b2Body_GetPosition(bodyId).y > Casts::pixelsToMeters(1080)) {
+	b2Vec2 position = b2Body_GetPosition(bodyId);
+	sf::Vector2f topLeft = Level::getTopLeft();
+	sf::Vector2f bottomRight = Level::getBottomRight();
+	if (position.y < topLeft.y || position.y > bottomRight.y || position.x < topLeft.x || position.x > bottomRight.x ) {
 		die();
 	}
 	touchingLeft = false;
 	touchingRight = false;
 	touchingFloor = false;
+
 	Casts::move(*transform, bodyId);
 }
 void Player::collide(Object* otherObject, b2Vec2 normal) {
-	LevelPolygon* levelRectangle = dynamic_cast<LevelPolygon*>(otherObject);
-	if (levelRectangle) {
-		if (levelRectangle->nextLevel >= 0) {
-			TransitionManager::get().finishLevel(levelRectangle->nextLevel);
-		}
-		if (levelRectangle->isKillbrick) {
-			die();
-		}
-		if (levelRectangle->gravityStrength >= 0) {
-			b2Vec2 newGravity = Casts::sfVector2f_to_b2Vec2(levelRectangle->transform->getTransform() * sf::Vector2f(0, 1)) * levelRectangle->gravityStrength;
-			b2World_SetGravity(b2Body_GetWorld(bodyId), newGravity);
-		}
-	}
-
-	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+	touch(otherObject);
+	b2Vec2 linearVelocity = Level::unrotateByGravity(b2Body_GetLinearVelocity(bodyId));
+	normal = Level::unrotateByGravity(normal);
+	std::cout << normal.y << std::endl;
 	if (normal.y < -0.5f) {
 		coyoteCounter = coyoteTime;
 		touchingFloor = true;
@@ -161,6 +151,24 @@ void Player::collide(Object* otherObject, b2Vec2 normal) {
 		else if (normal.x < -0.9) {
 			coyoteCounter = coyoteTime;
 			touchingLeft = true;
+		}
+	}
+}
+void Player::touch(Object* otherObject) {
+	LevelPolygon* levelRectangle = dynamic_cast<LevelPolygon*>(otherObject);
+	if (levelRectangle) {
+		if (levelRectangle->nextLevel >= 0) {
+			TransitionManager::get().finishLevel(levelRectangle->nextLevel);
+		}
+		if (levelRectangle->isKillbrick) {
+			die();
+		}
+		if (levelRectangle->gravityStrength >= 0) {
+			b2Vec2 newGravity = Casts::sfVector2f_to_b2Vec2(sf::Vector2f(0, 1).rotatedBy(levelRectangle->transform->getRotation())) * levelRectangle->gravityStrength;
+			b2World_SetGravity(b2Body_GetWorld(bodyId), newGravity);
+			b2Transform newTransform = b2Body_GetTransform(bodyId);
+			newTransform.q = b2MakeRot(levelRectangle->transform->getRotation().asRadians());
+			b2Body_SetTargetTransform(bodyId, newTransform, 1);
 		}
 	}
 }
@@ -204,6 +212,9 @@ void Player::draw(sf::RenderWindow& window) {
 	if (path.size() > 14400) {
 		path.erase(path.begin());
 	}
+	gravityPath[0].position = transform->getPosition() + sf::Vector2f(1, 1);
+	gravityPath[1].position = gravityPath[0].position + Casts::scaleFactor * Casts::b2Vec2_to_sfVector2f(b2World_GetGravity(b2Body_GetWorld(bodyId)));
 
 	window.draw(&path[0], path.size(), sf::PrimitiveType::LineStrip);
+	window.draw(gravityPath, 2, sf::PrimitiveType::LineStrip);
 }

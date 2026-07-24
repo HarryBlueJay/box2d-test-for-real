@@ -7,7 +7,7 @@ public:
 	//shapes//
 	sf::Transformable* transform;
 	sf::Texture* texture;
-	float parallaxFactor;
+	float parallaxFactor = 1.0f;
 
 	void draw(sf::RenderWindow& window);
 	~DrawableObject() {

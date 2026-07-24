@@ -43,6 +43,7 @@ private:
 
 	//debug//
 	std::vector<sf::Vertex> path;
+	sf::Vertex gravityPath[2];
 	bool finishedLevel = false;
 	bool dying = false;
 public:
@@ -54,6 +55,7 @@ public:
 	void update(float deltaTime) override;
 
 	void collide(Object* otherObject, b2Vec2 normal) override;
+	void touch(Object* otherObject) override;
 	void inputCallback(std::optional<sf::Event> event) override;
 
 	void draw(sf::RenderWindow& window) override;
