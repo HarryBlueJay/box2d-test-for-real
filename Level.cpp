@@ -194,6 +194,9 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			shapeDef.isSensor = true;
 			shapeDef.enableSensorEvents = true;
 		}
+		else {
+			shapeDef.enableContactEvents = true;
+		}
 		loadPolygon(object, levelPolygon, bodyId, shapeDef);
 		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 		if (object.getProperties().hasProperty("nextLevel")) {

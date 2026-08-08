@@ -38,51 +38,46 @@ bool Casts::OverlapCallback(b2ShapeId id, void* context) {
     return true;
 }
 
-void Casts::simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, sf::RenderWindow& window) {
+Casts::CastResult Casts::circlecast(b2Vec2 point, float radius, b2Vec2 offset, sf::RenderWindow* window) {
     CastResult context = {};
-    b2Vec2 points[2] = { point1, point2 };
-    b2ShapeProxy p = b2MakeProxy(points, 2, 0.5);
-    b2World_CastShape(worldId, &p, offset * 0.5, b2DefaultQueryFilter(), CastCallback, &context);
-    sf::Vertex line1[]{
-        {b2Vec2_to_sfVector2f(point1),sf::Color::Red },
-        {b2Vec2_to_sfVector2f(point2),sf::Color::Red },
-        {b2Vec2_to_sfVector2f(point2 + offset),sf::Color::Red },
-        {b2Vec2_to_sfVector2f(point1 + offset),sf::Color::Red },
-        {b2Vec2_to_sfVector2f(point1),sf::Color::Red }
-    };
+    b2Vec2 points[1] = { point };
+    b2ShapeProxy p = b2MakeProxy(points, 1, radius);
+    b2World_CastShape(worldId, &p, offset, b2DefaultQueryFilter(), CastCallback, &context);
 
-    if (showCasts) {
-        window.draw(line1, 5, sf::PrimitiveType::LineStrip);
-    }
-    if (context.hit) {
-        sf::Vertex line2[]{
-            { b2Vec2_to_sfVector2f(point1), sf::Color::Green },
-            { b2Vec2_to_sfVector2f(context.point),sf::Color::Green },
-        };
-        if (showCasts) {
-            window.draw(line2, 2, sf::PrimitiveType::Lines);
+    if (showCasts && window) {
+        sf::CircleShape circle(radius, 8);
+        circle.setOutlineColor(sf::Color::Red);
+        circle.setOutlineThickness(-1.0f);
+        circle.setPosition(b2Vec2_to_sfVector2f(context.point));
+        window->draw(circle);
+        if (context.hit) {
+            sf::Vertex line2[]{
+                { b2Vec2_to_sfVector2f(point), sf::Color::Green },
+                { b2Vec2_to_sfVector2f(context.point),sf::Color::Green },
+            };
+            window->draw(line2, 2, sf::PrimitiveType::Lines);
         }
     }
+    return context;
 }
 
 b2RayResult Casts::simpleRaycast(b2Vec2 start, b2Vec2 offset, sf::RenderWindow& window)
 {
     b2RayResult result = b2World_CastRayClosest(worldId, start, offset, b2DefaultQueryFilter());
-    sf::Vertex line1[]{
-        { b2Vec2_to_sfVector2f(start),sf::Color::Red },
-        { b2Vec2_to_sfVector2f(start + offset),sf::Color::Red },
-    };
-
     if (showCasts) {
-        window.draw(line1, 2, sf::PrimitiveType::Lines);
-    }
-    if (result.hit) {
-        sf::Vertex line2[]{
-            { b2Vec2_to_sfVector2f(start), sf::Color::Green },
-            { b2Vec2_to_sfVector2f(result.point),sf::Color::Green },
-        };
-        if (showCasts) {
+        if (result.hit) {
+            sf::Vertex line2[]{
+                { b2Vec2_to_sfVector2f(start), sf::Color::Green },
+                { b2Vec2_to_sfVector2f(result.point),sf::Color::Green },
+            };
             window.draw(line2, 2, sf::PrimitiveType::Lines);
+        }
+        else {
+            sf::Vertex line1[]{
+                { b2Vec2_to_sfVector2f(start),sf::Color::Red },
+                { b2Vec2_to_sfVector2f(start + offset),sf::Color::Red },
+            };
+            window.draw(line1, 2, sf::PrimitiveType::Lines);
         }
     }
     return result;

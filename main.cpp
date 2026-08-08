@@ -11,6 +11,7 @@ b2WorldId worldId;
 sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Black World");
 
 std::vector<Object*> objectList;
+const std::vector<Object*> singletonList = { &TransitionManager::get() };
 
 int main()
 {
@@ -38,32 +39,7 @@ int main()
         float deltaTime = clock.restart().asSeconds();
 
         window.clear(sf::Color::White);
-        if (TransitionManager::get().isTransitioning()) {
-            TransitionManager::get().update(deltaTime);
-        }
-        else {
-            //Collision
-            for (int i = 0; i < objectList.size(); i++) {
-                BaseCollider* collider = dynamic_cast<BaseCollider*>(objectList[i]);
-                if (!collider) { continue; }
-                b2ContactData data[10];
-                int elements = b2Body_GetContactData(collider->bodyId, data, 10);
-                for (int j = 0; j < elements; j++) {
-                    b2ContactData contactData = data[j];
-                    b2BodyId bodyA = b2Shape_GetBody(contactData.shapeIdA);
-                    b2BodyId bodyB = b2Shape_GetBody(contactData.shapeIdB);
-                    int k;
-                    b2Vec2 normal = contactData.manifold.normal;
-                    if (bodyA.index1 == collider->bodyId.index1) {
-                        k = reinterpret_cast<int>(b2Body_GetUserData(bodyB));
-                        normal *= -1;
-                    }
-                    else {
-                        k = reinterpret_cast<int>(b2Body_GetUserData(bodyA));
-                    }
-                    collider->collide(objectList[k], normal);
-                }
-            }
+        if (!TransitionManager::get().isTransitioning()) {
             // Sensors
             b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
             for (int i = 0; i < sensorEvents.beginCount; ++i) {
@@ -72,7 +48,19 @@ int main()
                 int sensorIndex = reinterpret_cast<int>(b2Body_GetUserData(b2Shape_GetBody(beginTouch->sensorShapeId)));
                 BaseCollider* collider = dynamic_cast<BaseCollider*>(objectList[colliderIndex]);
                 collider->touch(objectList[sensorIndex]);
-                // process begin event
+
+            }
+            // Collision
+            b2ContactEvents contactEvents = b2World_GetContactEvents(worldId);
+            for (int i = 0; i < contactEvents.beginCount; ++i) {
+                b2ContactBeginTouchEvent* beginTouch = contactEvents.beginEvents + i;
+                int colliderIndex = reinterpret_cast<int>(b2Body_GetUserData(b2Shape_GetBody(beginTouch->shapeIdA)));
+                int otherIndex = reinterpret_cast<int>(b2Body_GetUserData(b2Shape_GetBody(beginTouch->shapeIdB)));
+                BaseCollider* collider = dynamic_cast<BaseCollider*>(objectList[colliderIndex]);
+                BaseCollider* otherCollider = dynamic_cast<BaseCollider*>(objectList[otherIndex]);
+                b2Vec2 normal = beginTouch->manifold.normal;
+                collider->collide(objectList[otherIndex], -normal);
+                otherCollider->collide(objectList[colliderIndex], normal);
             }
             // Update objects
             for (int i = 0; i < objectList.size(); i++) {
@@ -82,11 +70,17 @@ int main()
             int subStepCount = 4;
             b2World_Step(worldId, deltaTime, subStepCount);
         }
-
+        // Update singletons
+        for (int i = 0; i < singletonList.size(); i++) {
+            singletonList[i]->update(deltaTime);
+        }
+        // Draw objects and singletons
         for (int i = 0; i < objectList.size(); i++) {
             objectList[i]->draw(window);
         }
-        TransitionManager::get().draw(window);
+        for (int i = 0; i < singletonList.size(); i++) {
+            singletonList[i]->draw(window);
+        }
         window.display();
     }
     return 0;

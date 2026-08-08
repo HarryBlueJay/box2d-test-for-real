@@ -6,7 +6,7 @@ TransitionManager::TransitionManager() {
 	fadeBox.setOrigin(sf::Vector2f(fadeBoxSize / 2, fadeBoxSize / 2));
 	fadeBox.setFillColor(sf::Color::Transparent);
 }
-bool TransitionManager::isTransitioning() {
+bool TransitionManager::isTransitioning() const {
 	return transitionState != 0;
 }
 void TransitionManager::finishLevel(int nextLevel) {
@@ -26,6 +26,7 @@ void TransitionManager::draw(sf::RenderWindow& window) {
 }
 
 void TransitionManager::update(float deltaTime) {
+	if (!isTransitioning()) { return; }
 	fadeTimeCounter = std::clamp(fadeTimeCounter + (deltaTime * transitionState), 0.0f, fadeTime);
 	if (fadeTimeCounter == fadeTime) {
 		Level::loadLevel(transitionLevel);

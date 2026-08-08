@@ -27,7 +27,7 @@ namespace Casts {
     };
     bool OverlapCallback(b2ShapeId id, void* context);
 
-    void simpleLinecast(b2Vec2 point1, b2Vec2 point2, b2Vec2 offset, sf::RenderWindow& window);
+    CastResult circlecast(b2Vec2 point, float radius, b2Vec2 offset, sf::RenderWindow* window);
 
     b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset, sf::RenderWindow& window);
 

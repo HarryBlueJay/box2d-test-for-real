@@ -63,8 +63,13 @@
                          "name":"color",
                          "type":"color",
                          "value":"#ff000000"
+                        }, 
+                        {
+                         "name":"tangentSpeed",
+                         "type":"float",
+                         "value":0
                         }],
-                 "rotation":0,
+                 "rotation":15,
                  "type":"",
                  "visible":true,
                  "width":1088,
@@ -165,6 +170,24 @@
                  "width":32,
                  "x":-416,
                  "y":-192
+                }, 
+                {
+                 "height":64,
+                 "id":247,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff000000"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":192,
+                 "x":-416,
+                 "y":-288
                 }, 
                 {
                  "height":128,
@@ -377,6 +400,16 @@
                          "value":"#ffaa5500"
                         }, 
                         {
+                         "name":"gravityStrength",
+                         "type":"float",
+                         "value":40
+                        }, 
+                        {
+                         "name":"sensor",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"weld",
                          "type":"object",
                          "value":219
@@ -387,7 +420,8 @@
                  "width":256,
                  "x":-864,
                  "y":-768
-                }, 
+                },
+            
                 {
                  "height":224,
                  "id":245,
@@ -404,7 +438,7 @@
                          "type":"bool",
                          "value":true
                         }],
-                 "rotation":90,
+                 "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":128,
@@ -616,7 +650,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":247,
+ "nextobjectid":250,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

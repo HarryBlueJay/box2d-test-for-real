@@ -6,13 +6,14 @@
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
-                6
+                6,
+                2
             ],
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": -718,
-                "y": 578
+                "x": 84,
+                "y": 15
             }
         },
         "level1old.json": {
@@ -33,21 +34,19 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 724,
-                "y": 40
+                "x": 16,
+                "y": 15
             }
         },
         "level3.json": {
             "expandedObjectLayers": [
-                6,
-                2,
                 7
             ],
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 742,
-                "y": 72
+                "x": 16,
+                "y": 15
             }
         },
         "level4.json": {
@@ -60,7 +59,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 16,
-                "y": 14
+                "y": 15
             }
         },
         "testlevel.json": {
@@ -91,7 +90,7 @@
         "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "bool",
+    "property.type": "float",
     "recentFiles": [
         "level4.json",
         "level3.json",

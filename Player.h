@@ -9,31 +9,32 @@ private:
 	// right hitbox
 	// up hitbox
 	// down hitbox
-	bool bottomLine = false;
-	bool topLine = false;
-	bool leftLine = false;
-	bool rightLine = false;
+	//bool bottomLine = false;
+	//bool topLine = false;
+	//bool leftLine = false;
+	//bool rightLine = false;
 
 	//state//
 	//Game::PlayerState state;
 	//bool canJump = false;
-	bool touchingLeft = false;
-	bool touchingRight = false;
-	bool touchingFloor = false;
+	//bool touchingLeft = false;
+	//bool touchingRight = false;
+	//bool touchingFloor = false;
 
 	//movement//
 	int wallJumps = 0;
-	float walkForce = 40;
-	float maxWalkingSpeed = 15;
-	float jumpSpeed = 25;
-	float dashSpeed = 30;
-	int maxDashes = 1;
+	const float walkForce = 40;
+	const float maxWalkingSpeed = 15;
+	const float jumpSpeed = 25;
+	const float dashSpeed = 30;
+	const int maxDashes = 1;
 	int dashes = maxDashes;
-	float coyoteTime = 0.1f;
+	const float coyoteTime = 0.1f;
 	float coyoteCounter = 0.0f;
 	sf::Vector2f lastGroundedPosition;
 
 	//body//
+	const b2Vec2 size = b2Vec2{ 2, 2 };
 	sf::RectangleShape eye;
 	sf::Vector2f eyeOffset;
 

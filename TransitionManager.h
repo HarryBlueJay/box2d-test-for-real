@@ -19,5 +19,5 @@ public:
 	void restartLevel();
 	void draw(sf::RenderWindow& window) override;
 	void update(float deltaTime) override;
-	bool isTransitioning();
+	bool isTransitioning() const;
 };
