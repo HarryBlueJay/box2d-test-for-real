@@ -136,7 +136,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 			objectSize.x,
 			objectSize.y
 		);
-		Casts::makeBox(*levelPolygon->getConvexShape(), &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
+		Casts::get().makeBox(*levelPolygon->getConvexShape(), &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
 		break;
 	}
 	case tson::ObjectType::Polygon: {
@@ -145,12 +145,12 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 		for (tson::Vector2i point : points) {
 			sfmlPoints.push_back(
 				sf::Vector2f(
-					Casts::pixelsToMeters(point.x),
-					Casts::pixelsToMeters(point.y)
+					Casts::get().pixelsToMeters(point.x),
+					Casts::get().pixelsToMeters(point.y)
 				)
 			);
 		}
-		Casts::makePolygon(*levelPolygon->getConvexShape(), &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
+		Casts::get().makePolygon(*levelPolygon->getConvexShape(), &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
 		break;
 	}
 	}
@@ -203,12 +203,12 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			levelPolygon->nextLevel = object.get<int>("nextLevel");
 			if (levelPolygon->nextLevel > 0) {
 				if (levelPolygon->nextLevel == currentLevelNumber) {
-					spawnLocation = Casts::sfVector2f_to_b2Vec2((levelPolygon->transform->getPosition() / Casts::scaleFactor) + sf::Vector2f(96, 192));
+					spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->transform->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
 				}
 				TextObject* text = new TextObject(font);
 				text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
 				text->text.setCharacterSize(60);
-				text->text.setScale(sf::Vector2f(Casts::scaleFactor, Casts::scaleFactor));
+				text->text.setScale(sf::Vector2f(Casts::get().scaleFactor, Casts::get().scaleFactor));
 				//text->text.setOrigin(text->text.getLocalBounds().size * 0.5f + sf::Vector2f(0, 30));
 				text->text.setPosition(levelPolygon->transform->getPosition());
 				text->text.setRotation(levelPolygon->transform->getRotation());
@@ -256,9 +256,9 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			objectPosition.x,
 			objectPosition.y
 		);
-		textObject->text.setPosition(Casts::pixelsToMeters(position));
+		textObject->text.setPosition(Casts::get().pixelsToMeters(position));
 		sf::Color polygonColor = sf::Color(text.color.r, text.color.g, text.color.b, text.color.a);
-		textObject->text.setScale(sf::Vector2f(Casts::scaleFactor, Casts::scaleFactor));
+		textObject->text.setScale(sf::Vector2f(Casts::get().scaleFactor, Casts::get().scaleFactor));
 		textObject->text.setFillColor(polygonColor);
 		objectList.push_back(textObject);
 		return textObject;
@@ -289,7 +289,6 @@ void Level::loadLevel(int levelNumber) {
 	std::vector<tson::Layer>& layers = map->getLayers();
 	uint64_t mask = 0x80'00'00'00'00'00'00'00;
 	for (tson::Layer layer : layers) {
-		std::cout << layer.getName() << std::endl;
 		float parallaxFactor = layer.getParallax().x;
 		uint64_t layerMask = mask;
 		uint64_t hitsPlayer = 0;
@@ -304,9 +303,7 @@ void Level::loadLevel(int levelNumber) {
 				spawnLocation.x = spawnLocationPosition.x;
 				spawnLocation.y = spawnLocationPosition.y;
 				Player* player = new Player(spawnLocation);
-				Camera* camera = new Camera(window);
-				objectList.push_back(camera);
-				camera->setTarget(player);
+				Camera::get().setTarget(player);
 				objectList.push_back(player);
 				b2Body_SetUserData(player->bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 				continue;
@@ -324,7 +321,6 @@ void Level::loadLevel(int levelNumber) {
 			}
 		}
 		mask >>= 1;
-		std::cout << mask << std::endl;
 	}
 	////Background
 	//parseLayer("Background", BACKGROUND, BACKGROUND);

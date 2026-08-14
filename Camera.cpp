@@ -4,9 +4,9 @@
 const int windowHeight = 800;
 const int cameraSpeed = 8;
 
-Camera::Camera(sf::RenderWindow& window) : target(nullptr), playerTarget(nullptr) {
+Camera::Camera() : target(nullptr), playerTarget(nullptr) {
 	view = sf::View();
-    draw(window);
+    //draw(window);
 }
 void Camera::update(float deltaTime) {
     if (!target) { return; }
@@ -97,7 +97,7 @@ void Camera::draw(sf::RenderWindow& window) {
     else {
         size.y *= windowSize.y * 1.0f / windowSize.x;
     }
-    size = Casts::pixelsToMeters(size);
+    size = Casts::get().pixelsToMeters(size);
     view.setSize(size);
     window.setView(view);
 }

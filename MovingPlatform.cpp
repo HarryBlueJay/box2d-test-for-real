@@ -3,10 +3,10 @@
 
 void MovingPlatform::parse(tson::Object object) {
 	startPoint = b2Body_GetPosition(bodyId);
-	b2Vec2 offset = Casts::pixelsToMeters(b2Vec2{ object.get<float>("offsetX"), object.get<float>("offsetY") });
+	b2Vec2 offset = Casts::get().pixelsToMeters(b2Vec2{ object.get<float>("offsetX"), object.get<float>("offsetY") });
 	endPoint = startPoint + offset;
 	b2Body_SetType(bodyId, b2_kinematicBody);
-	velocity = b2Normalize(offset) * object.get<float>("moveSpeed") * Casts::scaleFactor;
+	velocity = b2Normalize(offset) * object.get<float>("moveSpeed") * Casts::get().scaleFactor;
 	b2Body_SetLinearVelocity(bodyId, velocity);
 	waitTime = object.get<float>("waitTime");
 	b2Body_SetAngularVelocity(bodyId, object.get<float>("spinSpeed"));
@@ -28,5 +28,5 @@ void MovingPlatform::update(float deltaTime) {
 		waitCounter = waitTime;
 		velocity *= -1;
 	}
-	Casts::move(*transform, bodyId);
+	Casts::get().move(*transform, bodyId);
 }

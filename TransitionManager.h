@@ -1,7 +1,7 @@
 #pragma once
 #include "BasicIncludes.h"
-#include "Object.h"
-class TransitionManager: public Object {
+#include "Singleton.h"
+class TransitionManager: public Singleton<TransitionManager> {
 private:
 	int transitionState = 0;
 	const float fadeBoxSize = 100000;
@@ -9,12 +9,8 @@ private:
 	float fadeTimeCounter = 0;
 	int transitionLevel = 0;
 	sf::RectangleShape fadeBox;
-	TransitionManager();
 public:
-	static TransitionManager& get() {
-		static TransitionManager singleton;
-		return singleton;
-	};
+	TransitionManager();
 	void finishLevel(int nextLevel);
 	void restartLevel();
 	void draw(sf::RenderWindow& window) override;

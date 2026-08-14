@@ -1,11 +1,11 @@
 #pragma once
 #include "BasicIncludes.h"
 #include "Player.h"
-#include "Object.h"
+#include "Singleton.h"
 
-class Camera : public Object {
+class Camera : public Singleton<Camera> {
 public:
-	Camera(sf::RenderWindow& window);
+	Camera();
 	void update(float deltaTime) override;
 	//void inputCallback(std::optional<sf::Event> event) override;
 	void setTarget(sf::Transformable* target);

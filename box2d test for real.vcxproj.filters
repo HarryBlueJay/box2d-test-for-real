@@ -99,6 +99,9 @@
     <ClInclude Include="Weld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\ball.wav">

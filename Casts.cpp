@@ -21,83 +21,80 @@ sf::Vector2f Casts::rotate(sf::Vector2f input, float radians) {
 }
 
 //callbacks go here
-static float Casts::CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
+float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
 {
-    CastResult* result = (CastResult*)context;
+    Casts::CastResult* result = (Casts::CastResult*)context;
     result->point = point;
     result->bodyId = b2Shape_GetBody(shapeId);
     result->fraction = fraction;
     result->hit = true;
     return fraction;
 }
-bool Casts::OverlapCallback(b2ShapeId id, void* context) {
-    OverlapResult* result = (OverlapResult*)context;
+bool OverlapCallback(b2ShapeId id, void* context) {
+    Casts::OverlapResult* result = (Casts::OverlapResult*)context;
     result->hits += 1;
     result->hit = true;
     result->hitIds[result->hits] = id;
     return true;
 }
 
-Casts::CastResult Casts::circlecast(b2Vec2 point, float radius, b2Vec2 offset, sf::RenderWindow* window) {
+Casts::CastResult Casts::circlecast(b2Vec2 point, float radius, b2Vec2 offset) {
     CastResult context = {};
     b2Vec2 points[1] = { point };
     b2ShapeProxy p = b2MakeProxy(points, 1, radius);
     b2World_CastShape(worldId, &p, offset, b2DefaultQueryFilter(), CastCallback, &context);
 
-    if (showCasts && window) {
-        sf::CircleShape circle(radius, 8);
-        circle.setOutlineColor(sf::Color::Red);
-        circle.setOutlineThickness(-1.0f);
-        circle.setPosition(b2Vec2_to_sfVector2f(context.point));
-        window->draw(circle);
+    if (showCasts) {
+        sf::CircleShape* circle = new sf::CircleShape(radius, 8);
+        circle->setFillColor(sf::Color::Transparent);
+        circle->setOutlineColor(sf::Color::Red);
+        circle->setOutlineThickness(-scaleFactor);
+        circle->setPosition(b2Vec2_to_sfVector2f(context.point));
+        shapes.push_back(circle);
         if (context.hit) {
-            sf::Vertex line2[]{
-                { b2Vec2_to_sfVector2f(point), sf::Color::Green },
-                { b2Vec2_to_sfVector2f(context.point),sf::Color::Green },
-            };
-            window->draw(line2, 2, sf::PrimitiveType::Lines);
+            sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
+            (*line)[0] = { b2Vec2_to_sfVector2f(point), sf::Color::Green };
+            (*line)[1] = { b2Vec2_to_sfVector2f(context.point),sf::Color::Green };
+            shapes.push_back(line);
         }
     }
     return context;
 }
 
-b2RayResult Casts::simpleRaycast(b2Vec2 start, b2Vec2 offset, sf::RenderWindow& window)
+b2RayResult Casts::simpleRaycast(b2Vec2 start, b2Vec2 offset)
 {
     b2RayResult result = b2World_CastRayClosest(worldId, start, offset, b2DefaultQueryFilter());
     if (showCasts) {
         if (result.hit) {
-            sf::Vertex line2[]{
-                { b2Vec2_to_sfVector2f(start), sf::Color::Green },
-                { b2Vec2_to_sfVector2f(result.point),sf::Color::Green },
-            };
-            window.draw(line2, 2, sf::PrimitiveType::Lines);
+            sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
+            (*line)[0] = { b2Vec2_to_sfVector2f(start), sf::Color::Green };
+            (*line)[1] = { b2Vec2_to_sfVector2f(result.point),sf::Color::Green };
+            shapes.push_back(line);
         }
         else {
-            sf::Vertex line1[]{
-                { b2Vec2_to_sfVector2f(start),sf::Color::Red },
-                { b2Vec2_to_sfVector2f(start + offset),sf::Color::Red },
-            };
-            window.draw(line1, 2, sf::PrimitiveType::Lines);
+            sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
+            (*line)[0] = { b2Vec2_to_sfVector2f(start),sf::Color::Red };
+            (*line)[1] = { b2Vec2_to_sfVector2f(start + offset),sf::Color::Red };
+            shapes.push_back(line);
         }
     }
     return result;
 }
 
-Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter, sf::RenderWindow& window) {
+Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter) {
     OverlapResult result = {};
     b2Vec2 points[2] = { start, end };
     b2ShapeProxy p = b2MakeProxy(points, 2, 0);
     b2World_OverlapShape(worldId, &p, filter, OverlapCallback, &result);
-    sf::Color color = sf::Color::Red;
-    if (result.hits > 0) {
-        color = sf::Color::Green;
-    }
     if (showCasts) {
-        sf::Vertex line1[]{
-            { b2Vec2_to_sfVector2f(start),color },
-            { b2Vec2_to_sfVector2f(end),color },
-        };
-        window.draw(line1, 2, sf::PrimitiveType::Lines);
+        sf::Color color = sf::Color::Red;
+        if (result.hits > 0) {
+            color = sf::Color::Green;
+        }
+        sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
+        (*line)[0] = { b2Vec2_to_sfVector2f(start), color };
+        (*line)[1] = { b2Vec2_to_sfVector2f(end), color };
+        shapes.push_back(line);
     }
 
     return result;
@@ -108,14 +105,14 @@ void Casts::move(sf::Transformable& rectangle, b2BodyId& id) {
     rectangle.setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(id))));
 }
 void setupPolygon(b2Polygon& dynamicBox, b2BodyId& id, b2ShapeDef shapeDef, sf::ConvexShape& box, sf::Vector2f position, float rotation, b2BodyDef bodyDef) {
-    position = Casts::pixelsToMeters(position);
-    bodyDef.position = Casts::sfVector2f_to_b2Vec2(position);
+    position = Casts::get().pixelsToMeters(position);
+    bodyDef.position = Casts::get().sfVector2f_to_b2Vec2(position);
     bodyDef.rotation = b2MakeRot(rotation * B2_PI / 180);
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
     id = b2CreateBody(worldId, &bodyDef);
     b2CreatePolygonShape(id, &shapeDef, &dynamicBox);
 
-    Casts::move(box, id);
+    Casts::get().move(box, id);
 }
 void setupBox(sf::ConvexShape& box, sf::Vector2f size) {
     box.setPointCount(4);
@@ -186,4 +183,13 @@ void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId* id, b2ShapeDef shapeDe
         b2Polygon polygon = b2MakePolygon(&hull, 0);
         setupPolygon(polygon, *id, shapeDef, shape, position, rotation, bodyDef);
     }
+}
+
+void Casts::draw(sf::RenderWindow& window) {
+    if (!showCasts) { return; }
+    for (int i = 0; i < shapes.size(); i++) {
+        window.draw(*shapes[i]);
+        delete shapes[i];
+    }
+    shapes.clear();
 }

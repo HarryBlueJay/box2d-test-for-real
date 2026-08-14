@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Level.h"
 #include "TransitionManager.h"
+#include "Camera.h"
 #include <math.h>
 #include <Windows.h>
 
@@ -11,7 +12,7 @@ b2WorldId worldId;
 sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Black World");
 
 std::vector<Object*> objectList;
-const std::vector<Object*> singletonList = { &TransitionManager::get() };
+const std::vector<Object*> singletonList = { &TransitionManager::get(), &Camera::get(), &Casts::get() };
 
 int main()
 {

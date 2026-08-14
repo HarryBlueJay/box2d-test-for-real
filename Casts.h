@@ -1,7 +1,11 @@
 #pragma once
 #include "BasicIncludes.h"
+#include "Singleton.h"
 
-namespace Casts {
+class Casts : public Singleton<Casts> {
+private:
+    std::vector<sf::Drawable*> shapes = {};
+public:
     const float scaleFactor = 1.0f / 32.0f; // multiple of 2 to avoid precision issues
     //also anything below 4 pixels causes trouble, don't expect to reach that
     //vec2forSFML
@@ -16,8 +20,7 @@ namespace Casts {
         b2BodyId bodyId;
         float fraction;
         bool hit;
-    };          
-    static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context);
+    };
     struct OverlapResult
     {
         bool hit;
@@ -25,13 +28,12 @@ namespace Casts {
         int maxHits = 10;
         b2ShapeId hitIds[10];
     };
-    bool OverlapCallback(b2ShapeId id, void* context);
 
-    CastResult circlecast(b2Vec2 point, float radius, b2Vec2 offset, sf::RenderWindow* window);
+    CastResult circlecast(b2Vec2 point, float radius, b2Vec2 offset);
 
-    b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset, sf::RenderWindow& window);
+    b2RayResult simpleRaycast(b2Vec2 start, b2Vec2 offset);
 
-    OverlapResult lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter, sf::RenderWindow& window);
+    OverlapResult lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter filter);
 
     template <typename T = float>
     T pixelsToMeters(T input) {
@@ -43,4 +45,6 @@ namespace Casts {
     // maybe make a version that takes in a body def
     void makeBox(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, sf::Vector2f position, sf::Vector2f size, float rotation, b2BodyType bodyType);
     void makePolygon(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, std::vector<sf::Vector2f> offsets, sf::Vector2f position, float rotation, b2BodyType bodyType);
-}
+
+    void draw(sf::RenderWindow& window);
+};

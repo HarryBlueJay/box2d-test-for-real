@@ -224,6 +224,7 @@
     <ClInclude Include="MovingPlatform.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Singleton.h" />
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="tileson.hpp" />
     <ClInclude Include="TransitionManager.h" />
