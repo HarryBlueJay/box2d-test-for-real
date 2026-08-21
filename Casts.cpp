@@ -1,6 +1,7 @@
 #include "BasicIncludes.h"
 #include "Casts.h"
 #include "BaseCollider.h"
+#include "Level.h"
 extern b2WorldId worldId;
 bool showCasts = true;
 
@@ -24,6 +25,7 @@ sf::Vector2f Casts::rotate(sf::Vector2f input, float radians) {
 float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context)
 {
     Casts::CastResult* result = (Casts::CastResult*)context;
+    result->normal = normal;
     result->point = point;
     result->bodyId = b2Shape_GetBody(shapeId);
     result->fraction = fraction;
@@ -42,21 +44,22 @@ Casts::CastResult Casts::circlecast(b2Vec2 point, float radius, b2Vec2 offset) {
     CastResult context = {};
     b2Vec2 points[1] = { point };
     b2ShapeProxy p = b2MakeProxy(points, 1, radius);
-    b2World_CastShape(worldId, &p, offset, b2DefaultQueryFilter(), CastCallback, &context);
+    b2QueryFilter filter = b2DefaultQueryFilter();
+    filter.maskBits = CollisionGroup::LEVEL;
+    b2World_CastShape(worldId, &p, offset, filter, CastCallback, &context);
 
-    if (showCasts) {
+    if (showCasts && context.hit) {
         sf::CircleShape* circle = new sf::CircleShape(radius, 8);
         circle->setFillColor(sf::Color::Transparent);
         circle->setOutlineColor(sf::Color::Red);
         circle->setOutlineThickness(-scaleFactor);
-        circle->setPosition(b2Vec2_to_sfVector2f(context.point));
+        circle->setPosition(b2Vec2_to_sfVector2f(context.point + context.normal * radius - b2Vec2{ radius, radius }));
         shapes.push_back(circle);
-        if (context.hit) {
-            sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
-            (*line)[0] = { b2Vec2_to_sfVector2f(point), sf::Color::Green };
-            (*line)[1] = { b2Vec2_to_sfVector2f(context.point),sf::Color::Green };
-            shapes.push_back(line);
-        }
+
+        sf::VertexArray* line = new sf::VertexArray(sf::PrimitiveType::Lines, 2);
+        (*line)[0] = { b2Vec2_to_sfVector2f(point), sf::Color::Green };
+        (*line)[1] = { b2Vec2_to_sfVector2f(context.point),sf::Color::Green };
+        shapes.push_back(line);
     }
     return context;
 }

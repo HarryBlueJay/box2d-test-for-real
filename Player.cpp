@@ -4,6 +4,10 @@
 #include "TransitionManager.h"
 sf::Texture bodyTexture;
 sf::Texture eyeTexture;
+const b2Vec2 size = b2Vec2{ 2, 2 };
+const float radius = size.x / 2.1f;
+const float offset = size.x / 2.0f - radius;
+const std::vector<b2Vec2> offsets = { {0, offset}, {-offset, 0}, {offset, 0} };
 
 
 Player::Player(b2Vec2 spawnLocation) {
@@ -13,7 +17,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	bodyDef.fixedRotation = true;
 
 	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-	playerShapeDef.filter.maskBits = PLAYER | LEVEL;
+	playerShapeDef.filter.maskBits = PLAYER | LEVEL | SENSOR;
 	playerShapeDef.filter.categoryBits = PLAYER;
 	playerShapeDef.enableSensorEvents = true;
 	playerShapeDef.enableContactEvents = true;
@@ -72,9 +76,21 @@ void Player::update(float deltaTime) {
 		}
 		return;
 	}
-	bool touchingFloor = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), size.x / 2.0f, Level::rotateByGravity(b2Vec2{ 0, 100 })).hit;
-	bool touchingLeft = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), size.x / 2.0f, Level::rotateByGravity(b2Vec2{ -1, 0 })).hit;
-	bool touchingRight = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), size.x / 2.0f, Level::rotateByGravity(b2Vec2{ 1, 0 })).hit;
+	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
+
+	sf::Vector2f end = Casts::get().b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
+	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
+
+	linearVelocity = Level::unrotateByGravity(linearVelocity);
+
+	bool touchingFloor = false;
+	bool touchingLeft = false;
+	bool touchingRight = false;
+	std::vector<bool*> touching = { &touchingFloor, &touchingLeft, &touchingRight };
+	for (int i = 0; i < offsets.size(); i++) {
+		if (b2Dot(offsets[i], linearVelocity) <= 0) { continue; }
+		*touching[i] = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), radius, Level::rotateByGravity(offsets[i])).hit;
+	}
 	if (!touchingFloor) {
 		coyoteCounter -= deltaTime;
 	}
@@ -88,12 +104,6 @@ void Player::update(float deltaTime) {
 	if (touchingLeft || touchingRight) {
 		coyoteCounter = coyoteTime;
 	}
-	b2Vec2 linearVelocity = b2Body_GetLinearVelocity(bodyId);
-	
-	sf::Vector2f end = Casts::get().b2Vec2_to_sfVector2f(b2Normalize(linearVelocity)) / 2.5f;
-	eyeOffset = end + (eyeOffset - end) * std::exp(-deltaTime * 10);
-
-	linearVelocity = Level::unrotateByGravity(linearVelocity);
 	
 	float xForce = 0;
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -126,6 +136,7 @@ void Player::update(float deltaTime) {
 			else {
 				wallJumps = static_cast<int>(touchingWall);
 			}
+			std::cout << wallJumps << std::endl;
 			b2Body_SetLinearVelocity(bodyId, Level::rotateByGravity(b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed));
 		}
 		coyoteCounter = 0.0f;

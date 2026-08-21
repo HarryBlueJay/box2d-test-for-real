@@ -34,7 +34,7 @@ private:
 	sf::Vector2f lastGroundedPosition;
 
 	//body//
-	const b2Vec2 size = b2Vec2{ 2, 2 };
+	/*const b2Vec2 size = b2Vec2{ 2, 2 };*/
 	sf::RectangleShape eye;
 	sf::Vector2f eyeOffset;
 

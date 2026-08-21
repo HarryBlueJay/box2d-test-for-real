@@ -192,6 +192,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
 		if (object.get<bool>("sensor")) {
 			shapeDef.isSensor = true;
+			shapeDef.filter.categoryBits = SENSOR;
 			shapeDef.enableSensorEvents = true;
 		}
 		else {

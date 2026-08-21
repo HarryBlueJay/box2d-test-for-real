@@ -17,6 +17,7 @@ public:
     struct CastResult
     {
         b2Vec2 point;
+        b2Vec2 normal;
         b2BodyId bodyId;
         float fraction;
         bool hit;
