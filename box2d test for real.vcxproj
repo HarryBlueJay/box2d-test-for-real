@@ -153,6 +153,7 @@
     <ClCompile Include="Casts.cpp" />
     <ClCompile Include="DrawableObject.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelPolygon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovingPlatform.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="DrawableObject.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelPolygon.h" />
     <ClInclude Include="MovingPlatform.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />

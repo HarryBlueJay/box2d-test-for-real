@@ -1,6 +1,6 @@
 #pragma once
-#include "Level.h"
 #include "tileson.hpp"
+#include "LevelPolygon.h"
 
 class MovingPlatform : public LevelPolygon {
 private:

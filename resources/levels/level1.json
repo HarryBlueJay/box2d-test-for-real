@@ -37,8 +37,31 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":-1440,
-                 "y":-768
+                 "x":-1536,
+                 "y":82
+                }, 
+                {
+                 "height":64,
+                 "id":255,
+                 "name":"",
+                 "opacity":1,
+                 "properties":[
+                        {
+                         "name":"color",
+                         "type":"color",
+                         "value":"#ff808080"
+                        }, 
+                        {
+                         "name":"dynamic",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":-32,
+                 "y":-288
                 }],
          "opacity":1,
          "parallaxx":1.001,
@@ -69,7 +92,7 @@
                          "type":"float",
                          "value":0
                         }],
-                 "rotation":15,
+                 "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":1088,
@@ -170,24 +193,6 @@
                  "width":32,
                  "x":-416,
                  "y":-192
-                }, 
-                {
-                 "height":64,
-                 "id":247,
-                 "name":"",
-                 "opacity":1,
-                 "properties":[
-                        {
-                         "name":"color",
-                         "type":"color",
-                         "value":"#ff000000"
-                        }],
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":192,
-                 "x":-416,
-                 "y":-288
                 }, 
                 {
                  "height":128,
@@ -407,7 +412,7 @@
                         {
                          "name":"sensor",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }, 
                         {
                          "name":"weld",
@@ -418,10 +423,9 @@
                  "type":"",
                  "visible":true,
                  "width":256,
-                 "x":-864,
-                 "y":-768
-                },
-            
+                 "x":-1240,
+                 "y":-224
+                }, 
                 {
                  "height":224,
                  "id":245,
@@ -438,12 +442,25 @@
                          "type":"bool",
                          "value":true
                         }],
-                 "rotation":0,
+                 "rotation":90,
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":352,
-                 "y":-416
+                 "x":-512,
+                 "y":-1184
+                },
+            
+                {
+                 "height":136,
+                 "id":251,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":-200,
+                 "y":-520
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -650,7 +667,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":250,
+ "nextobjectid":256,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

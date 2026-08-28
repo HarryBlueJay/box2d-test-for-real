@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "LevelPolygon.h"
 class LevelPolygon;
 
 class Weld : public Object {

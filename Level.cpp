@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "DrawableObject.h"
 #include "MovingPlatform.h"
+#include "LevelPolygon.h"
 #include "TextObject.h"
 #include "Weld.h"
 extern b2WorldId worldId;
@@ -227,6 +228,9 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		levelPolygon->gravityStrength = object.getProperties().hasProperty("gravityStrength") ? object.get<float>("gravityStrength") : -1;
 
 		levelPolygon->bodyId = bodyId;
+		if (object.get<bool>("dynamic")) {
+			b2Body_SetType(bodyId, b2_dynamicBody);
+		}
 		if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
 			platform->parse(object);
 		}

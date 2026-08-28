@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "Casts.h"
 #include "TransitionManager.h"
+#include "LevelPolygon.h"
 sf::Texture bodyTexture;
 sf::Texture eyeTexture;
 const b2Vec2 size = b2Vec2{ 2, 2 };
@@ -88,8 +89,13 @@ void Player::update(float deltaTime) {
 	bool touchingRight = false;
 	std::vector<bool*> touching = { &touchingFloor, &touchingLeft, &touchingRight };
 	for (int i = 0; i < offsets.size(); i++) {
-		if (b2Dot(offsets[i], linearVelocity) <= 0) { continue; }
-		*touching[i] = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), radius, Level::rotateByGravity(offsets[i])).hit;
+		//if (b2Dot(offsets[i], linearVelocity) <= 0) { continue; }
+		b2Vec2 offset = Level::rotateByGravity(offsets[i]);
+		Casts::CastResult result = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), radius, offset);
+		if (!result.hit) { continue; }
+		offset = b2Normalize(offset);
+		if (b2Dot(result.normal, offset) >= 0) { continue; }
+		*touching[i] = true;
 	}
 	if (!touchingFloor) {
 		coyoteCounter -= deltaTime;
@@ -130,14 +136,14 @@ void Player::update(float deltaTime) {
 			if (touchingFloor) {
 				touchingWall /= 10;
 			}
+			std::cout << touchingWall << std::endl;
 			if (std::signbit(wallJumps) == std::signbit(touchingWall)) {
 				wallJumps += static_cast<int>(touchingWall);
 			}
 			else {
 				wallJumps = static_cast<int>(touchingWall);
 			}
-			std::cout << wallJumps << std::endl;
-			b2Body_SetLinearVelocity(bodyId, Level::rotateByGravity(b2Normalize({ touchingWall * -1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed));
+			b2Body_SetLinearVelocity(bodyId, Level::rotateByGravity(b2Normalize({ touchingWall * 1.0f, -2.0f + abs(wallJumps / 4.0f) }) * jumpSpeed));
 		}
 		coyoteCounter = 0.0f;
 	}
