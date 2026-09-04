@@ -119,11 +119,11 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	if (texturePath != "") {
 		levelPolygon->texture = new sf::Texture(texturePath);
 		levelPolygon->texture->setSmooth(false);
-		levelPolygon->getShape()->setTexture(levelPolygon->texture);
+		levelPolygon->getConvexShape()->setTexture(levelPolygon->texture);
 	}
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
-	levelPolygon->getShape()->setFillColor(polygonColor);
+	levelPolygon->getConvexShape()->setFillColor(polygonColor);
 
 	tson::ObjectType objectType = object.getObjectType();
 	sf::Vector2f position = sf::Vector2f(
@@ -230,6 +230,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		levelPolygon->bodyId = bodyId;
 		if (object.get<bool>("dynamic")) {
 			b2Body_SetType(bodyId, b2_dynamicBody);
+			b2Body_EnableSleep(bodyId, false);
 		}
 		if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
 			platform->parse(object);
@@ -292,17 +293,29 @@ void Level::loadLevel(int levelNumber) {
 	bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
 
 	std::vector<tson::Layer>& layers = map->getLayers();
+	tson::Layer* collisionLayer = nullptr;
+	for (tson::Layer& layer : layers) {
+		float parallaxFactor = layer.getParallax().x;
+		if (parallaxFactor == 1.0f) {
+			collisionLayer = &layer;
+			break;
+		}
+	}
 	uint64_t mask = 0x80'00'00'00'00'00'00'00;
-	for (tson::Layer layer : layers) {
+	for (tson::Layer& layer : layers) {
 		float parallaxFactor = layer.getParallax().x;
 		uint64_t layerMask = mask;
 		uint64_t hitsPlayer = 0;
+		std::vector<tson::Object>& objects = layer.getObjects();
 		if (parallaxFactor == 1.0f) {
 			layerMask = LEVEL;
 			hitsPlayer = PLAYER;
 		}
-		for (int i = 0; i < layer.getObjects().size(); i++) {
-			auto& object = layer.getObjects()[i];
+		else if (parallaxFactor < 1.0f) {
+			objects.insert(objects.end(), collisionLayer->getObjects().begin(), collisionLayer->getObjects().end());
+		}
+		for (int i = 0; i < objects.size(); i++) {
+			tson::Object& object = objects[i];
 			if (object.isPoint()) {
 				tson::Vector2i spawnLocationPosition = object.getPosition();
 				spawnLocation.x = spawnLocationPosition.x;
@@ -318,22 +331,20 @@ void Level::loadLevel(int levelNumber) {
 			DrawableObject* levelPolygon = dynamic_cast<DrawableObject*>(loadedObject);
 			if (levelPolygon == nullptr) { continue; }
 			levelPolygon->parallaxFactor = parallaxFactor;
-			if (levelPolygon->getShape() == nullptr) { continue; }
-			for (int i = 0; i < levelPolygon->getShape()->getPointCount(); i++) {
-				sf::FloatRect rect = levelPolygon->getShape()->getGlobalBounds();
+			if (levelPolygon->getConvexShape() == nullptr) { continue; }
+			if (parallaxFactor < 1.0f) {
+				uint8_t shade = abs(1.0f - parallaxFactor) * 1000 + 50;
+				levelPolygon->getConvexShape()->setFillColor(levelPolygon->getConvexShape()->getFillColor() + sf::Color(shade, shade, shade, 0));
+			}
+			
+			for (int i = 0; i < levelPolygon->getConvexShape()->getPointCount(); i++) {
+				sf::FloatRect rect = levelPolygon->getConvexShape()->getGlobalBounds();
 				updateBounds(sf::Vector2f(rect.position.x, rect.position.y));
 				updateBounds(sf::Vector2f(rect.position.x + rect.size.x, rect.position.y + rect.size.y));
 			}
 		}
 		mask >>= 1;
 	}
-	////Background
-	//parseLayer("Background", BACKGROUND, BACKGROUND);
-	////Collision
-	//parseLayer("Collision", LEVEL, LEVEL | PLAYER);
-	
-	////Foreground
-	//parseLayer("Foreground", FOREGROUND, FOREGROUND);
 	for (int i = 0; i < objectList.size(); i++) {
 		objectList[i]->start();
 	}

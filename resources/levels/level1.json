@@ -64,8 +64,60 @@
                  "y":-288
                 }],
          "opacity":1,
-         "parallaxx":1.001,
-         "parallaxy":1.001,
+         "parallaxx":0.95,
+         "parallaxy":0.95,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"Background",
+         "objects":[],
+         "opacity":1,
+         "parallaxx":0.96,
+         "parallaxy":0.96,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":11,
+         "name":"Background",
+         "objects":[],
+         "opacity":1,
+         "parallaxx":0.97,
+         "parallaxy":0.97,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":12,
+         "name":"Background",
+         "objects":[],
+         "opacity":1,
+         "parallaxx":0.98,
+         "parallaxy":0.98,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":13,
+         "name":"Background",
+         "objects":[],
+         "opacity":1,
+         "parallaxx":0.99,
+         "parallaxy":0.99,
          "type":"objectgroup",
          "visible":true,
          "x":0,
@@ -446,8 +498,8 @@
                  "type":"",
                  "visible":true,
                  "width":128,
-                 "x":-512,
-                 "y":-1184
+                 "x":384,
+                 "y":-96
                 },
             
                 {
@@ -666,8 +718,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":256,
+ "nextlayerid":15,
+ "nextobjectid":267,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

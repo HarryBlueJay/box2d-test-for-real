@@ -12,8 +12,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -64,
-                "y": -256
+                "x": 84,
+                "y": 15
             }
         },
         "level1old.json": {
@@ -51,9 +51,9 @@
         },
         "level4.json": {
             "expandedObjectLayers": [
+                3,
                 6,
-                2,
-                3
+                2
             ],
             "scale": 0.5,
             "selectedLayer": 2,

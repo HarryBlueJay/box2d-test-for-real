@@ -30,7 +30,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	Casts::get().makeCircleWithBodyDef(*getConvexShape(), bodyId, playerShapeDef, Casts::get().b2Vec2_to_sfVector2f(spawnLocation), playerSize / Casts::get().scaleFactor, 0, bodyDef);
 
 	auto _ = bodyTexture.loadFromFile("resources/body.png");
-	getShape()->setTexture(&bodyTexture);
+	getConvexShape()->setTexture(&bodyTexture);
 	_ = eyeTexture.loadFromFile("resources/eye.png");
 	eye.setTexture(&eyeTexture);
 	eye.setSize(playerSize);
@@ -62,11 +62,11 @@ void Player::update(float deltaTime) {
 	if (dying) {
 		deltaTime /= deathAnimationTime;
 		sf::Vector2f shrink = sf::Vector2f(deltaTime, deltaTime);
-		sf::Vector2f center = getShape()->getGlobalBounds().getCenter();
+		sf::Vector2f center = getConvexShape()->getGlobalBounds().getCenter();
 		transform->setScale(transform->getScale() - shrink);
 		transform->move(shrink / 2.0f);
 		transform->rotate(sf::degrees(deltaTime * deathRotationSpeed));
-		sf::Vector2f newCenter = getShape()->getGlobalBounds().getCenter();
+		sf::Vector2f newCenter = getConvexShape()->getGlobalBounds().getCenter();
 		sf::Vector2f centerOffset = center - newCenter;
 		transform->move(centerOffset);
 		eye.setPosition(transform->getPosition());
@@ -234,7 +234,7 @@ void Player::inputCallback(std::optional<sf::Event> event) {
 void Player::draw(sf::RenderWindow& window) {
 	sf::Vector2f rotatedEyeOffset = eyeOffset.rotatedBy(-transform->getRotation());
 	eye.setPosition(transform->getPosition() + (rotatedEyeOffset * eye.getScale().x));
-	window.draw(*getShape());
+	window.draw(*getConvexShape());
 	window.draw(eye);
 	path.push_back({ transform->getPosition(), sf::Color::Green });
 	if (path.size() > 14400) {

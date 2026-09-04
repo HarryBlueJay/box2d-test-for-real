@@ -20,9 +20,6 @@ public:
 			transform = nullptr;
 		}
 	}
-	sf::Shape* getShape() {
-		return dynamic_cast<sf::Shape*>(transform);
-	}
 	sf::ConvexShape* getConvexShape() {
 		return dynamic_cast<sf::ConvexShape*>(transform);
 	}
