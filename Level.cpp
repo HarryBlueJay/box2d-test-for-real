@@ -186,8 +186,11 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			objectList.push_back(weld);
 		}
 		// default is exactly zero
-		if (float friction = object.get<float>("friction") > 0) {
+		if (float friction = object.get<float>("friction"); friction > 0) {
 			shapeDef.material.friction = friction;
+		}
+		if (float density = object.get<float>("density"); density > 0) {
+			shapeDef.density = density;
 		}
 		shapeDef.material.restitution = object.get<float>("restitution");
 		shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
@@ -301,6 +304,14 @@ void Level::loadLevel(int levelNumber) {
 			break;
 		}
 	}
+	std::vector<tson::Object> collisionObjects = collisionLayer->getObjects();
+	for (int i = 0; i < collisionObjects.size(); i++) {
+		if (collisionObjects[i].get<bool>("dynamic")) {
+			collisionObjects[i] = collisionObjects[collisionObjects.size() - 1];
+			collisionObjects.resize(collisionObjects.size() - 1);
+			i--;
+		}
+	}
 	uint64_t mask = 0x80'00'00'00'00'00'00'00;
 	for (tson::Layer& layer : layers) {
 		float parallaxFactor = layer.getParallax().x;
@@ -312,7 +323,7 @@ void Level::loadLevel(int levelNumber) {
 			hitsPlayer = PLAYER;
 		}
 		else if (parallaxFactor < 1.0f) {
-			objects.insert(objects.end(), collisionLayer->getObjects().begin(), collisionLayer->getObjects().end());
+			objects.insert(objects.end(), collisionObjects.begin(), collisionObjects.end());
 		}
 		for (int i = 0; i < objects.size(); i++) {
 			tson::Object& object = objects[i];

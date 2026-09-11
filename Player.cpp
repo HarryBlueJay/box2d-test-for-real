@@ -136,7 +136,6 @@ void Player::update(float deltaTime) {
 			if (touchingFloor) {
 				touchingWall /= 10;
 			}
-			std::cout << touchingWall << std::endl;
 			if (std::signbit(wallJumps) == std::signbit(touchingWall)) {
 				wallJumps += static_cast<int>(touchingWall);
 			}

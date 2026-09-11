@@ -10,10 +10,10 @@
                 2
             ],
             "scale": 0.5,
-            "selectedLayer": 0,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 84,
-                "y": 15
+                "x": 484,
+                "y": 320
             }
         },
         "level1old.json": {
@@ -31,11 +31,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 0.5,
-            "selectedLayer": 2,
+            "scale": 0.33,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 16,
-                "y": 15
+                "x": 1484.8484848484848,
+                "y": 166.66666666666674
             }
         },
         "level3.json": {
@@ -46,14 +46,14 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 16,
-                "y": 15
+                "y": 14
             }
         },
         "level4.json": {
             "expandedObjectLayers": [
-                3,
                 6,
-                2
+                2,
+                3
             ],
             "scale": 0.5,
             "selectedLayer": 2,
@@ -90,11 +90,11 @@
         "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "bool",
+    "property.type": "float",
     "recentFiles": [
+        "level2.json",
         "level4.json",
         "level3.json",
-        "level2.json",
         "level1.json",
         "testlevel.json",
         "tutorial.json",
