@@ -10,6 +10,7 @@ private:
 	float waitTime = 0.0f;
 	float waitCounter = 0.0f;
 public:
+	MovingPlatform(sf::Transformable* _transform, float _parallaxFactor, b2BodyId _bodyId): LevelPolygon(_transform, _parallaxFactor, _bodyId) {};
 	void parse(tson::Object object);
 	void update(float deltaTime) override;
 };

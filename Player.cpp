@@ -7,12 +7,11 @@ sf::Texture bodyTexture;
 sf::Texture eyeTexture;
 const b2Vec2 size = b2Vec2{ 2, 2 };
 const float radius = size.x / 2.1f;
-const float offset = size.x / 2.0f - radius;
+const float offset = (size.x / 2.0f - radius) * 2;
 const std::vector<b2Vec2> offsets = { {0, offset}, {-offset, 0}, {offset, 0} };
 
 
-Player::Player(b2Vec2 spawnLocation) {
-	transform = new sf::ConvexShape();
+Player::Player(b2Vec2 spawnLocation, b2BodyId _bodyId): BaseCollider(new sf::ConvexShape(), 1.0f, _bodyId) {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.fixedRotation = true;
@@ -37,7 +36,7 @@ Player::Player(b2Vec2 spawnLocation) {
 	eye.setOrigin(transform->getOrigin());
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
-	Casts::get().move(*transform, bodyId);
+	move();
 	dying = false;
 	eye.setFillColor(sf::Color::Black);
 
@@ -96,6 +95,7 @@ void Player::update(float deltaTime) {
 		offset = b2Normalize(offset);
 		if (b2Dot(result.normal, offset) >= 0) { continue; }
 		*touching[i] = true;
+		//(int) b2Body_GetUserData(result.bodyId)
 	}
 	if (!touchingFloor) {
 		coyoteCounter -= deltaTime;
@@ -191,7 +191,7 @@ void Player::touch(Object* otherObject) {
 			die();
 		}
 		if (levelRectangle->gravityStrength >= 0) {
-			b2Vec2 newGravity = Casts::get().sfVector2f_to_b2Vec2(sf::Vector2f(0, 1).rotatedBy(levelRectangle->transform->getRotation())) * levelRectangle->gravityStrength;
+			b2Vec2 newGravity = Casts::get().sfVector2f_to_b2Vec2(sf::Vector2f(0, 1).rotatedBy(levelRectangle->getTransformable()->getRotation())) * levelRectangle->gravityStrength;
 			b2World_SetGravity(b2Body_GetWorld(bodyId), newGravity);
 			//b2Transform newTransform = b2Body_GetTransform(bodyId);
 			//newTransform.q = b2MakeRot(levelRectangle->transform->getRotation().asRadians());

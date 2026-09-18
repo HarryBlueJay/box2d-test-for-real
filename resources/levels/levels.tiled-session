@@ -12,8 +12,8 @@
             "scale": 0.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 484,
-                "y": 320
+                "x": 420,
+                "y": 122
             }
         },
         "level1old.json": {
@@ -34,8 +34,8 @@
             "scale": 0.33,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1484.8484848484848,
-                "y": 166.66666666666674
+                "x": 15.151515151515127,
+                "y": 16.66666666666663
             }
         },
         "level3.json": {
@@ -46,7 +46,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 16,
-                "y": 14
+                "y": 15
             }
         },
         "level4.json": {

@@ -114,8 +114,6 @@ void setupPolygon(b2Polygon& dynamicBox, b2BodyId& id, b2ShapeDef shapeDef, sf::
     b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
     id = b2CreateBody(worldId, &bodyDef);
     b2CreatePolygonShape(id, &shapeDef, &dynamicBox);
-
-    Casts::get().move(box, id);
 }
 void setupBox(sf::ConvexShape& box, sf::Vector2f size) {
     box.setPointCount(4);

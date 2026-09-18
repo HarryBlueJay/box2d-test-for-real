@@ -149,6 +149,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseCollider.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Casts.cpp" />
     <ClCompile Include="DrawableObject.cpp" />

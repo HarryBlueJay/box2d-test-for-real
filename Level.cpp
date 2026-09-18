@@ -117,9 +117,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	tson::Colori objectColor = object.get<tson::Colori>("color");
 	std::string texturePath = object.get<std::string>("texture");
 	if (texturePath != "") {
-		levelPolygon->texture = new sf::Texture(texturePath);
-		levelPolygon->texture->setSmooth(false);
-		levelPolygon->getConvexShape()->setTexture(levelPolygon->texture);
+		levelPolygon->addTexture(texturePath);
 	}
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
