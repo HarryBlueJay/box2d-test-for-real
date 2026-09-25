@@ -76,7 +76,7 @@ void Camera::setTarget(sf::Transformable* newTarget) {
     update(0);
 }
 void Camera::setTarget(Player* newTarget) {
-    setTarget(newTarget->transform);
+    setTarget(newTarget->getTransformable());
     playerTarget = newTarget;
 }
 void Camera::draw(sf::RenderWindow& window) {

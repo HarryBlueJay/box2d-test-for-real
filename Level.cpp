@@ -112,8 +112,7 @@ static void updateBounds(sf::Vector2f coordinate) {
 	}
 }
 static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2BodyId& bodyId, b2ShapeDef shapeDef) {
-	tson::Vector2i objectPosition = object.getPosition();
-	float objectRotation = object.getRotation();
+
 	tson::Colori objectColor = object.get<tson::Colori>("color");
 	std::string texturePath = object.get<std::string>("texture");
 	if (texturePath != "") {
@@ -122,37 +121,7 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	sf::Color polygonColor = sf::Color::Black;
 	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
 	levelPolygon->getConvexShape()->setFillColor(polygonColor);
-
-	tson::ObjectType objectType = object.getObjectType();
-	sf::Vector2f position = sf::Vector2f(
-		objectPosition.x,
-		objectPosition.y
-	);
-	switch (objectType) {
-	case tson::ObjectType::Rectangle: {
-		tson::Vector2i objectSize = object.getSize();
-		sf::Vector2f size = sf::Vector2f(
-			objectSize.x,
-			objectSize.y
-		);
-		Casts::get().makeBox(*levelPolygon->getConvexShape(), &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
-		break;
-	}
-	case tson::ObjectType::Polygon: {
-		std::vector<tson::Vector2i> points = object.getPolygons();
-		std::vector<sf::Vector2f> sfmlPoints;
-		for (tson::Vector2i point : points) {
-			sfmlPoints.push_back(
-				sf::Vector2f(
-					Casts::get().pixelsToMeters(point.x),
-					Casts::get().pixelsToMeters(point.y)
-				)
-			);
-		}
-		Casts::get().makePolygon(*levelPolygon->getConvexShape(), &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
-		break;
-	}
-	}
+	
 	if (object.getId() >= objectIds.size()) {
 		objectIds.resize(object.getId() + 1);
 	}
@@ -174,7 +143,6 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 		else {
 			levelPolygon = new LevelPolygon;
 		}
-		levelPolygon->transform = new sf::ConvexShape();
 		unsigned int weldNumber = object.get<unsigned int>("weld");
 		if (weldNumber > 0) {
 			Weld* weld = new Weld();
@@ -206,15 +174,15 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			levelPolygon->nextLevel = object.get<int>("nextLevel");
 			if (levelPolygon->nextLevel > 0) {
 				if (levelPolygon->nextLevel == currentLevelNumber) {
-					spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->transform->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
+					spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->getTransformable()->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
 				}
 				TextObject* text = new TextObject(font);
 				text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
 				text->text.setCharacterSize(60);
 				text->text.setScale(sf::Vector2f(Casts::get().scaleFactor, Casts::get().scaleFactor));
 				//text->text.setOrigin(text->text.getLocalBounds().size * 0.5f + sf::Vector2f(0, 30));
-				text->text.setPosition(levelPolygon->transform->getPosition());
-				text->text.setRotation(levelPolygon->transform->getRotation());
+				text->text.setPosition(levelPolygon->getTransformable()->getPosition());
+				text->text.setRotation(levelPolygon->getTransformable()->getRotation());
 				text->text.setOutlineThickness(1.0f);
 				if (!levelCompletions[levelPolygon->nextLevel]) {
 					text->text.setFillColor(sf::Color::Red);

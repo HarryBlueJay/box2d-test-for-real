@@ -11,7 +11,7 @@ const float offset = (size.x / 2.0f - radius) * 2;
 const std::vector<b2Vec2> offsets = { {0, offset}, {-offset, 0}, {offset, 0} };
 
 
-Player::Player(b2Vec2 spawnLocation, b2BodyId _bodyId): BaseCollider(new sf::ConvexShape(), 1.0f, _bodyId) {
+Player::Player(b2Vec2 spawnLocation) : BaseCollider(new sf::ConvexShape(), 1.0f, b2BodyId{}) {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.fixedRotation = true;
@@ -156,7 +156,7 @@ void Player::update(float deltaTime) {
 		die();
 	}
 
-	Casts::get().move(*transform, bodyId);
+	move();
 }
 void Player::collide(Object* otherObject, b2Vec2 normal) {
 	touch(otherObject);

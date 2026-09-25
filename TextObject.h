@@ -3,11 +3,11 @@
 #include "Object.h"
 
 class TextObject : public DrawableObject {
-private:
+public:
 	//shapes//
 	sf::Text text;
-public:
-	TextObject(sf::Texture* _texture, float _parallaxFactor, sf::Font& font):
+
+	TextObject(float _parallaxFactor, sf::Font& font):
 		text(font),
-		DrawableObject(&text, _texture, _parallaxFactor) {}
+		DrawableObject(&text, _parallaxFactor) {}
 };

@@ -1,19 +1,19 @@
 {
-    "activeFile": "level1.json",
+    "activeFile": "level2.json",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "level1.json": {
             "expandedObjectLayers": [
-                6,
-                2
+                2,
+                6
             ],
             "scale": 0.5,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 420,
-                "y": 122
+                "x": 84,
+                "y": 15
             }
         },
         "level1old.json": {
@@ -31,11 +31,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 0.33,
-            "selectedLayer": 1,
+            "scale": 0.75,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 15.151515151515127,
-                "y": 16.66666666666663
+                "x": 16,
+                "y": 15.333333333333371
             }
         },
         "level3.json": {
@@ -51,9 +51,9 @@
         },
         "level4.json": {
             "expandedObjectLayers": [
-                6,
+                3,
                 2,
-                3
+                6
             ],
             "scale": 0.5,
             "selectedLayer": 2,
@@ -92,10 +92,10 @@
     "project": "levels.tiled-project",
     "property.type": "float",
     "recentFiles": [
-        "level2.json",
+        "level1.json",
         "level4.json",
         "level3.json",
-        "level1.json",
+        "level2.json",
         "testlevel.json",
         "tutorial.json",
         "level1old.json"

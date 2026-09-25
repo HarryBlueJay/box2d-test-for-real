@@ -28,5 +28,5 @@ void MovingPlatform::update(float deltaTime) {
 		waitCounter = waitTime;
 		velocity *= -1;
 	}
-	Casts::get().move(*transform, bodyId);
+	move();
 }

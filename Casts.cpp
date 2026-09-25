@@ -103,10 +103,6 @@ Casts::OverlapResult Casts::lineOverlap(b2Vec2 start, b2Vec2 end, b2QueryFilter 
     return result;
 }
 
-void Casts::move(sf::Transformable& rectangle, b2BodyId& id) {
-    rectangle.setPosition(b2Vec2_to_sfVector2f(b2Body_GetPosition(id)));
-    rectangle.setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(id))));
-}
 void setupPolygon(b2Polygon& dynamicBox, b2BodyId& id, b2ShapeDef shapeDef, sf::ConvexShape& box, sf::Vector2f position, float rotation, b2BodyDef bodyDef) {
     position = Casts::get().pixelsToMeters(position);
     bodyDef.position = Casts::get().sfVector2f_to_b2Vec2(position);
