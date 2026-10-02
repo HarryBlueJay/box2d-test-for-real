@@ -2,53 +2,67 @@
 #include "Casts.h"
 #include "tileson.hpp"
 
-void BaseCollider::setup(float _parallaxFactor, tson::ObjectType objectType, sf::Vector2f position, float objectRotation, sf::Vector2f size, std::vector<sf::Vector2f> sfmlPoints) {
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	switch (objectType) {
+void BaseCollider::setup(const SetupParameters& params) {
+	switch (params.objectType) {
 	case tson::ObjectType::Rectangle: {
-		Casts::get().makeBox(*getConvexShape(), &bodyId, shapeDef, position, size, objectRotation, b2_staticBody);
+		for (int i = 0; i < box.getPointCount(); i++) {
+			offsets[i] = sfVector2f_to_b2Vec2(box.getPoint(i));
+		}
+		Casts::get().makeBox(*getConvexShape(), &bodyId, params.shapeDef, params.position, params.size, params.objectRotation, b2_staticBody);
 		break;
 	}
 	case tson::ObjectType::Polygon: {
-		
-		Casts::get().makePolygon(*getConvexShape(), &bodyId, shapeDef, sfmlPoints, position, objectRotation, b2_staticBody);
+		Casts::get().makePolygon(*getConvexShape(), &bodyId, params.shapeDef, params.sfmlPoints, params.position, params.objectRotation, b2_staticBody);
 		break;
 	}
+	case tson::ObjectType::Point: {
+		Casts::get().makeCircleWithBodyDef(*getConvexShape(), bodyId, params.shapeDef, params.position, params.size, 0, bodyDef);
 	}
+	}
+	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef.type = b2_staticBody;
+	b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&params.sfmlPoints[0]), params.sfmlPoints.size());
+	b2Polygon polygon = b2MakePolygon(&hull, 0);
+	setupPolygon(polygon, *id, shapeDef, shape, position, rotation, bodyDef);
     move();
 }
-BaseCollider::BaseCollider(float _parallaxFactor, tson::Object object) :
+BaseCollider::BaseCollider(float _parallaxFactor, uint64_t collisionLayer, uint64_t layerMask, tson::Object object) :
 	BaseCollider(_parallaxFactor)
 	{
+	SetupParameters params;
+	params.shapeDef = b2DefaultShapeDef(); // possibly required
 	std::vector<tson::Vector2i> points = object.getPolygons();
-	std::vector<sf::Vector2f> sfmlPoints;
 	for (tson::Vector2i point : points) {
-		sfmlPoints.push_back(
+		params.sfmlPoints.push_back(
 			sf::Vector2f(
 				Casts::get().pixelsToMeters(point.x),
 				Casts::get().pixelsToMeters(point.y)
 			)
 		);
 	}
-	float objectRotation = object.getRotation();
-	tson::ObjectType objectType = object.getObjectType();
+	params.objectRotation = object.getRotation();
+	params.objectType = object.getObjectType();
 	tson::Vector2i objectPosition = object.getPosition();
-	sf::Vector2f position = sf::Vector2f(
+	params.position = sf::Vector2f(
 		objectPosition.x,
 		objectPosition.y
 	);
 	tson::Vector2i objectSize = object.getSize();
-	sf::Vector2f size = sf::Vector2f(
+	params.size = sf::Vector2f(
 		objectSize.x,
 		objectSize.y
 	);
-	setup(_parallaxFactor, objectType, position, objectRotation, size, sfmlPoints);
+	setup(params);
 }
 BaseCollider::BaseCollider(float _parallaxFactor) :
 	DrawableObject(new sf::ConvexShape(), _parallaxFactor) {}
 void BaseCollider::move() {
     transform->setPosition(Casts::get().b2Vec2_to_sfVector2f(b2Body_GetPosition(bodyId)));
     transform->setRotation(sf::radians(b2Rot_GetAngle(b2Body_GetRotation(bodyId))));
+}
+void BaseCollider::teleport(b2Vec2 position) {
+	b2Body_SetTransform(bodyId, position, b2Body_GetRotation(bodyId));
+	move();
 }
 const b2BodyId& BaseCollider::getBodyId() const {
     return bodyId;

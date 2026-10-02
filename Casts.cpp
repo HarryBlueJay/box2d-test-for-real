@@ -157,10 +157,7 @@ void Casts::makeBox(sf::ConvexShape& box, b2BodyId* id, b2ShapeDef shapeDef, sf:
     if (id) {
         b2BodyDef bodyDef = b2DefaultBodyDef();
         bodyDef.type = bodyType;
-        b2Vec2 offsets[4];
-        for (int i = 0; i < box.getPointCount(); i++) {
-            offsets[i] = sfVector2f_to_b2Vec2(box.getPoint(i));
-        }
+      
         b2Hull hull = b2ComputeHull(offsets, 4);
         b2Polygon polygon = b2MakePolygon(&hull, 0);
         setupPolygon(polygon, *id, shapeDef, box, position, rotation, bodyDef);
@@ -173,12 +170,7 @@ void Casts::makePolygon(sf::ConvexShape& shape, b2BodyId* id, b2ShapeDef shapeDe
         shape.setPoint(i, offsets[i]);
     }
     if (id) {
-        b2BodyDef bodyDef = b2DefaultBodyDef();
-        bodyDef.type = bodyType;
-        b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&offsets[0]), offsets.size());
-        //b2Polygon polygon = b2MakeOffsetPolygon(&hull, sfVector2f_to_b2Vec2(position), b2MakeRot(rotation * B2_PI / 180));
-        b2Polygon polygon = b2MakePolygon(&hull, 0);
-        setupPolygon(polygon, *id, shapeDef, shape, position, rotation, bodyDef);
+
     }
 }
 

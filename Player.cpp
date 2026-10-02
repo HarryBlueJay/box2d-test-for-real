@@ -1,6 +1,8 @@
 #include "Player.h"
 #include "Level.h"
 #include "Casts.h"
+#include "Camera.h"
+#include "tileson.hpp"
 #include "TransitionManager.h"
 #include "LevelPolygon.h"
 sf::Texture bodyTexture;
@@ -11,22 +13,25 @@ const float offset = (size.x / 2.0f - radius) * 2;
 const std::vector<b2Vec2> offsets = { {0, offset}, {-offset, 0}, {offset, 0} };
 
 
-Player::Player(b2Vec2 spawnLocation) : BaseCollider(new sf::ConvexShape(), 1.0f, b2BodyId{}) {
-	b2BodyDef bodyDef = b2DefaultBodyDef();
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.fixedRotation = true;
-
-	b2ShapeDef playerShapeDef = b2DefaultShapeDef();
-	playerShapeDef.filter.maskBits = PLAYER | LEVEL | SENSOR;
-	playerShapeDef.filter.categoryBits = PLAYER;
-	playerShapeDef.enableSensorEvents = true;
-	playerShapeDef.enableContactEvents = true;
-	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
-	playerShapeDef.density /= 4;
-	bodyIdMaterial.friction = 0.5f;
-	playerShapeDef.material = bodyIdMaterial;
+Player::Player(tson::Object object) : BaseCollider(1.0f, PLAYER, PLAYER | LEVEL | SENSOR, object) {
+	BaseCollider::SetupParameters params;
 	sf::Vector2f playerSize = Casts::get().b2Vec2_to_sfVector2f(size);
-	Casts::get().makeCircleWithBodyDef(*getConvexShape(), bodyId, playerShapeDef, Casts::get().b2Vec2_to_sfVector2f(spawnLocation), playerSize / Casts::get().scaleFactor, 0, bodyDef);
+	params.size = playerSize / Casts::get().scaleFactor;
+	//bodyDef.type = b2_dynamicBody;
+	//bodyDef.fixedRotation = true;
+
+	params.shapeDef.enableContactEvents = true;
+	params.shapeDef.enableSensorEvents = true;
+	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
+	params.shapeDef.density /= 4;
+	bodyIdMaterial.friction = 0.5f;
+	params.shapeDef.material = bodyIdMaterial;
+
+	tson::Vector2i spawnLocationPosition = object.getPosition();
+	sf::Vector2f spawnLocation = sf::Vector2f(spawnLocationPosition.x, spawnLocationPosition.y);
+
+	
+	Camera::get().setTarget(this);
 
 	auto _ = bodyTexture.loadFromFile("resources/body.png");
 	getConvexShape()->setTexture(&bodyTexture);

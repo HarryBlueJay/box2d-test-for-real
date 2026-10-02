@@ -49,7 +49,7 @@ private:
 	bool dying = false;
 public:
 
-	Player(b2Vec2 spawnLocation);
+	Player(tson::Object object);
 	void die();
 	sf::Vector2f getCameraPosition(sf::View& view);
 

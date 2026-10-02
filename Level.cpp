@@ -20,7 +20,6 @@ int currentLevelNumber = 0;
 sf::Font font = sf::Font("resources\\sansation.ttf");
 std::vector<std::string> levelList;
 std::vector<bool> levelCompletions;
-b2Vec2 spawnLocation;
 extern std::vector<Object*> objectList;
 std::vector<b2BodyId> objectIds;
 sf::Vector2f topLeft;
@@ -174,7 +173,7 @@ static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layer
 			levelPolygon->nextLevel = object.get<int>("nextLevel");
 			if (levelPolygon->nextLevel > 0) {
 				if (levelPolygon->nextLevel == currentLevelNumber) {
-					spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->getTransformable()->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
+					//spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->getTransformable()->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
 				}
 				TextObject* text = new TextObject(font);
 				text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
@@ -294,11 +293,7 @@ void Level::loadLevel(int levelNumber) {
 		for (int i = 0; i < objects.size(); i++) {
 			tson::Object& object = objects[i];
 			if (object.isPoint()) {
-				tson::Vector2i spawnLocationPosition = object.getPosition();
-				spawnLocation.x = spawnLocationPosition.x;
-				spawnLocation.y = spawnLocationPosition.y;
-				Player* player = new Player(spawnLocation);
-				Camera::get().setTarget(player);
+				Player* player = new Player(object);
 				objectList.push_back(player);
 				b2Body_SetUserData(player->bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 				continue;
