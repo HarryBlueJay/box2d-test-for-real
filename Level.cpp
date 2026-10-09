@@ -127,28 +127,30 @@ static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2Bo
 	objectIds[object.getId()] = bodyId;
 	objectList.push_back(levelPolygon);
 }
-static Object* loadObject(tson::Object& object, b2BodyId& bodyId, uint64_t layerMask, uint64_t hitsPlayer) {
+static Object* loadObject(tson::Object& object, float parallaxFactor, uint64_t layerMask, uint64_t hitsPlayer) {
 	tson::ObjectType objectType = object.getObjectType();
 	switch (objectType) {
 	case tson::ObjectType::Rectangle:
 	case tson::ObjectType::Polygon: {
 		LevelPolygon* levelPolygon = nullptr;
-		b2ShapeDef shapeDef = b2DefaultShapeDef();
-		shapeDef.filter.categoryBits = layerMask;
-		shapeDef.filter.maskBits = layerMask | hitsPlayer;
+		// I wanted it to be below, and now it's split in half
+		unsigned int weldNumber = object.get<unsigned int>("weld");
+		uint64_t maskBits = layerMask | hitsPlayer;
+		Weld* weld = nullptr;
+		if (weldNumber > 0) {
+			weld = new Weld();
+			weld->objectB = weldNumber;
+			maskBits = hitsPlayer;
+			objectList.push_back(weld);
+		}
 		if (object.get<float>("moveSpeed") != 0 || object.get<float>("spinSpeed") != 0) {
-			levelPolygon = new MovingPlatform;
+			levelPolygon = new MovingPlatform(parallaxFactor, layerMask, maskBits, object);
 		}
 		else {
-			levelPolygon = new LevelPolygon;
+			levelPolygon = new LevelPolygon(parallaxFactor, layerMask, maskBits, object);
 		}
-		unsigned int weldNumber = object.get<unsigned int>("weld");
-		if (weldNumber > 0) {
-			Weld* weld = new Weld();
+		if (weld) {
 			weld->objectA = levelPolygon;
-			weld->objectB = weldNumber;
-			shapeDef.filter.maskBits = hitsPlayer;
-			objectList.push_back(weld);
 		}
 		// default is exactly zero
 		if (float friction = object.get<float>("friction"); friction > 0) {
@@ -292,17 +294,16 @@ void Level::loadLevel(int levelNumber) {
 		}
 		for (int i = 0; i < objects.size(); i++) {
 			tson::Object& object = objects[i];
-			if (object.isPoint()) {
+			if (object.getClassType() == "Player") {
 				Player* player = new Player(object);
 				objectList.push_back(player);
 				b2Body_SetUserData(player->bodyId, reinterpret_cast<void*>(objectList.size() - 1));
 				continue;
 			}
 			b2BodyId bodyId;
-			Object* loadedObject = loadObject(object, bodyId, layerMask, hitsPlayer);
+			Object* loadedObject = loadObject(object, parallaxFactor, layerMask, hitsPlayer);
 			DrawableObject* levelPolygon = dynamic_cast<DrawableObject*>(loadedObject);
 			if (levelPolygon == nullptr) { continue; }
-			levelPolygon->parallaxFactor = parallaxFactor;
 			if (levelPolygon->getConvexShape() == nullptr) { continue; }
 			if (parallaxFactor < 1.0f) {
 				uint8_t shade = abs(1.0f - parallaxFactor) * 1000 + 50;

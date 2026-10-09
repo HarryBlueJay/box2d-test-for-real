@@ -21,6 +21,35 @@
                 "DOOR"
             ],
             "valuesAsFlags": false
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 2,
+            "members": [
+                {
+                    "name": "density",
+                    "type": "float",
+                    "value": 0.25
+                },
+                {
+                    "name": "friction",
+                    "type": "float",
+                    "value": 0.5
+                },
+                {
+                    "name": "radius",
+                    "type": "float",
+                    "value": 2
+                }
+            ],
+            "name": "Player",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "project"
+            ]
         }
     ]
 }
