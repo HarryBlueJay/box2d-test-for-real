@@ -2,6 +2,7 @@
 #include "Casts.h"
 #include "BaseCollider.h"
 #include "Level.h"
+#include "CollisionGroup.h"
 extern b2WorldId worldId;
 bool showCasts = true;
 
@@ -45,7 +46,7 @@ Casts::CastResult Casts::circlecast(b2Vec2 point, float radius, b2Vec2 offset) {
     b2Vec2 points[1] = { point };
     b2ShapeProxy p = b2MakeProxy(points, 1, radius);
     b2QueryFilter filter = b2DefaultQueryFilter();
-    filter.maskBits = CollisionGroup::LEVEL;
+    filter.maskBits = LEVEL;
     b2World_CastShape(worldId, &p, offset, filter, CastCallback, &context);
 
     if (showCasts && context.hit) {

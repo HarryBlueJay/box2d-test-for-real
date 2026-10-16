@@ -7,7 +7,7 @@ namespace tson {
 };
 class LevelPolygon : public BaseCollider {
 public:
-	using BaseCollider::BaseCollider;
+	LevelPolygon(float _parallaxFactor, uint64_t collisionLayer, uint64_t layerMask, tson::Object object);
 	tson::ObjectType objectType;
 	int nextLevel;
 	bool isKillbrick;

@@ -1067,7 +1067,7 @@
         {
          "draworder":"topdown",
          "id":3,
-         "name":"SpawnLocation",
+         "name":"Objects",
          "objects":[
                 {
                  "height":0,
@@ -1076,11 +1076,11 @@
                  "opacity":1,
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"Player",
                  "visible":true,
                  "width":0,
-                 "x":80,
-                 "y":-240
+                 "x":64,
+                 "y":-256
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1252,7 +1252,7 @@
          "y":0
         }],
  "nextlayerid":15,
- "nextobjectid":299,
+ "nextobjectid":300,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",

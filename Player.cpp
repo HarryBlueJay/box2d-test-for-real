@@ -5,31 +5,16 @@
 #include "tileson.hpp"
 #include "TransitionManager.h"
 #include "LevelPolygon.h"
+#include "CollisionGroup.h"
 sf::Texture bodyTexture;
 sf::Texture eyeTexture;
-const b2Vec2 size = b2Vec2{ 2, 2 };
-const float radius = size.x / 2.1f;
-const float offset = (size.x / 2.0f - radius) * 2;
-const std::vector<b2Vec2> offsets = { {0, offset}, {-offset, 0}, {offset, 0} };
+const std::vector<b2Vec2> offsets = { {0, 1}, {-1, 0}, {1, 0} };
 
 
 Player::Player(tson::Object object) : BaseCollider(1.0f, PLAYER, PLAYER | LEVEL | SENSOR, object) {
-	BaseCollider::SetupParameters params;
-	sf::Vector2f playerSize = Casts::get().b2Vec2_to_sfVector2f(size);
-	params.size = playerSize / Casts::get().scaleFactor;
-	//bodyDef.type = b2_dynamicBody;
-	//bodyDef.fixedRotation = true;
-
-	params.shapeDef.enableContactEvents = true;
-	params.shapeDef.enableSensorEvents = true;
-	b2SurfaceMaterial bodyIdMaterial = b2DefaultSurfaceMaterial();
-	params.shapeDef.density /= 4;
-	bodyIdMaterial.friction = 0.5f;
-	params.shapeDef.material = bodyIdMaterial;
-
+	radius = object.get<float>("radius");
 	tson::Vector2i spawnLocationPosition = object.getPosition();
 	sf::Vector2f spawnLocation = sf::Vector2f(spawnLocationPosition.x, spawnLocationPosition.y);
-
 	
 	Camera::get().setTarget(this);
 
@@ -37,7 +22,7 @@ Player::Player(tson::Object object) : BaseCollider(1.0f, PLAYER, PLAYER | LEVEL 
 	getConvexShape()->setTexture(&bodyTexture);
 	_ = eyeTexture.loadFromFile("resources/eye.png");
 	eye.setTexture(&eyeTexture);
-	eye.setSize(playerSize);
+	eye.setSize(sf::Vector2f(radius, radius));
 	eye.setOrigin(transform->getOrigin());
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));
@@ -94,7 +79,7 @@ void Player::update(float deltaTime) {
 	std::vector<bool*> touching = { &touchingFloor, &touchingLeft, &touchingRight };
 	for (int i = 0; i < offsets.size(); i++) {
 		//if (b2Dot(offsets[i], linearVelocity) <= 0) { continue; }
-		b2Vec2 offset = Level::rotateByGravity(offsets[i]);
+		b2Vec2 offset = Level::rotateByGravity(offsets[i] * radius * 1.001f);
 		Casts::CastResult result = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), radius, offset);
 		if (!result.hit) { continue; }
 		offset = b2Normalize(offset);

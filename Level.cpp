@@ -13,6 +13,7 @@
 #include "LevelPolygon.h"
 #include "TextObject.h"
 #include "Weld.h"
+#include "CollisionGroup.h"
 extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 extern sf::RenderWindow window;
@@ -110,22 +111,13 @@ static void updateBounds(sf::Vector2f coordinate) {
 		bottomRight.y = coordinate.y;
 	}
 }
-static void loadPolygon(tson::Object& object, DrawableObject* levelPolygon, b2BodyId& bodyId, b2ShapeDef shapeDef) {
-
-	tson::Colori objectColor = object.get<tson::Colori>("color");
-	std::string texturePath = object.get<std::string>("texture");
-	if (texturePath != "") {
-		levelPolygon->addTexture(texturePath);
-	}
-	sf::Color polygonColor = sf::Color::Black;
-	polygonColor = sf::Color(objectColor.r, objectColor.g, objectColor.b, objectColor.a);
-	levelPolygon->getConvexShape()->setFillColor(polygonColor);
-	
+static void storeObject(tson::Object& object, BaseCollider* levelPolygon) {
 	if (object.getId() >= objectIds.size()) {
 		objectIds.resize(object.getId() + 1);
 	}
-	objectIds[object.getId()] = bodyId;
+	objectIds[object.getId()] = levelPolygon->getBodyId();
 	objectList.push_back(levelPolygon);
+	b2Body_SetUserData(levelPolygon->getBodyId(), reinterpret_cast<void*>(objectList.size() - 1));
 }
 static Object* loadObject(tson::Object& object, float parallaxFactor, uint64_t layerMask, uint64_t hitsPlayer) {
 	tson::ObjectType objectType = object.getObjectType();
@@ -152,32 +144,14 @@ static Object* loadObject(tson::Object& object, float parallaxFactor, uint64_t l
 		if (weld) {
 			weld->objectA = levelPolygon;
 		}
-		// default is exactly zero
-		if (float friction = object.get<float>("friction"); friction > 0) {
-			shapeDef.material.friction = friction;
-		}
-		if (float density = object.get<float>("density"); density > 0) {
-			shapeDef.density = density;
-		}
-		shapeDef.material.restitution = object.get<float>("restitution");
-		shapeDef.material.tangentSpeed = object.get<float>("tangentSpeed");
-		if (object.get<bool>("sensor")) {
-			shapeDef.isSensor = true;
-			shapeDef.filter.categoryBits = SENSOR;
-			shapeDef.enableSensorEvents = true;
-		}
-		else {
-			shapeDef.enableContactEvents = true;
-		}
-		loadPolygon(object, levelPolygon, bodyId, shapeDef);
-		b2Body_SetUserData(bodyId, reinterpret_cast<void*>(objectList.size() - 1));
+		storeObject(object, levelPolygon);
 		if (object.getProperties().hasProperty("nextLevel")) {
 			levelPolygon->nextLevel = object.get<int>("nextLevel");
 			if (levelPolygon->nextLevel > 0) {
 				if (levelPolygon->nextLevel == currentLevelNumber) {
 					//spawnLocation = Casts::get().sfVector2f_to_b2Vec2((levelPolygon->getTransformable()->getPosition() / Casts::get().scaleFactor) + sf::Vector2f(96, 192));
 				}
-				TextObject* text = new TextObject(font);
+				TextObject* text = new TextObject(parallaxFactor, font);
 				text->text.setString(" " + std::to_string(levelPolygon->nextLevel));
 				text->text.setCharacterSize(60);
 				text->text.setScale(sf::Vector2f(Casts::get().scaleFactor, Casts::get().scaleFactor));
@@ -194,21 +168,13 @@ static Object* loadObject(tson::Object& object, float parallaxFactor, uint64_t l
 		else {
 			levelPolygon->nextLevel = -1;
 		}
-		levelPolygon->isKillbrick = object.get<bool>("isKillbrick");
-		levelPolygon->gravityStrength = object.getProperties().hasProperty("gravityStrength") ? object.get<float>("gravityStrength") : -1;
-
-		levelPolygon->bodyId = bodyId;
-		if (object.get<bool>("dynamic")) {
-			b2Body_SetType(bodyId, b2_dynamicBody);
-			b2Body_EnableSleep(bodyId, false);
-		}
 		if (MovingPlatform* platform = dynamic_cast<MovingPlatform*>(levelPolygon)) {
 			platform->parse(object);
 		}
 		return levelPolygon;
 	}
 	case tson::ObjectType::Text: {		
-		TextObject* textObject = new TextObject(font);
+		TextObject* textObject = new TextObject(parallaxFactor, font);
 		tson::Text text = object.getText();
 		//textObject->text.setFont(font);
 		textObject->text.setString(text.text);
@@ -296,11 +262,9 @@ void Level::loadLevel(int levelNumber) {
 			tson::Object& object = objects[i];
 			if (object.getClassType() == "Player") {
 				Player* player = new Player(object);
-				objectList.push_back(player);
-				b2Body_SetUserData(player->bodyId, reinterpret_cast<void*>(objectList.size() - 1));
+				storeObject(object, player);
 				continue;
 			}
-			b2BodyId bodyId;
 			Object* loadedObject = loadObject(object, parallaxFactor, layerMask, hitsPlayer);
 			DrawableObject* levelPolygon = dynamic_cast<DrawableObject*>(loadedObject);
 			if (levelPolygon == nullptr) { continue; }

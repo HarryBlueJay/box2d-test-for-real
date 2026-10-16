@@ -11,18 +11,6 @@
     ],
     "propertyTypes": [
         {
-            "id": 1,
-            "name": "RectangleType",
-            "storageType": "int",
-            "type": "enum",
-            "values": [
-                "NORMAL",
-                "KILLBRICK",
-                "DOOR"
-            ],
-            "valuesAsFlags": false
-        },
-        {
             "color": "#ffa0a0a4",
             "drawFill": true,
             "id": 2,
@@ -33,6 +21,11 @@
                     "value": 0.25
                 },
                 {
+                    "name": "dynamic",
+                    "type": "bool",
+                    "value": true
+                },
+                {
                     "name": "friction",
                     "type": "float",
                     "value": 0.5
@@ -40,7 +33,12 @@
                 {
                     "name": "radius",
                     "type": "float",
-                    "value": 2
+                    "value": 1
+                },
+                {
+                    "name": "trigger",
+                    "type": "bool",
+                    "value": true
                 }
             ],
             "name": "Player",
@@ -50,6 +48,18 @@
                 "object",
                 "project"
             ]
+        },
+        {
+            "id": 1,
+            "name": "RectangleType",
+            "storageType": "int",
+            "type": "enum",
+            "values": [
+                "NORMAL",
+                "KILLBRICK",
+                "DOOR"
+            ],
+            "valuesAsFlags": false
         }
     ]
 }
