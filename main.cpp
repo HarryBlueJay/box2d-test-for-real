@@ -18,7 +18,9 @@ int main()
 {
     worldDef = b2DefaultWorldDef();
     worldDef.gravity = b2Vec2{ 0.0f, 40.0f };
-    Level::loadLevelList();
+    if (!Level::setupLevels()) {
+        return 1;
+    }
     Level::loadLevel(0);
 
     ShowWindow(window.getNativeHandle(),SW_MAXIMIZE);

@@ -15,6 +15,8 @@ BaseCollider::BaseCollider(float _parallaxFactor, uint64_t collisionLayer, uint6
 	DrawableObject(new sf::ConvexShape(), _parallaxFactor)
 	{
 	b2ShapeDef shapeDef = b2DefaultShapeDef(); // possibly required
+	shapeDef.filter.categoryBits = collisionLayer;
+	shapeDef.filter.maskBits = layerMask;
 
 	// Properties
 	if (object.getProperties().hasProperty("friction")) {
@@ -80,7 +82,7 @@ BaseCollider::BaseCollider(float _parallaxFactor, uint64_t collisionLayer, uint6
 		bodyDef.fixedRotation = true; // Maybe change it in the future
 		float b2Radius = radius / Casts::get().scaleFactor;
 		position.x -= radius;
-		const float edgeSize = 0.01f;
+		const float edgeSize = 0.1f;
 		setupBox(sf::Vector2f(radius * 2.0f, radius * 2.0f));
 		for (int i = 0; i < 4; i++) {
 			b2Points.push_back({ radius, radius });
@@ -97,6 +99,7 @@ BaseCollider::BaseCollider(float _parallaxFactor, uint64_t collisionLayer, uint6
 				b2Points[i].y -= edgeSize;
 			}
 		}
+		radius -= edgeSize;
 	}
 	}
 	b2Hull hull = b2ComputeHull(reinterpret_cast<const b2Vec2*>(&b2Points[0]), b2Points.size());

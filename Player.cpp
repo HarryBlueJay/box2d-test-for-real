@@ -18,11 +18,9 @@ Player::Player(tson::Object object) : BaseCollider(1.0f, PLAYER, PLAYER | LEVEL 
 	
 	Camera::get().setTarget(this);
 
-	auto _ = bodyTexture.loadFromFile("resources/body.png");
-	getConvexShape()->setTexture(&bodyTexture);
-	_ = eyeTexture.loadFromFile("resources/eye.png");
+	auto _ = eyeTexture.loadFromFile("resources/eye.png");
 	eye.setTexture(&eyeTexture);
-	eye.setSize(sf::Vector2f(radius, radius));
+	eye.setSize(sf::Vector2f(radius * 2, radius * 2));
 	eye.setOrigin(transform->getOrigin());
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	//b2Body_SetTransform(bodyId, spawnLocation, b2Body_GetRotation(bodyId));

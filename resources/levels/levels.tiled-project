@@ -16,6 +16,11 @@
             "id": 2,
             "members": [
                 {
+                    "name": "color",
+                    "type": "color",
+                    "value": "#ffffffff"
+                },
+                {
                     "name": "density",
                     "type": "float",
                     "value": 0.25
@@ -34,6 +39,11 @@
                     "name": "radius",
                     "type": "float",
                     "value": 1
+                },
+                {
+                    "name": "texture",
+                    "type": "string",
+                    "value": "resources/body.png"
                 },
                 {
                     "name": "trigger",

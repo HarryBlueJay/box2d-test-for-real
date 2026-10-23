@@ -18,13 +18,18 @@ extern b2WorldId worldId;
 extern b2WorldDef worldDef;
 extern sf::RenderWindow window;
 int currentLevelNumber = 0;
+
 sf::Font font = sf::Font("resources\\sansation.ttf");
 std::vector<std::string> levelList;
 std::vector<bool> levelCompletions;
+tson::Project project;
+
 extern std::vector<Object*> objectList;
 std::vector<b2BodyId> objectIds;
+
 sf::Vector2f topLeft;
 sf::Vector2f bottomRight;
+
 sf::Vector2f Level::getTopLeft() {
 	return topLeft;
 }
@@ -59,7 +64,12 @@ sf::Color Level::tiledHexToSfColor(std::string color) {
 int Level::getCurrentLevel() {
 	return currentLevelNumber;
 }
-void Level::loadLevelList() {
+bool Level::setupLevels() {
+	// Setup tileson
+	if (!project.parse("resources\\levels\\levels.tiled-project")) {
+		std::cout << "Failed to parse project" << std::endl;
+		return false;
+	}
 	std::ifstream levelListJSON("resources\\levels\\levels.json");
 	nlohmann::json data = nlohmann::json::parse(levelListJSON);
 	levelListJSON.close();
@@ -82,6 +92,7 @@ void Level::loadLevelList() {
 		}
 		completedLevelList.close();
 	}
+	return true;
 }
 void Level::completeCurrentLevel() {
 	levelCompletions[currentLevelNumber] = true;
@@ -209,7 +220,7 @@ static Object* loadObject(tson::Object& object, float parallaxFactor, uint64_t l
 	return nullptr;
 }
 void Level::loadLevel(int levelNumber) {
-	tson::Tileson t;
+	tson::Tileson t{&project};
 	std::unique_ptr<tson::Map> map = t.parse("resources\\levels\\" + levelList[levelNumber]);
 	if (map->getStatus() != tson::ParseStatus::OK) {
 		std::cout << "Failed to parse" << std::endl;
@@ -260,10 +271,22 @@ void Level::loadLevel(int levelNumber) {
 		}
 		for (int i = 0; i < objects.size(); i++) {
 			tson::Object& object = objects[i];
-			if (object.getClassType() == "Player") {
-				Player* player = new Player(object);
-				storeObject(object, player);
-				continue;
+			tson::TiledClass* objectClass = object.getClass();
+			if (objectClass) {
+				// Thanks, tileson
+				// Sets the property to what it should be if it's not overridden.
+				tson::PropertyCollection properties = objectClass->getMembers();
+				for (tson::Property* property : properties.get()) {
+					// Value is overriden, do nothing
+					if (object.getProperties().hasProperty(property->getName())) { continue; }
+					object.getProperties().setProperty(property->getName(), *property);
+				}
+
+				if (objectClass->getName() == "Player") {
+					Player* player = new Player(object);
+					storeObject(object, player);
+					continue;
+				}
 			}
 			Object* loadedObject = loadObject(object, parallaxFactor, layerMask, hitsPlayer);
 			DrawableObject* levelPolygon = dynamic_cast<DrawableObject*>(loadedObject);

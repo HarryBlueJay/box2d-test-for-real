@@ -8,7 +8,7 @@ namespace Level {
 	b2Vec2 unrotateByGravity(const b2Vec2& vector);
 	sf::Color tiledHexToSfColor(std::string color);
 	void loadLevel(int levelNumber);
-	void loadLevelList();
+	bool setupLevels();
 	void completeCurrentLevel();
 	int getCurrentLevel();
 }

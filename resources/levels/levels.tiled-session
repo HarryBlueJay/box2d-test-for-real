@@ -1,5 +1,5 @@
 {
-    "activeFile": "level2.json",
+    "activeFile": "level1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -10,7 +10,7 @@
                 2
             ],
             "scale": 0.5,
-            "selectedLayer": 5,
+            "selectedLayer": 7,
             "viewCenter": {
                 "x": 84,
                 "y": 15
@@ -34,8 +34,8 @@
             "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 772.7272727272726,
-                "y": 827.2727272727271
+                "x": 15.151515151515127,
+                "y": 16.66666666666663
             }
         },
         "level3.json": {
@@ -90,12 +90,12 @@
         "level4.json"
     ],
     "project": "levels.tiled-project",
-    "property.type": "bool",
+    "property.type": "color",
     "recentFiles": [
-        "level1.json",
         "level4.json",
         "level3.json",
         "level2.json",
+        "level1.json",
         "testlevel.json",
         "tutorial.json",
         "level1old.json"
