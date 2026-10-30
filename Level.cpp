@@ -240,14 +240,7 @@ void Level::loadLevel(int levelNumber) {
 	bottomRight = sf::Vector2f(FLT_MIN, FLT_MIN);
 
 	std::vector<tson::Layer>& layers = map->getLayers();
-	tson::Layer* collisionLayer = nullptr;
-	for (tson::Layer& layer : layers) {
-		float parallaxFactor = layer.getParallax().x;
-		if (parallaxFactor == 1.0f) {
-			collisionLayer = &layer;
-			break;
-		}
-	}
+	tson::Layer* collisionLayer = map->getLayer("Collision");
 	std::vector<tson::Object> collisionObjects = collisionLayer->getObjects();
 	for (int i = 0; i < collisionObjects.size(); i++) {
 		if (collisionObjects[i].get<bool>("dynamic")) {
@@ -281,6 +274,11 @@ void Level::loadLevel(int levelNumber) {
 					if (object.getProperties().hasProperty(property->getName())) { continue; }
 					object.getProperties().setProperty(property->getName(), *property);
 				}
+
+				// Guess what I just found!
+				// Edit -> Preferences -> General -> Export Options -> Resolve object types and properties
+				// It was all for NOTHING! WOO
+				// Disregard the disregardment, it only works IF AND ONLY IF you export. Not if you only save. Thanks tiled.
 
 				if (objectClass->getName() == "Player") {
 					Player* player = new Player(object);

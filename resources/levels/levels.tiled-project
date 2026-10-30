@@ -13,6 +13,94 @@
         {
             "color": "#ffa0a0a4",
             "drawFill": true,
+            "id": 3,
+            "members": [
+                {
+                    "name": "color",
+                    "type": "color",
+                    "value": "#ff000000"
+                },
+                {
+                    "name": "density",
+                    "type": "float",
+                    "value": 1
+                },
+                {
+                    "name": "dynamic",
+                    "type": "bool",
+                    "value": false
+                },
+                {
+                    "name": "friction",
+                    "type": "float",
+                    "value": 0.6
+                },
+                {
+                    "name": "radius",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "restitution",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "sensor",
+                    "type": "bool",
+                    "value": false
+                },
+                {
+                    "name": "tangentSpeed",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "texture",
+                    "type": "string",
+                    "value": ""
+                },
+                {
+                    "name": "trigger",
+                    "type": "bool",
+                    "value": false
+                }
+            ],
+            "name": "BaseCollider",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 5,
+            "members": [
+                {
+                    "name": "gravityStrength",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "isKillbrick",
+                    "type": "bool",
+                    "value": false
+                }
+            ],
+            "name": "LevelPolygon",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
             "id": 2,
             "members": [
                 {

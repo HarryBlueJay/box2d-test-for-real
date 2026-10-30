@@ -2,15 +2,12 @@
 
 DrawableObject::DrawableObject(sf::Transformable* _transform, float _parallaxFactor) :
 	transform(_transform),
-	parallaxFactor(_parallaxFactor) {}
+	parallaxFactor(_parallaxFactor),
+	texture(nullptr) {}
 DrawableObject::~DrawableObject() {
 	if (texture) {
 		delete texture;
 		texture = nullptr;
-	}
-	if (transform) {
-		delete transform;
-		transform = nullptr;
 	}
 }
 void DrawableObject::draw(sf::RenderWindow& window) {

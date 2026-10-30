@@ -69,6 +69,11 @@ void Camera::update(float deltaTime) {
     }
     view.setCenter(start);
 }
+void Camera::removeTarget() {
+    playerTarget = nullptr;
+    target = nullptr;
+}
+// Do not call these with a null pointer. YOU WILL FACE THE CONSEQUENCES.
 void Camera::setTarget(sf::Transformable* newTarget) {
     playerTarget = nullptr;
     target = newTarget;
@@ -76,8 +81,10 @@ void Camera::setTarget(sf::Transformable* newTarget) {
     update(0);
 }
 void Camera::setTarget(Player* newTarget) {
-    setTarget(newTarget->getTransformable());
+    target = newTarget->getTransformable();
     playerTarget = newTarget;
+    view.setCenter(playerTarget->getCameraPosition(view));
+    update(0);
 }
 void Camera::draw(sf::RenderWindow& window) {
     sf::Vector2u windowSize = window.getSize();

@@ -4,6 +4,8 @@
 class Object
 {
 public:
+	virtual ~Object() {}
+
 	virtual void start() {}
 
 	virtual void update(float deltaTime) {}

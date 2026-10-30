@@ -197,6 +197,8 @@
          "name":"Background",
          "objects":[],
          "opacity":1,
+         "parallaxx":1.001,
+         "parallaxy":1.001,
          "type":"objectgroup",
          "visible":true,
          "x":0,
@@ -248,12 +250,12 @@
         {
          "draworder":"topdown",
          "id":3,
-         "name":"SpawnLocation",
+         "name":"Objects",
          "objects":[
                 {
                  "height":0,
                  "id":8,
-                 "name":"",
+                 "name":"SpawnLocation",
                  "opacity":1,
                  "point":true,
                  "rotation":0,
@@ -284,7 +286,7 @@
  "nextobjectid":197,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.12.1",
+ "tiledversion":"1.12.2",
  "tileheight":32,
  "tilesets":[],
  "tilewidth":32,

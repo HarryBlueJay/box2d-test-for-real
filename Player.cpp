@@ -31,6 +31,11 @@ Player::Player(tson::Object object) : BaseCollider(1.0f, PLAYER, PLAYER | LEVEL 
 	gravityPath[0].color = sf::Color::Red;
 	gravityPath[1].color = sf::Color::Red;
 }
+
+Player::~Player() {
+	Camera::get().removeTarget();
+}
+
 void Player::die() {
 	b2Body_SetLinearVelocity(bodyId, { 0,0 });
 	dying = true;
@@ -77,7 +82,7 @@ void Player::update(float deltaTime) {
 	std::vector<bool*> touching = { &touchingFloor, &touchingLeft, &touchingRight };
 	for (int i = 0; i < offsets.size(); i++) {
 		//if (b2Dot(offsets[i], linearVelocity) <= 0) { continue; }
-		b2Vec2 offset = Level::rotateByGravity(offsets[i] * radius * 1.001f);
+		b2Vec2 offset = Level::rotateByGravity(offsets[i] * 0.1f);
 		Casts::CastResult result = Casts::get().circlecast(b2Body_GetWorldCenterOfMass(bodyId), radius, offset);
 		if (!result.hit) { continue; }
 		offset = b2Normalize(offset);

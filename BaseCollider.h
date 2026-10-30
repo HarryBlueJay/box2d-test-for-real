@@ -10,6 +10,7 @@ class BaseCollider : public DrawableObject {
 protected:
 	//shapes//
 	b2BodyId bodyId;
+	sf::ConvexShape convexShape;
 private:
 	void setupBox(sf::Vector2f size);
 	BaseCollider();

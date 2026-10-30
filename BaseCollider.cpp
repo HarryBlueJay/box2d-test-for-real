@@ -12,7 +12,7 @@ void BaseCollider::setupBox(sf::Vector2f size) {
 	getConvexShape()->setPoint(3, sf::Vector2f(0, size.y));
 }
 BaseCollider::BaseCollider(float _parallaxFactor, uint64_t collisionLayer, uint64_t layerMask, tson::Object object) :
-	DrawableObject(new sf::ConvexShape(), _parallaxFactor)
+	DrawableObject(&convexShape, _parallaxFactor)
 	{
 	b2ShapeDef shapeDef = b2DefaultShapeDef(); // possibly required
 	shapeDef.filter.categoryBits = collisionLayer;

@@ -50,6 +50,7 @@ private:
 public:
 
 	Player(tson::Object object);
+	~Player();
 	void die();
 	sf::Vector2f getCameraPosition(sf::View& view);
 
